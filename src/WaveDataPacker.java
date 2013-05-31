@@ -14,7 +14,7 @@ public class WaveDataPacker implements IWaveObserver {
 	@Override
 	public void process(double startTime, double endTime, double[] values) {
 		int upto = (int)Math.round(values.length * this.upto);
-		int neigh = (int)Math.round(values.length * this.neigh);
+		int neigh = Math.max(1, (int)Math.round(values.length * this.neigh));
 		
 		double[] nextData = new double[upto / neigh];
 		for (int i = neigh / 2; i < upto - neigh / 2; i += neigh)

@@ -82,7 +82,7 @@ public class TextToSpeechByLengthAligner {
         matching[matching.length - 1] = sentences.length - 1;
         for (int i = speechTimes.size() - 2; i >= 0; --i)
         	matching[i] = matchingIndexes[i + 1][matching[i + 1]];
-
+        
         AudioLabel[] labels = new AudioLabel[matching.length];
 		int lastMatching = 0;
 		for (int i = 0; i < matching.length; ++i) {

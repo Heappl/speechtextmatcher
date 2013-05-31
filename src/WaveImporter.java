@@ -36,7 +36,6 @@ public class WaveImporter
 		AudioFileDataSource audioSource = (AudioFileDataSource)cm.lookup("audioFileDataSource");
 		File sourceFile = new File(this.waveFilePath);
 		audioSource.setAudioFile(sourceFile, null);
-		frontend.initialize();
 		
 		Data data = null;
 		while ((data = frontend.getData()) != null) {

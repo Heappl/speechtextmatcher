@@ -70,7 +70,7 @@ public class OfflineSpeechRecognizer implements IWaveObserver {
 	    {
 	    	if ((start >= 0) && !isSpeech[i])
 	    	{
-	    		out.add(new Speech(allData.get(start).startTime, allData.get(i - 1).endTime));
+	    		out.add(new Speech(allData.get(start).startTime, allData.get(i).startTime));
 	    		start = -1;
 	    	}
 	    	if ((start < 0) && isSpeech[i])
