@@ -223,7 +223,7 @@ public class Main {
         
         double wholeTime = 0;
         for (Speech elem : speechTimes) wholeTime += elem.end - elem.start;
-        text = text.replaceAll("\n *\n", ".").replaceAll("[\\s\n]+", " ");
+        text = text.replaceAll("\n\\s*\n", ".").replaceAll("[\\s]+", " ");
         SortedSet<Character> chars = new TreeSet<Character>();
         for (int i = 0; i < text.length(); ++i)
         	if (Character.isLetterOrDigit(text.charAt(i)))
@@ -231,8 +231,8 @@ public class Main {
         String charRegex = "";
         for (Character c : chars) charRegex += c;
         System.err.println("chars " + charRegex);
-        String[] sentences = text.split(" *[^" + charRegex + "'\\s]+ *");
-        String[] words = text.split("[^" + charRegex + "' ]+");
+        String[] sentences = text.split("\\s*[^" + charRegex + "'\\s]+\\s*");
+        String[] words = text.split("[^" + charRegex + "']+");
         int totalChars = 0;
         for (String word : words) totalChars += word.length();
         System.err.println("sentences: " + sentences.length);
@@ -371,7 +371,7 @@ public class Main {
 				double end = speechTimes.get(i).end;
 				String label = "";
 				if (matching[i] >= sentences.length) break;
-				for (int j = lastMatching; j <= matching[i]; ++j) label += " " + sentences[j];
+				for (int j = lastMatching; j <= matching[i]; ++j) label += ". " + sentences[j];
 				output.write(startx + " " + end + " " + label + "\n");
 				output.flush();
 				lastMatching = matching[i] + 1;
