@@ -47,7 +47,8 @@ public class Main {
 
 		// start the microphone or exit if the programm if this is not possible
 		AudioFileDataSource fileSource = (AudioFileDataSource) cm.lookup("audioFileDataSource");
-		File inputFile = new File("/home/bartek/workspace/speechtextmatcher/stefan-zeromski-doktor-piotr_test.wav");
+//		File inputFile = new File("/home/bartek/workspace/speechtextmatcher/stefan-zeromski-doktor-piotr_test.wav");
+		File inputFile = new File("/home/bartek/workspace/speechtextmatcher/stefan-zeromski-doktor-piotr.wav");
 //		File inputFile = new File("/home/bartek/workspace/speechtextmatcher/test3.wav");
 		fileSource.setAudioFile(inputFile, null);
         
@@ -77,7 +78,8 @@ public class Main {
         ArrayList<Double> dataTimes = new ArrayList<Double>();
         double lastTimeEnd = 0;
         double speechStart = 0;
-        int neigh = 30;
+        int neigh = 1;
+        int spectrumSize = 0;
         while (aux != null)	{
         	if (aux.getClass() == SpeechStartSignal.class) {
         		speechStart = lastTimeEnd;
@@ -107,7 +109,7 @@ public class Main {
         		DoubleData floatData = (DoubleData)aux;
         		int s = floatData.getValues().length;
         		
-        		int upto = s / 2;
+        		int upto = s;
         		long[] longData = new long[upto / neigh];
         		double[] data = new double[upto / neigh];
         		for (int i = neigh / 2; i < upto - neigh / 2; i += neigh)
@@ -120,6 +122,7 @@ public class Main {
         			}
         		}
 //        		display.drawData(longData);
+        		spectrumSize = data.length;
         		
         		long lastSampleNumber = floatData.getFirstSampleNumber() + s;
         		lastTimeEnd = (double)lastSampleNumber / floatData.getSampleRate();
@@ -130,69 +133,170 @@ public class Main {
         	aux = frontend.getData();
         }
         
-//        String text = "";
-//        try {
-//			BufferedReader fileReader = new BufferedReader(new FileReader("/home/bartek/workspace/speechtextmatcher/doktor-piotr_2.txt"));
-//			String line;
-//			while ((line = fileReader.readLine()) != null)
-//				text += line;
-//		} catch (FileNotFoundException e1) {
-//			e1.printStackTrace();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//        
-//        double wholeTime = 0;
-//        for (Speech elem : speechTimes) wholeTime += elem.end - elem.start;
-//        text = text.replaceAll("   *", " ");
-//        String[] sentences = text.split(" *[.,:\"!—”„…?;()]+ *");
-//        String[] words = text.split("[.,:\"!—”„…?;() ]+");
-//        int totalChars = 0;
-//        for (String word : words) totalChars += word.length();
-//        
-//        double timePerChar = wholeTime / totalChars;
-//        double timePerWord = wholeTime / words.length;
-//        double[] estimatedTimes = new double[sentences.length];
-//        for (int i = 0; i < sentences.length; ++i)
-//        {
-//        	String[] sentWords = sentences[i].split(" ");
-//        	int chars = 0;
-//        	for (String word : sentWords) chars += word.length();
-//        	estimatedTimes[i] = (chars * timePerChar + sentWords.length * timePerWord) / 2.0;
-//        }
-//        
-//        int[] matching = new int[speechTimes.size()];
-//        int lastMatched = 0;
-//        double carryOn = 0;
-//        for (int j = 0; j < speechTimes.size(); ++j)
-//        {
-//        	double estTime = carryOn;
-//        	int bestMatched = lastMatched;
-//        	double smallestDiff = Double.MAX_VALUE;
-//        	double time = speechTimes.get(j).end - speechTimes.get(j).start;
-//        	for (int i = lastMatched; i < sentences.length; ++i)
-//        	{
-//        		estTime += estimatedTimes[i];
-//        		double diff = time - estTime;
-//        		if (Math.abs(smallestDiff) > Math.abs(diff))
-//        		{
-//        			smallestDiff = diff;
-//        			bestMatched = i;
-//        		}
-//        		if (diff < 0) break;
-//        	}
-//        	if (Math.abs(smallestDiff) > timePerWord)
-//        	{
-//        		if (smallestDiff < 0)
-//        			carryOn = (Math.ceil(smallestDiff / timePerWord) + 1) * timePerWord;
-//        		else
-//        			carryOn = (Math.floor(smallestDiff / timePerWord) - 1) * timePerWord;
-//        		System.err.println("bigger " + carryOn);
-//        	}
-//        	matching[j] = bestMatched + 1;
-//        	lastMatched = bestMatched + 1;
-//        	System.err.println(j + " " + bestMatched + " " + time + " " + estTime);
-//        }
+        double[] averages = new double[spectrumSize];
+        for (int i = 0; i < allData.size(); ++i)
+        {
+        	double[] curr = allData.get(i);
+        	for (int j = 0; j < spectrumSize; ++j)
+        		averages[j] += curr[j];
+        }
+        for (int j = 0; j < spectrumSize; ++j) averages[j] /= allData.size();
+        double[] deviations = new double[spectrumSize];
+        for (int i = 0; i < allData.size(); ++i)
+        {
+        	double[] curr = allData.get(i);
+        	for (int j = 0; j < spectrumSize; ++j)
+        		deviations[j] += Math.abs(averages[j] - curr[j]);// * (averages[j] - curr[j]);
+        }
+        for (int j = 0; j < spectrumSize; ++j) deviations[j] /= allData.size();
+        
+        boolean[] isSpeech = new boolean[allData.size() + 2];
+        for (int i = 0; i < allData.size(); ++i)
+        {
+        	int count = 0;
+        	double[] curr = allData.get(i);
+        	for (int j = 0; j < spectrumSize; ++j)
+        		if (Math.abs(curr[j] - averages[j]) > deviations[j])
+        			++count;
+        	isSpeech[i + 1] = (count > 0);
+        }
+        int dist = 70;
+        for (int i = 1; i < allData.size() - 1; ++i)
+        {
+        	if (isSpeech[i]) continue;
+        	boolean foundLeft = i < dist;
+        	boolean foundRight = i > allData.size() - dist;
+        	for (int j = 1; j < dist; ++j) {
+        		if (foundLeft) break;
+        		foundLeft |= isSpeech[i - j] ^ isSpeech[i];
+        	}
+        	for (int j = 1; j < dist; ++j) {
+        		if (foundRight) break;
+        		foundRight |= isSpeech[i + j] ^ isSpeech[i];
+        	}
+        	if (foundLeft && foundRight)
+        		isSpeech[i] = !isSpeech[i];
+        }
+        dist = 30;
+        for (int i = dist; i < allData.size() - dist; ++i)
+        {
+        	if (!isSpeech[i]) continue;
+        	boolean foundLeft = i < dist;
+        	boolean foundRight = i > allData.size() - dist;
+        	for (int j = 1; j < dist; ++j) {
+        		if (foundLeft) break;
+        		foundLeft |= isSpeech[i - j] ^ isSpeech[i];
+        	}
+        	for (int j = 1; j < dist; ++j) {
+        		if (foundRight) break;
+        		foundRight |= isSpeech[i + j] ^ isSpeech[i];
+        	}
+        	if (foundLeft && foundRight)
+        		isSpeech[i] = !isSpeech[i];
+        }
+        
+        int start = -1;
+        for (int i = 0; i < allData.size(); ++i)
+        {
+        	if ((start >= 0) && !isSpeech[i])
+        	{
+        		speechTimes.add(new Speech(dataTimes.get(start), dataTimes.get(i)));
+        		start = -1;
+        	}
+        	if ((start < 0) && isSpeech[i])
+        		start = i;
+        }
+        System.err.println("speeches " + speechTimes.size());
+        
+        String text = "";
+        try {
+			BufferedReader fileReader = new BufferedReader(new FileReader("/home/bartek/workspace/speechtextmatcher/doktor-piotr_2.txt"));
+//			BufferedReader fileReader = new BufferedReader(new FileReader("stefan-zeromski-doktor-piotr_test.txt"));
+			String line;
+			while ((line = fileReader.readLine()) != null)
+				text += line + "\n";
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+        
+        double wholeTime = 0;
+        for (Speech elem : speechTimes) wholeTime += elem.end - elem.start;
+        text = text.replaceAll("\n *\n", ".").replaceAll("[\\s\n]+", " ");
+        SortedSet<Character> chars = new TreeSet<Character>();
+        for (int i = 0; i < text.length(); ++i)
+        	if (Character.isLetterOrDigit(text.charAt(i)))
+        		chars.add(text.charAt(i));
+        String charRegex = "";
+        for (Character c : chars) charRegex += c;
+        System.err.println("chars " + charRegex);
+        String[] sentences = text.split(" *[^" + charRegex + "'\\s]+ *");
+        String[] words = text.split("[^" + charRegex + "' ]+");
+        int totalChars = 0;
+        for (String word : words) totalChars += word.length();
+        System.err.println("sentences: " + sentences.length);
+        
+        double timePerChar = wholeTime / totalChars;
+        double timePerWord = wholeTime / words.length;
+        double[] estimatedTimes = new double[sentences.length];
+        for (int i = 0; i < sentences.length; ++i)
+        {
+        	String[] sentWords = sentences[i].split(" ");
+        	int noChars = 0;
+        	for (String word : sentWords) noChars += word.length();
+        	estimatedTimes[i] = (noChars * timePerChar + sentWords.length * timePerWord) / 2.0;
+        }
+        
+        //matching[i][j] - best matching when we matched `i` speeches and `j` sentences 
+        double[] matchingScores = new double[sentences.length];
+        int[][] matchingIndexes = new int[speechTimes.size()][sentences.length];
+        double[][] estimates = new double[sentences.length][sentences.length];
+        double totalEstTime = 0;
+        for (int i = 0; i < sentences.length; ++i)
+        {
+        	totalEstTime += estimatedTimes[i];
+        	estimates[i][0] = totalEstTime;
+        	for (int j = 1; j <= i; ++j)
+        		estimates[i][j] = totalEstTime - estimates[j - 1][0];
+        	for (int j = i + 1; j < sentences.length; ++j)
+        		estimates[i][j] = Double.MAX_VALUE;
+        }
+        for (int i = 0; i < sentences.length; ++i)
+        {
+        	double time = speechTimes.get(0).end - speechTimes.get(0).start;
+        	double auxEst = (estimates[i][0] - time);
+        	matchingScores[i] = auxEst * auxEst;
+        	matchingIndexes[0][i] = 0;
+        }
+        
+        for (int i = 1; i < speechTimes.size(); ++i)
+        {
+        	double time = speechTimes.get(i).end - speechTimes.get(i).start;
+        	double[] newMatchingScores = new double[sentences.length];
+        	for (int j = 0; j < sentences.length; ++j)
+        	{
+        		newMatchingScores[j] = Double.MAX_VALUE;
+        		for (int k = 1; k <= j; ++k)
+        		{
+        			double prevScore = matchingScores[j - k];
+        			double auxDiff = time - estimates[j][j - k + 1];
+        			double diff = auxDiff * auxDiff;
+        			double scoreCand = prevScore + diff;
+        			if (scoreCand < newMatchingScores[j])
+        			{
+        				newMatchingScores[j] = scoreCand;
+        				matchingIndexes[i][j] = j - k;
+        			}
+        		}
+        	}
+        	matchingScores = newMatchingScores;
+        }
+        
+        int[] matching = new int[speechTimes.size()];
+        matching[matching.length - 1] = sentences.length - 1;
+        for (int i = speechTimes.size() - 2; i >= 0; --i)
+        	matching[i] = matchingIndexes[i + 1][matching[i + 1]];
         
 //        class Similar
 //        {
@@ -255,44 +359,48 @@ public class Main {
 			File outputFile = new File("/home/bartek/workspace/speechtextmatcher/labels.txt");
 			OutputStreamWriter outputStream = new OutputStreamWriter(new FileOutputStream(outputFile));
 			output = new BufferedWriter(outputStream);
-//			
-//			int lastMatching = 0;
-//			for (int i = 0; i < matching.length; ++i) {
-//				double start = speechTimes.get(i).start;
-//				double end = speechTimes.get(i).end;
-//				String label = "";
-//				if (matching[i] >= sentences.length) break;
-//				for (int j = lastMatching; j < matching[i]; ++j) label += " " + sentences[j];
-//				output.write(start + " " + end + " " + label + "\n");
-//				output.flush();
-//				lastMatching = matching[i];
-//			}
-//			output.close();
+			
+//			int count = 0;
+//			for (Speech speech : speechTimes)
+//				output.write(speech.start + " " + speech.end + " label_" + count++ + "\n");
+//			output.flush();
+			
+			int lastMatching = 0;
+			for (int i = 0; i < matching.length; ++i) {
+				double startx = speechTimes.get(i).start;
+				double end = speechTimes.get(i).end;
+				String label = "";
+				if (matching[i] >= sentences.length) break;
+				for (int j = lastMatching; j <= matching[i]; ++j) label += " " + sentences[j];
+				output.write(startx + " " + end + " " + label + "\n");
+				output.flush();
+				lastMatching = matching[i] + 1;
+			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		int count = 0;
-    	for (Similar elem : best)
-    	{
-    		int bestInd1 = elem.first;
-    		int bestInd2 = elem.second;
-    		
-			try {
-				double firstStart = dataTimes.get(bestInd1);
-				double firstEnd = dataTimes.get(bestInd1 + window);
-				double secondStart = dataTimes.get(bestInd2);
-				double secondEnd = dataTimes.get(bestInd2 + window);
-				output.write(firstStart + " " + firstEnd + " " + count + "_first\n");
-				output.write(secondStart + " " + secondEnd + " " + count + "_second\n");
-				++count;
-				output.flush();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-    		System.err.println(bestInd1 + " " + bestInd2);
-    	}
+//		int count = 0;
+//    	for (Similar elem : best)
+//    	{
+//    		int bestInd1 = elem.first;
+//    		int bestInd2 = elem.second;
+//    		
+//			try {
+//				double firstStart = dataTimes.get(bestInd1);
+//				double firstEnd = dataTimes.get(bestInd1 + window);
+//				double secondStart = dataTimes.get(bestInd2);
+//				double secondEnd = dataTimes.get(bestInd2 + window);
+//				output.write(firstStart + " " + firstEnd + " " + count + "_first\n");
+//				output.write(secondStart + " " + secondEnd + " " + count + "_second\n");
+//				++count;
+//				output.flush();
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
+//    		System.err.println(bestInd1 + " " + bestInd2);
+//    	}
     	try {
 			if (output != null) output.close();
 		} catch (IOException e) {
