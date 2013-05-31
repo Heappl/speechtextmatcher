@@ -62,15 +62,10 @@ class WaveFormPanel extends JPanel {
 	}
 }
 
-public class WaveDisplay extends JFrame {
+public class WaveDisplay extends JFrame implements IWaveObserver {
 	int width = 1500;
 	int height = 600;
 	WaveFormPanel wavePanel = new WaveFormPanel(width, height);
-	
-	public void drawData(long[] data)
-	{
-		wavePanel.drawData(data);
-	}
 	
 	public WaveDisplay() {
 		setTitle("WaveDisplay");
@@ -79,6 +74,13 @@ public class WaveDisplay extends JFrame {
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		add(wavePanel);
 		setVisible(true);
-//		pack();
+	}
+
+	@Override
+	public void process(double startTime, double endTime, double[] values) {
+		long[] data = new long[values.length];
+		for (int i = 0; i < values.length; ++i)
+			data[i] = Math.round(Math.log10(values[i]) * 100000);
+		wavePanel.drawData(data);
 	}
 }
