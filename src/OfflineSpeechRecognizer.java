@@ -29,7 +29,7 @@ public class OfflineSpeechRecognizer implements IWaveObserver {
 	@Override
 	public void process(double startTime, double endTime, double[] values) {
 		allData.add(new Data(startTime, endTime, values));
-		this.spectrumSize = values.length;
+		this.spectrumSize = Math.max(values.length, this.spectrumSize);
 	}
 	
 	public ArrayList<Speech> findSpeechParts()
@@ -61,8 +61,9 @@ public class OfflineSpeechRecognizer implements IWaveObserver {
 	    			++count;
 	    	isSpeech[i + 1] = (count > 0);
 	    }
-	    fillHoles(isSpeech, true, this.speechGravity, 1);
-	    fillHoles(isSpeech, false, this.nonSpeechGravity, this.nonSpeechGravity);
+
+        fillHoles(isSpeech, true, this.speechGravity, 1);
+        fillHoles(isSpeech, false, this.nonSpeechGravity, this.nonSpeechGravity);
 	    
 	    int start = -1;
 	    ArrayList<Speech> out = new ArrayList<Speech>();
@@ -79,24 +80,19 @@ public class OfflineSpeechRecognizer implements IWaveObserver {
 	    return out;
 	}
 	
-	private void fillHoles(boolean[] data, boolean type, int gravity, int edgeStart)
+	private void fillHoles(boolean[] data, boolean type, int gravity, int margin)
 	{
-		edgeStart = Math.max(1, edgeStart);
-	    for (int i = edgeStart; i < allData.size() - edgeStart; ++i)
-	    {
-	    	if (data[i] == type) continue;
-	    	boolean foundLeft = i < gravity;
-	    	boolean foundRight = i > allData.size() - gravity;
-	    	for (int j = 1; j < gravity; ++j) {
-	    		if (foundLeft) break;
-	    		foundLeft |= data[i - j] ^ type;
-	    	}
-	    	for (int j = 1; j < gravity; ++j) {
-	    		if (foundRight) break;
-	    		foundRight |= data[i + j] ^ type;
-	    	}
-	    	if (foundLeft && foundRight)
-	    		data[i] = type;
-	    }
+		margin = Math.max(1, margin);
+        for (int i = margin; i < allData.size() - margin; ++i)
+        {
+        	if (data[i] == type) continue;
+        	boolean foundLeft = i < gravity;
+        	boolean foundRight = i > allData.size() - gravity;
+        	for (int j = 1; j < gravity; ++j) {
+        		if (!foundLeft) foundLeft |= data[i - j] ^ !type;
+        		if (!foundRight) foundRight |= data[i + j] ^ !type;
+        	}
+        	if (foundLeft && foundRight) data[i] = type;
+        }
 	}
 }

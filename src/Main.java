@@ -4,8 +4,8 @@ public class Main {
 	
     public static void main(String[] args) {
     	
-    	String waveFile = "/home/bartek/workspace/speechtextmatcher/stefan-zeromski-doktor-piotr_test.wav";
-//    	String waveFile = "/home/bartek/workspace/speechtextmatcher/stefan-zeromski-doktor-piotr.wav";
+//    	String waveFile = "/home/bartek/workspace/speechtextmatcher/stefan-zeromski-doktor-piotr_test.wav";
+    	String waveFile = "/home/bartek/workspace/speechtextmatcher/stefan-zeromski-doktor-piotr.wav";
 //    	String waveFile = "/home/bartek/workspace/speechtextmatcher/przedwiosnie-rodowod.wav";
     	
 //    	String textFile = "/home/bartek/workspace/speechtextmatcher/doktor-piotr_2.txt";
@@ -14,9 +14,9 @@ public class Main {
     	
     	WaveImporter waveImporter = new WaveImporter(waveFile);
     	OfflineSpeechRecognizer speechRecognizer = new OfflineSpeechRecognizer(70, 30);
-    	WaveDisplay display = new WaveDisplay(); 
-    	waveImporter.registerObserver(display);//new WaveDataPacker(display, 1.0, 0.01));
-    	waveImporter.registerObserver(new WaveDataPacker(speechRecognizer, 0.5, 0.001));
+//    	WaveDisplay display = new WaveDisplay(); 
+//    	waveImporter.registerObserver(display);//new WaveDataPacker(display, 1.0, 0.01));
+    	waveImporter.registerObserver(speechRecognizer);//new WaveDataPacker(speechRecognizer, 1.0, 0.00001));
     	waveImporter.process();
     	
         ArrayList<Speech> speechTimes = speechRecognizer.findSpeechParts();
