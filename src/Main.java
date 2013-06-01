@@ -31,16 +31,17 @@ public class Main {
         String text = new TextImporter(textFile).getText();
         
         AudioLabel[] labels = new TextToSpeechByLengthAligner().findMatching(text, speechTimes);
-//        
+        
 //        Map<String, Integer> prefixes = new TreeMap<String, Integer>();
 //        
 //        ArrayList<AudioLabel> newLabels = new ArrayList<AudioLabel>();
 //        
+//        int minPrefix = 5;
 //        for (AudioLabel label : labels)
 //        {
 //        	String labelText = label.getLabel().replaceAll("[. ]+", " ");
 //        	
-//        	for (int i = 3; i < Math.min(labelText.length(), 30); ++i)
+//        	for (int i = minPrefix; i < Math.min(labelText.length(), minPrefix + 1); ++i)
 //        	{
 //        		String prefix = labelText.substring(0, i);
 //        		if (!prefixes.containsKey(prefix))
@@ -51,9 +52,10 @@ public class Main {
 //        }
 //        for (AudioLabel label : labels)
 //        {
-//        	if (label.getLabel().length() < 4) continue;
-//        	String prefix = label.getLabel().replaceAll("[. ]+", " ").substring(0, 3);
-//        	if (!prefixes.containsValue(prefix)) continue;
+//        	String labelText = label.getLabel().replaceAll("[. ]+", " ");
+//        	if (labelText.length() < minPrefix) continue;
+//        	String prefix = labelText.substring(0, minPrefix);
+//        	if (!prefixes.containsKey(prefix)) continue;
 //        	int n = prefixes.get(prefix);
 //        	if (n > 2) newLabels.add(label);
 //        }

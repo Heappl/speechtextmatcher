@@ -85,18 +85,18 @@ public class OfflineSpeechRecognizer implements IWaveObserver {
 	    	for (int j = 0; j < spectrumSize; ++j) sum += Math.log(curr[j]);
 	    	isSpeech[i + 1] = (sum > backgroundAverage);
 	    }
-
+	    
         fillHoles(isSpeech, true, this.speechGravity, 0);
         fillHoles(isSpeech, true, this.speechGravity, 0);
-        fillHoles(isSpeech, false, this.nonSpeechGravity, 1);
-        fillHoles(isSpeech, false, this.nonSpeechGravity, 1);
+        fillHoles(isSpeech, false, this.nonSpeechGravity, 2 * this.nonSpeechGravity);
+        fillHoles(isSpeech, false, this.nonSpeechGravity, 2 * this.nonSpeechGravity);
 	    
 	    
 	    int start = -1;
 	    ArrayList<Speech> out = new ArrayList<Speech>();
 	    for (int i = 0; i < allData.size(); ++i)
 	    {
-	    	if ((start >= 0) && !isSpeech[i])
+	    	if ((start >= 0) && ((i == allData.size() - 1) || !isSpeech[i]))
 	    	{
 	    		Speech speech = new Speech(
 	    				allData.get(start).getStartTime(),
@@ -121,12 +121,12 @@ public class OfflineSpeechRecognizer implements IWaveObserver {
 		int countRight = gravity;
 		boolean[] newData = new boolean[gravity + 1];
 		int newDataInd = 0;
-        for (int i = -gravity; i < data.length + 2 * gravity + 1; ++i)
+        for (int i = -gravity; i < data.length + 3 * gravity; ++i)
         {
         	int index = i - gravity;
         	
     		int dataReceding = index - gravity - 1;
-    		if (dataReceding >= 0) {
+    		if ((dataReceding >= 0) && (dataReceding < data.length)) {
     			data[dataReceding] = newData[newDataInd];
     		}
     		

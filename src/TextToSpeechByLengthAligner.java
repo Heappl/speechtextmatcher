@@ -44,9 +44,9 @@ public class TextToSpeechByLengthAligner {
         	totalEstTime += estimatedTimes[i];
         	estimates[i][0] = totalEstTime;
         	for (int j = 0; j <= i; ++j)
-        		estimates[i][j] = totalEstTime - estimates[j][0];
+        		estimates[i][j + 1] = totalEstTime - estimates[j][0];
         	for (int j = i + 1; j < sentences.length; ++j)
-        		estimates[i][j] = Double.MAX_VALUE;
+        		estimates[i][j + 1] = Double.MAX_VALUE;
         }
         for (int i = 0; i < sentences.length; ++i)
         {
@@ -65,12 +65,10 @@ public class TextToSpeechByLengthAligner {
         	for (int j = 0; j < sentences.length; ++j)
         	{
         		newMatchingScores[j] = Double.MAX_VALUE;
-//        		if (j > 0) newMatchingScores[j] += matchingScores[j - 1];
-//        		matchingIndexes[i][j] = j;
         		for (int k = 0; k <= j; ++k)
         		{
         			double prevScore = matchingScores[j - k];
-        			double auxDiff = time - estimates[j][j - k];
+        			double auxDiff = time - estimates[j][j - k + 1];
         			double diff = auxDiff * auxDiff;
         			double scoreCand = prevScore + diff;
         			if (scoreCand < newMatchingScores[j])
