@@ -1,30 +1,68 @@
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
+
+import edu.cmu.sphinx.result.MAPConfidenceScorer;
 
 public class Main {
 	
     public static void main(String[] args) {
     	
-//    	String waveFile = "/home/bartek/workspace/speechtextmatcher/stefan-zeromski-doktor-piotr_test.wav";
-    	String waveFile = "/home/bartek/workspace/speechtextmatcher/stefan-zeromski-doktor-piotr.wav";
+    	String waveFile = "/home/bartek/workspace/speechtextmatcher/stefan-zeromski-doktor-piotr_test.wav";
+//    	String waveFile = "/home/bartek/workspace/speechtextmatcher/stefan-zeromski-doktor-piotr.wav";
 //    	String waveFile = "/home/bartek/workspace/speechtextmatcher/przedwiosnie-rodowod.wav";
     	
-//    	String textFile = "/home/bartek/workspace/speechtextmatcher/doktor-piotr_2.txt";
+    	String textFile = "/home/bartek/workspace/speechtextmatcher/doktor-piotr_2.txt";
 //    	String textFile = "/home/bartek/workspace/speechtextmatcher/przedwiosnie_rodowod.txt";
-    	String textFile = "stefan-zeromski-doktor-piotr_test.txt";
-    	
+//    	String textFile = "stefan-zeromski-doktor-piotr_test.txt";4
+
     	WaveImporter waveImporter = new WaveImporter(waveFile);
-    	OfflineSpeechRecognizer speechRecognizer = new OfflineSpeechRecognizer(70, 30);
+    	OfflineSpeechRecognizer speechRecognizer = new OfflineSpeechRecognizer(10, 5);
 //    	WaveDisplay display = new WaveDisplay(); 
 //    	waveImporter.registerObserver(display);//new WaveDataPacker(display, 1.0, 0.01));
     	waveImporter.registerObserver(speechRecognizer);//new WaveDataPacker(speechRecognizer, 1.0, 0.00001));
     	waveImporter.process();
     	
-        ArrayList<Speech> speechTimes = speechRecognizer.findSpeechParts();
-        System.err.println("speeches " + speechTimes.size());
+    	ArrayList<Speech> speechTimes = speechRecognizer.findSpeechParts();
+//    	ArrayList<Data> allData = speechRecognizer.getAllData();
+//        System.err.println("speeches " + speechTimes.size());
+//        
+//        String text = new TextImporter(textFile).getText();
+//        
+//        AudioLabel[] labels = new TextToSpeechByLengthAligner().findMatching(text, speechTimes);
+//        
+//        Map<String, Integer> prefixes = new TreeMap<String, Integer>();
+//        
+//        ArrayList<AudioLabel> newLabels = new ArrayList<AudioLabel>();
+//        
+//        for (AudioLabel label : labels)
+//        {
+//        	String labelText = label.getLabel().replaceAll("[. ]+", " ");
+//        	
+//        	for (int i = 3; i < Math.min(labelText.length(), 30); ++i)
+//        	{
+//        		String prefix = labelText.substring(0, i);
+//        		if (!prefixes.containsKey(prefix))
+//        			prefixes.put(prefix, 1);
+//        		else
+//        			prefixes.put(prefix, prefixes.get(prefix) + 1);
+//        	}
+//        }
+//        for (AudioLabel label : labels)
+//        {
+//        	if (label.getLabel().length() < 4) continue;
+//        	String prefix = label.getLabel().replaceAll("[. ]+", " ").substring(0, 3);
+//        	if (!prefixes.containsValue(prefix)) continue;
+//        	int n = prefixes.get(prefix);
+//        	if (n > 2) newLabels.add(label);
+//        }
+//        labels = newLabels.toArray(new AudioLabel[0]);
+    	
+    	AudioLabel[] labels = new AudioLabel[speechTimes.size()];
+    	for (int i = 0; i < labels.length; ++i)
+    		labels[i] = new AudioLabel("label" + i, speechTimes.get(i).getStartTime(), speechTimes.get(i).getEndTime());
         
-        String text = new TextImporter(textFile).getText();
-        
-        AudioLabel[] labels = new TextToSpeechByLengthAligner().findMatching(text, speechTimes);
         new AudacityLabelsExporter("/home/bartek/workspace/speechtextmatcher/labels.txt").export(labels);
         
 //        class Similar
@@ -103,6 +141,7 @@ public class Main {
 //			}
 //    		System.err.println(bestInd1 + " " + bestInd2);
 //    	}
- 
+
+        System.err.println("END");
     }
 }

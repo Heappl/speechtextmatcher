@@ -33,7 +33,8 @@ public class TextToSpeechByLengthAligner {
         	estimatedTimes[i] = (noChars * timePerChar + sentWords.length * timePerWord) / 2.0;
         }
         
-        //matching[i][j] - best matching when we matched `i` speeches and `j` sentences 
+        //matchingScores[i][j] - best matching when we matched `i` speeches and `j` sentences 
+        //however we only need previous (for `i - 1`) results 
         double[] matchingScores = new double[sentences.length];
         int[][] matchingIndexes = new int[speechTimes.size()][sentences.length];
         double[][] estimates = new double[sentences.length][sentences.length];

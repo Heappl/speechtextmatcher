@@ -1,19 +1,5 @@
 import java.util.ArrayList;
 
-class Data
-{
-	double[] spectrum;
-	double startTime;
-	double endTime;
-	
-	Data(double startTime, double endTime, double[] spectrum)
-	{
-		this.spectrum = spectrum;
-		this.startTime = startTime;
-		this.endTime = endTime;
-	}
-}
-
 public class OfflineSpeechRecognizer implements IWaveObserver {
 
 	private ArrayList<Data> allData = new ArrayList<Data>();
@@ -32,38 +18,79 @@ public class OfflineSpeechRecognizer implements IWaveObserver {
 		this.spectrumSize = Math.max(values.length, this.spectrumSize);
 	}
 	
+	public ArrayList<Data> getAllData()
+	{
+		return allData;
+	}
+	
 	public ArrayList<Speech> findSpeechParts()
 	{
-		double[] averages = new double[this.spectrumSize];
+//		double[] averages = new double[this.spectrumSize];
+//	    for (int i = 0; i < allData.size(); ++i)
+//	    {
+//	    	double[] curr = allData.get(i).getSpectrum();
+//	    	for (int j = 0; j < spectrumSize; ++j)
+//	    		averages[j] += curr[j];
+//	    }
+//	    for (int j = 0; j < spectrumSize; ++j) averages[j] /= allData.size();
+//	    double[] deviations = new double[spectrumSize];
+//	    for (int i = 0; i < allData.size(); ++i)
+//	    {
+//	    	double[] curr = allData.get(i).getSpectrum();
+//	    	for (int j = 0; j < spectrumSize; ++j)
+//	    		deviations[j] += Math.abs(averages[j] - curr[j]);
+//	    }
+//	    for (int j = 0; j < spectrumSize; ++j) deviations[j] /= allData.size();
+//	    
+//	    boolean[] isSpeech = new boolean[allData.size() + 2];
+//	    for (int i = 0; i < allData.size(); ++i)
+//	    {
+//	    	int count = 0;
+//	    	double[] curr = allData.get(i).getSpectrum();
+//	    	for (int j = 0; j < spectrumSize; ++j)
+//	    		if ((curr[j] - averages[j]) > deviations[j])
+//	    			++count;
+//	    	isSpeech[i + 1] = (count > 0);
+//	    }
+		
+		double average = 0;
 	    for (int i = 0; i < allData.size(); ++i)
 	    {
-	    	double[] curr = allData.get(i).spectrum;
+	    	double[] curr = allData.get(i).getSpectrum();
 	    	for (int j = 0; j < spectrumSize; ++j)
-	    		averages[j] += curr[j];
+	    		average += Math.log(curr[j]);
 	    }
-	    for (int j = 0; j < spectrumSize; ++j) averages[j] /= allData.size();
-	    double[] deviations = new double[spectrumSize];
+	    average /= allData.size();
+	    
+	    double backgroundAverage = 0;
+	    int count = 0;
 	    for (int i = 0; i < allData.size(); ++i)
 	    {
-	    	double[] curr = allData.get(i).spectrum;
+	    	double[] curr = allData.get(i).getSpectrum();
+	    	double sum = 0;
 	    	for (int j = 0; j < spectrumSize; ++j)
-	    		deviations[j] += Math.abs(averages[j] - curr[j]);
+	    		sum += Math.log(curr[j]);
+	    	if (sum < average) {
+	    		backgroundAverage += sum;
+	    		count++;
+	    	}
 	    }
-	    for (int j = 0; j < spectrumSize; ++j) deviations[j] /= allData.size();
+	    backgroundAverage /= count;
 	    
 	    boolean[] isSpeech = new boolean[allData.size() + 2];
 	    for (int i = 0; i < allData.size(); ++i)
 	    {
-	    	int count = 0;
-	    	double[] curr = allData.get(i).spectrum;
-	    	for (int j = 0; j < spectrumSize; ++j)
-	    		if (Math.abs(curr[j] - averages[j]) > deviations[j])
-	    			++count;
-	    	isSpeech[i + 1] = (count > 0);
+	    	double[] curr = allData.get(i).getSpectrum();
+	    	double sum = 0;
+	    	for (int j = 0; j < spectrumSize; ++j) sum += Math.log(curr[j]);
+	    	isSpeech[i + 1] = (sum > backgroundAverage);
 	    }
 
-        fillHoles(isSpeech, true, this.speechGravity, 1);
-        fillHoles(isSpeech, false, this.nonSpeechGravity, this.nonSpeechGravity);
+        fillHoles(isSpeech, true, this.speechGravity, 0);
+        fillHoles(isSpeech, true, this.speechGravity, 0);
+        fillHoles(isSpeech, false, this.nonSpeechGravity, 1);
+        fillHoles(isSpeech, false, this.nonSpeechGravity, 1);
+	    
 	    
 	    int start = -1;
 	    ArrayList<Speech> out = new ArrayList<Speech>();
@@ -71,7 +98,10 @@ public class OfflineSpeechRecognizer implements IWaveObserver {
 	    {
 	    	if ((start >= 0) && !isSpeech[i])
 	    	{
-	    		out.add(new Speech(allData.get(start).startTime, allData.get(i).startTime));
+	    		Speech speech = new Speech(
+	    				allData.get(start).getStartTime(),
+	    				allData.get(i).getStartTime());
+	    		out.add(speech);
 	    		start = -1;
 	    	}
 	    	if ((start < 0) && isSpeech[i])
@@ -80,19 +110,44 @@ public class OfflineSpeechRecognizer implements IWaveObserver {
 	    return out;
 	}
 	
+	private boolean isOfType(boolean[] data, int index, boolean type)
+	{
+		return ((index < 0) || (index >= data.length) || (data[index] == type));
+	}
+	
 	private void fillHoles(boolean[] data, boolean type, int gravity, int margin)
 	{
-		margin = Math.max(1, margin);
-        for (int i = margin; i < allData.size() - margin; ++i)
+		int countLeft = gravity;
+		int countRight = gravity;
+		boolean[] newData = new boolean[gravity + 1];
+		int newDataInd = 0;
+        for (int i = -gravity; i < data.length + 2 * gravity + 1; ++i)
         {
-        	if (data[i] == type) continue;
-        	boolean foundLeft = i < gravity;
-        	boolean foundRight = i > allData.size() - gravity;
-        	for (int j = 1; j < gravity; ++j) {
-        		if (!foundLeft) foundLeft |= data[i - j] ^ !type;
-        		if (!foundRight) foundRight |= data[i + j] ^ !type;
-        	}
-        	if (foundLeft && foundRight) data[i] = type;
+        	int index = i - gravity;
+        	
+    		int dataReceding = index - gravity - 1;
+    		if (dataReceding >= 0) {
+    			data[dataReceding] = newData[newDataInd];
+    		}
+    		
+    		if ((index >= margin) && (index < allData.size() - margin)
+    			&& (countRight > 0) && (countLeft > 0)) {
+    			newData[newDataInd] = type;
+    		}
+    		else if ((index >= 0) && (index < data.length)) {
+    			newData[newDataInd] = data[index];
+    		}
+    		newDataInd = (newDataInd + 1) % newData.length;
+        	
+        	int recedingForLeft = index - gravity;
+        	int incomingForLeft = index;
+        	int recedingForRight = index + 1;
+        	int incomingForRight = i + 1;
+        	
+        	if (isOfType(data, recedingForLeft, type)) countLeft--;
+        	if (isOfType(data, incomingForLeft, type)) countLeft++;
+        	if (isOfType(data, recedingForRight, type)) countRight--;
+        	if (isOfType(data, incomingForRight, type)) countRight++;
         }
 	}
 }

@@ -43,15 +43,15 @@ public class WaveImporter
 				if (data.getClass() == DoubleData.class)
 				{
 					DoubleData doubleData = (DoubleData)data;
-					double startTime = doubleData.getFirstSampleNumber() / doubleData.getSampleRate();
-					double endTime = startTime + doubleData.getValues().length / doubleData.getSampleRate();
+					double startTime = (double)doubleData.getFirstSampleNumber() / (double)doubleData.getSampleRate();
+					double endTime = startTime + (double)doubleData.getValues().length / (double)doubleData.getSampleRate();
 					observer.process(startTime, endTime, doubleData.getValues());
 				}
 				if (data.getClass() == FloatData.class)
 				{
 					FloatData floatData = (FloatData)data;
-					double startTime = floatData.getFirstSampleNumber() / floatData.getSampleRate();
-					double endTime = startTime + floatData.getValues().length / floatData.getSampleRate();
+					double startTime = (double)floatData.getFirstSampleNumber() / (double)floatData.getSampleRate();
+					double endTime = startTime + (double)floatData.getValues().length / (double)floatData.getSampleRate();
 					double[] doubleData = new double[floatData.getValues().length];
 					for (int i = 0; i < doubleData.length; ++i)
 						doubleData[i] = floatData.getValues()[i];
@@ -59,5 +59,8 @@ public class WaveImporter
 				}
 			}
 		}
+		
+		observers.clear();
+		System.gc();
 	}
 }
