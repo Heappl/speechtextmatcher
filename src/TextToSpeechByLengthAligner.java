@@ -35,16 +35,16 @@ public class TextToSpeechByLengthAligner {
         
         //matchingScores[i][j] - best matching when we matched `i` speeches and `j` sentences 
         //however we only need previous (for `i - 1`) results 
-        double[] matchingScores = new double[sentences.length];
-        int[][] matchingIndexes = new int[speechTimes.size()][sentences.length];
-        double[][] estimates = new double[sentences.length][sentences.length];
+        double[] matchingScores = new double[sentences.length + 1];
+        int[][] matchingIndexes = new int[speechTimes.size()][sentences.length + 1];
+        double[][] estimates = new double[sentences.length][sentences.length + 1];
         double totalEstTime = 0;
         for (int i = 0; i < sentences.length; ++i)
         {
         	totalEstTime += estimatedTimes[i];
         	estimates[i][0] = totalEstTime;
-        	for (int j = 1; j <= i; ++j)
-        		estimates[i][j] = totalEstTime - estimates[j - 1][0];
+        	for (int j = 0; j <= i; ++j)
+        		estimates[i][j] = totalEstTime - estimates[j][0];
         	for (int j = i + 1; j < sentences.length; ++j)
         		estimates[i][j] = Double.MAX_VALUE;
         }
@@ -52,9 +52,11 @@ public class TextToSpeechByLengthAligner {
         {
         	double time = speechTimes.get(0).getTime();
         	double auxEst = (estimates[i][0] - time);
-        	matchingScores[i] = auxEst * auxEst;
-        	matchingIndexes[0][i] = 0;
+        	matchingScores[i + 1] = auxEst * auxEst;
+        	matchingIndexes[0][i + 1] = 0;
         }
+        matchingScores[0] = speechTimes.get(0).getTime() * speechTimes.get(0).getTime();
+        matchingIndexes[0][0] = -1;
         
         for (int i = 1; i < speechTimes.size(); ++i)
         {
@@ -63,10 +65,12 @@ public class TextToSpeechByLengthAligner {
         	for (int j = 0; j < sentences.length; ++j)
         	{
         		newMatchingScores[j] = Double.MAX_VALUE;
-        		for (int k = 1; k <= j; ++k)
+//        		if (j > 0) newMatchingScores[j] += matchingScores[j - 1];
+//        		matchingIndexes[i][j] = j;
+        		for (int k = 0; k <= j; ++k)
         		{
         			double prevScore = matchingScores[j - k];
-        			double auxDiff = time - estimates[j][j - k + 1];
+        			double auxDiff = time - estimates[j][j - k];
         			double diff = auxDiff * auxDiff;
         			double scoreCand = prevScore + diff;
         			if (scoreCand < newMatchingScores[j])
@@ -84,7 +88,7 @@ public class TextToSpeechByLengthAligner {
         for (int i = speechTimes.size() - 2; i >= 0; --i)
         	matching[i] = matchingIndexes[i + 1][matching[i + 1]];
         
-        AudioLabel[] labels = new AudioLabel[matching.length];
+        ArrayList<AudioLabel> labels = new ArrayList<AudioLabel>();
 		int lastMatching = 0;
 		for (int i = 0; i < matching.length; ++i) {
 			double startx = speechTimes.get(i).getStartTime();
@@ -92,9 +96,15 @@ public class TextToSpeechByLengthAligner {
 			String label = "";
 			if (matching[i] >= sentences.length) break;
 			for (int j = lastMatching; j <= matching[i]; ++j) label += ". " + sentences[j];
-			labels[i] = new AudioLabel(label, startx, end);
+			
+			while ((i + 1 < matching.length) && (matching[i + 1] == matching[i])) {
+				++i;
+				end = speechTimes.get(i).getEndTime();
+			}
+			
+			labels.add(new AudioLabel(label, startx, end));
 			lastMatching = matching[i] + 1;
 		}
-		return labels;
+		return labels.toArray(new AudioLabel[0]);
 	}
 }

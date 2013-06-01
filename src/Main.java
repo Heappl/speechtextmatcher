@@ -9,16 +9,16 @@ public class Main {
 	
     public static void main(String[] args) {
     	
-    	String waveFile = "/home/bartek/workspace/speechtextmatcher/stefan-zeromski-doktor-piotr_test.wav";
-//    	String waveFile = "/home/bartek/workspace/speechtextmatcher/stefan-zeromski-doktor-piotr.wav";
+//    	String waveFile = "/home/bartek/workspace/speechtextmatcher/stefan-zeromski-doktor-piotr_test.wav";
+    	String waveFile = "/home/bartek/workspace/speechtextmatcher/stefan-zeromski-doktor-piotr.wav";
 //    	String waveFile = "/home/bartek/workspace/speechtextmatcher/przedwiosnie-rodowod.wav";
     	
     	String textFile = "/home/bartek/workspace/speechtextmatcher/doktor-piotr_2.txt";
 //    	String textFile = "/home/bartek/workspace/speechtextmatcher/przedwiosnie_rodowod.txt";
-//    	String textFile = "stefan-zeromski-doktor-piotr_test.txt";4
+//    	String textFile = "stefan-zeromski-doktor-piotr_test.txt";
 
     	WaveImporter waveImporter = new WaveImporter(waveFile);
-    	OfflineSpeechRecognizer speechRecognizer = new OfflineSpeechRecognizer(10, 5);
+    	OfflineSpeechRecognizer speechRecognizer = new OfflineSpeechRecognizer(10, 10);
 //    	WaveDisplay display = new WaveDisplay(); 
 //    	waveImporter.registerObserver(display);//new WaveDataPacker(display, 1.0, 0.01));
     	waveImporter.registerObserver(speechRecognizer);//new WaveDataPacker(speechRecognizer, 1.0, 0.00001));
@@ -26,11 +26,11 @@ public class Main {
     	
     	ArrayList<Speech> speechTimes = speechRecognizer.findSpeechParts();
 //    	ArrayList<Data> allData = speechRecognizer.getAllData();
-//        System.err.println("speeches " + speechTimes.size());
-//        
-//        String text = new TextImporter(textFile).getText();
-//        
-//        AudioLabel[] labels = new TextToSpeechByLengthAligner().findMatching(text, speechTimes);
+        System.err.println("speeches " + speechTimes.size());
+        
+        String text = new TextImporter(textFile).getText();
+        
+        AudioLabel[] labels = new TextToSpeechByLengthAligner().findMatching(text, speechTimes);
 //        
 //        Map<String, Integer> prefixes = new TreeMap<String, Integer>();
 //        
@@ -59,9 +59,9 @@ public class Main {
 //        }
 //        labels = newLabels.toArray(new AudioLabel[0]);
     	
-    	AudioLabel[] labels = new AudioLabel[speechTimes.size()];
-    	for (int i = 0; i < labels.length; ++i)
-    		labels[i] = new AudioLabel("label" + i, speechTimes.get(i).getStartTime(), speechTimes.get(i).getEndTime());
+//    	AudioLabel[] labels = new AudioLabel[speechTimes.size()];
+//    	for (int i = 0; i < labels.length; ++i)
+//    		labels[i] = new AudioLabel("label" + i, speechTimes.get(i).getStartTime(), speechTimes.get(i).getEndTime());
         
         new AudacityLabelsExporter("/home/bartek/workspace/speechtextmatcher/labels.txt").export(labels);
         
