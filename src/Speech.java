@@ -14,8 +14,8 @@ public class Speech {
 	
 	public double getStartTime() { return this.startTime; }
 	public double getEndTime() { return this.endTime; }
-	public double getStartDataIndex() { return this.startDataIndex; }
-	public double getEndDataIndex() { return this.endDataIndex; }
+	public int getStartDataIndex() { return this.startDataIndex; }
+	public int getEndDataIndex() { return this.endDataIndex; }
 
 	public double getTime() { return getEndTime() - getStartTime(); }
 }

@@ -1,7 +1,8 @@
 import java.util.ArrayList;
+import java.util.Iterator;
 
 
-public class Speeches {
+public class Speeches implements Iterable<Speech> {
 	
 	private ArrayList<Speech> speeches = null;
 	private double totalTime = 0;  
@@ -14,4 +15,9 @@ public class Speeches {
 	public double getTotalTime() { return this.totalTime; }
 	public int size() { return this.speeches.size(); }
 	public Speech get(int i) { return speeches.get(i); }
+
+	@Override
+	public Iterator<Speech> iterator() {
+		return speeches.iterator();
+	}
 }

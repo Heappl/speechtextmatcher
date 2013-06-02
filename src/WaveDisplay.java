@@ -22,6 +22,7 @@ class WaveFormPanel extends JPanel {
 		image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 		this.width = width;
 		this.height = height;
+		setVisible(true);
 	}
 	
 	public void drawData(long[] data)
@@ -49,29 +50,32 @@ class WaveFormPanel extends JPanel {
 			g.setColor(Color.BLUE);
 			g.fillRect(x, this.height / 2 - height - 1, barWidth, height + 1);
 		}
-		try {
-			Thread.sleep(100);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
-
-	@Override
-	public void paintComponent(Graphics g) {
-		super.paintComponent(g);
 	}
 }
 
 public class WaveDisplay extends JFrame implements IWaveObserver {
 	int width = 1600;
 	int height = 600;
-	WaveFormPanel wavePanel = new WaveFormPanel(width, height);
+	WaveFormPanel wavePanel;
+	long[] currData = null;
 	
-	public WaveDisplay() {
+	public WaveDisplay()
+	{
+		init();
+	}
+	public WaveDisplay(int width, int height)
+	{
+		this.width = width;
+		this.height = height;
+		init();
+	}
+	private void init()
+	{
 		setTitle("WaveDisplay");
 		setSize(width, height);
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		this.wavePanel = new WaveFormPanel(width, height);
 		add(wavePanel);
 		setVisible(true);
 	}
@@ -81,7 +85,19 @@ public class WaveDisplay extends JFrame implements IWaveObserver {
 		long[] data = new long[values.length];
 //		System.err.println(values.length);
 		for (int i = 0; i < values.length; ++i)
-			data[i] = Math.round(Math.log10(values[i]) * 100000);
+			data[i] = Math.round(values[i] * 100000);
 		wavePanel.drawData(data);
+		currData = data;
+	}
+	public void drawData(long[] data)
+	{
+		wavePanel.drawData(data);
+		currData = data;
+	}
+
+	@Override
+	public void paint(Graphics g) {
+		super.paint(g);
+		if (currData != null) drawData(currData);
 	}
 }
