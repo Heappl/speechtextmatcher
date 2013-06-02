@@ -9,23 +9,25 @@ public class Main {
 	
     public static void main(String[] args) {
     	
-    	String waveFile = "/home/bartek/workspace/speechtextmatcher/stefan-zeromski-doktor-piotr_test.wav";
-//    	String waveFile = "/home/bartek/workspace/speechtextmatcher/stefan-zeromski-doktor-piotr.wav";
-//    	String waveFile = "/home/bartek/workspace/speechtextmatcher/przedwiosnie-rodowod.wav";
     	
-//    	String textFile = "/home/bartek/workspace/speechtextmatcher/doktor-piotr_2.txt";
+//    	String waveFile = "/home/bartek/workspace/speechtextmatcher/przedwiosnie-rodowod.wav";
 //    	String textFile = "/home/bartek/workspace/speechtextmatcher/przedwiosnie_rodowod.txt";
-    	String textFile = "stefan-zeromski-doktor-piotr_test.txt";
+    	
+//    	String waveFile = "/home/bartek/workspace/speechtextmatcher/stefan-zeromski-doktor-piotr_test.wav";
+//    	String textFile = "stefan-zeromski-doktor-piotr_test.txt";
+    	
+    	String waveFile = "/home/bartek/workspace/speechtextmatcher/stefan-zeromski-doktor-piotr.wav";
+    	String textFile = "/home/bartek/workspace/speechtextmatcher/doktor-piotr_2.txt";
 
     	WaveImporter waveImporter = new WaveImporter(waveFile);
-    	OfflineSpeechRecognizer speechRecognizer = new OfflineSpeechRecognizer(10, 10);
+    	OfflineSpeechRecognizer speechRecognizer = new OfflineSpeechRecognizer(12, 10);
 //    	WaveDisplay display = new WaveDisplay(); 
 //    	waveImporter.registerObserver(new WaveDataPacker(display, 1.0, 0.01));
     	waveImporter.registerObserver(new WaveDataPacker(speechRecognizer, 1.0, 0.1));
     	waveImporter.process();
     	
     	ArrayList<Speech> speechTimes = speechRecognizer.findSpeechParts();
-//    	ArrayList<Data> allData = speechRecognizer.getAllData();
+    	ArrayList<Data> allData = speechRecognizer.getAllData();
         System.err.println("speeches " + speechTimes.size());
         
         String text = new TextImporter(textFile).getText();

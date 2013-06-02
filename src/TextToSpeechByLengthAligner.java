@@ -16,7 +16,7 @@ public class TextToSpeechByLengthAligner {
         		chars.add(text.charAt(i));
         String charRegex = "";
         for (Character c : chars) charRegex += c;
-        String[] sentences = text.split("\\s*[^" + charRegex + "'\\s]+\\s*");
+        String[] sentences = text.split("(\\s*[^" + charRegex + "'\\s]+\\s*)+");
         String[] words = text.split("[^" + charRegex + "']+");
         int totalChars = 0;
         for (String word : words) totalChars += word.length();
@@ -51,7 +51,7 @@ public class TextToSpeechByLengthAligner {
         for (int i = 0; i < sentences.length; ++i)
         {
         	double time = speechTimes.get(0).getTime();
-        	double auxEst = (estimates[i][0] - time);
+        	double auxEst = (estimates[i][0] * 10.0 - time * 10.0);
         	matchingScores[i + 1] = auxEst * auxEst;
         	matchingIndexes[0][i + 1] = 0;
         }
@@ -68,7 +68,7 @@ public class TextToSpeechByLengthAligner {
         		for (int k = 0; k <= j; ++k)
         		{
         			double prevScore = matchingScores[j - k];
-        			double auxDiff = time - estimates[j][j - k + 1];
+        			double auxDiff = time * 10.0 - estimates[j][j - k + 1] * 10.0;
         			double diff = auxDiff * auxDiff;
         			double scoreCand = prevScore + diff;
         			if (scoreCand < newMatchingScores[j])
