@@ -58,7 +58,7 @@ public class OfflineSpeechRecognizer implements IWaveObserver {
 	    {
 	    	double[] curr = allData.get(i).getSpectrum();
 	    	for (int j = 0; j < spectrumSize; ++j)
-	    		average += Math.log(curr[j]);
+	    		average += curr[j];
 	    }
 	    average /= allData.size();
 	    
@@ -69,7 +69,7 @@ public class OfflineSpeechRecognizer implements IWaveObserver {
 	    	double[] curr = allData.get(i).getSpectrum();
 	    	double sum = 0;
 	    	for (int j = 0; j < spectrumSize; ++j)
-	    		sum += Math.log(curr[j]);
+	    		sum += curr[j];
 	    	if (sum < average) {
 	    		backgroundAverage += sum;
 	    		count++;
@@ -82,7 +82,7 @@ public class OfflineSpeechRecognizer implements IWaveObserver {
 	    {
 	    	double[] curr = allData.get(i).getSpectrum();
 	    	double sum = 0;
-	    	for (int j = 0; j < spectrumSize; ++j) sum += Math.log(curr[j]);
+	    	for (int j = 0; j < spectrumSize; ++j) sum += curr[j];
 	    	isSpeech[i + 1] = (sum > backgroundAverage);
 	    }
 	    

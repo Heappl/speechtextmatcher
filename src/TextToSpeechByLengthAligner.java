@@ -95,7 +95,7 @@ public class TextToSpeechByLengthAligner {
 			if (matching[i] >= sentences.length) break;
 			for (int j = lastMatching; j <= matching[i]; ++j) label += ". " + sentences[j];
 			
-			while ((i + 1 < matching.length) && (matching[i + 1] == matching[i])) {
+			while ((i + 1 < matching.length) && (matching[i + 1] < matching[i] + 1)) {
 				++i;
 				end = speechTimes.get(i).getEndTime();
 			}

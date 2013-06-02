@@ -18,8 +18,8 @@ public class WaveDataPacker implements IWaveObserver {
 		
 		double[] nextData = new double[upto / neigh];
 		for (int i = neigh / 2; i < upto - neigh / 2; i += neigh)
-			for (int j = -neigh / 2; j <= neigh / 2; ++j)
-				nextData[i / neigh] += values[i + j];
+			for (int j = -neigh / 2; j < neigh / 2; ++j)
+				nextData[i / neigh] += Math.log(values[i + j]);
 		this.next.process(startTime, endTime, nextData);
 	}
 }

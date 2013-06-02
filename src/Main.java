@@ -9,19 +9,19 @@ public class Main {
 	
     public static void main(String[] args) {
     	
-//    	String waveFile = "/home/bartek/workspace/speechtextmatcher/stefan-zeromski-doktor-piotr_test.wav";
-    	String waveFile = "/home/bartek/workspace/speechtextmatcher/stefan-zeromski-doktor-piotr.wav";
+    	String waveFile = "/home/bartek/workspace/speechtextmatcher/stefan-zeromski-doktor-piotr_test.wav";
+//    	String waveFile = "/home/bartek/workspace/speechtextmatcher/stefan-zeromski-doktor-piotr.wav";
 //    	String waveFile = "/home/bartek/workspace/speechtextmatcher/przedwiosnie-rodowod.wav";
     	
-    	String textFile = "/home/bartek/workspace/speechtextmatcher/doktor-piotr_2.txt";
+//    	String textFile = "/home/bartek/workspace/speechtextmatcher/doktor-piotr_2.txt";
 //    	String textFile = "/home/bartek/workspace/speechtextmatcher/przedwiosnie_rodowod.txt";
-//    	String textFile = "stefan-zeromski-doktor-piotr_test.txt";
+    	String textFile = "stefan-zeromski-doktor-piotr_test.txt";
 
     	WaveImporter waveImporter = new WaveImporter(waveFile);
     	OfflineSpeechRecognizer speechRecognizer = new OfflineSpeechRecognizer(10, 10);
 //    	WaveDisplay display = new WaveDisplay(); 
-//    	waveImporter.registerObserver(display);//new WaveDataPacker(display, 1.0, 0.01));
-    	waveImporter.registerObserver(speechRecognizer);//new WaveDataPacker(speechRecognizer, 1.0, 0.00001));
+//    	waveImporter.registerObserver(new WaveDataPacker(display, 1.0, 0.01));
+    	waveImporter.registerObserver(new WaveDataPacker(speechRecognizer, 1.0, 0.1));
     	waveImporter.process();
     	
     	ArrayList<Speech> speechTimes = speechRecognizer.findSpeechParts();
@@ -36,7 +36,7 @@ public class Main {
 //        
 //        ArrayList<AudioLabel> newLabels = new ArrayList<AudioLabel>();
 //        
-//        int minPrefix = 5;
+//        int minPrefix = 3;
 //        for (AudioLabel label : labels)
 //        {
 //        	String labelText = label.getLabel().replaceAll("[. ]+", " ");
@@ -57,7 +57,7 @@ public class Main {
 //        	String prefix = labelText.substring(0, minPrefix);
 //        	if (!prefixes.containsKey(prefix)) continue;
 //        	int n = prefixes.get(prefix);
-//        	if (n > 2) newLabels.add(label);
+//        	if (n > 10) newLabels.add(new AudioLabel(prefix, label.getStart(), label.getStart() + 0.5));
 //        }
 //        labels = newLabels.toArray(new AudioLabel[0]);
     	
