@@ -5,25 +5,13 @@ import java.util.TreeSet;
 
 public class TextToSpeechByLengthAligner {
 
-	AudioLabel[] findMatching(String text, ArrayList<Speech> speechTimes)
+	AudioLabel[] findMatching(Text text, Speeches speeches)
 	{
-		double wholeTime = 0;
-        for (Speech elem : speechTimes) wholeTime += elem.getTime();
-        text = text.replaceAll("\n\\s*\n", ".").replaceAll("[\\s]+", " ");
-        SortedSet<Character> chars = new TreeSet<Character>();
-        for (int i = 0; i < text.length(); ++i)
-        	if (Character.isLetterOrDigit(text.charAt(i)))
-        		chars.add(text.charAt(i));
-        String charRegex = "";
-        for (Character c : chars) charRegex += c;
-        String[] sentences = text.split("(\\s*[^" + charRegex + "'\\s]+\\s*)+");
-        String[] words = text.split("[^" + charRegex + "']+");
-        int totalChars = 0;
-        for (String word : words) totalChars += word.length();
+        String[] sentences = text.getSentences();
+        double timePerChar = text.getEstimatedTimePerCharacter();
+        double timePerWord = text.getEstimatedTimePerWord();
         System.err.println("sentences: " + sentences.length);
         
-        double timePerChar = wholeTime / totalChars;
-        double timePerWord = wholeTime / words.length;
         double[] estimatedTimes = new double[sentences.length];
         for (int i = 0; i < sentences.length; ++i)
         {
@@ -36,7 +24,7 @@ public class TextToSpeechByLengthAligner {
         //matchingScores[i][j] - best matching when we matched `i` speeches and `j` sentences 
         //however we only need previous (for `i - 1`) results 
         double[] matchingScores = new double[sentences.length + 1];
-        int[][] matchingIndexes = new int[speechTimes.size()][sentences.length + 1];
+        int[][] matchingIndexes = new int[speeches.size()][sentences.length + 1];
         double[][] estimates = new double[sentences.length][sentences.length + 1];
         double totalEstTime = 0;
         for (int i = 0; i < sentences.length; ++i)
@@ -50,17 +38,17 @@ public class TextToSpeechByLengthAligner {
         }
         for (int i = 0; i < sentences.length; ++i)
         {
-        	double time = speechTimes.get(0).getTime();
+        	double time = speeches.get(0).getTime();
         	double auxEst = (estimates[i][0] * 10.0 - time * 10.0);
         	matchingScores[i + 1] = auxEst * auxEst;
         	matchingIndexes[0][i + 1] = 0;
         }
-        matchingScores[0] = speechTimes.get(0).getTime() * speechTimes.get(0).getTime();
+        matchingScores[0] = speeches.get(0).getTime() * speeches.get(0).getTime();
         matchingIndexes[0][0] = -1;
         
-        for (int i = 1; i < speechTimes.size(); ++i)
+        for (int i = 1; i < speeches.size(); ++i)
         {
-        	double time = speechTimes.get(i).getTime();
+        	double time = speeches.get(i).getTime();
         	double[] newMatchingScores = new double[sentences.length];
         	for (int j = 0; j < sentences.length; ++j)
         	{
@@ -81,23 +69,23 @@ public class TextToSpeechByLengthAligner {
         	matchingScores = newMatchingScores;
         }
         
-        int[] matching = new int[speechTimes.size()];
+        int[] matching = new int[speeches.size()];
         matching[matching.length - 1] = sentences.length - 1;
-        for (int i = speechTimes.size() - 2; i >= 0; --i)
+        for (int i = speeches.size() - 2; i >= 0; --i)
         	matching[i] = matchingIndexes[i + 1][matching[i + 1]];
         
         ArrayList<AudioLabel> labels = new ArrayList<AudioLabel>();
 		int lastMatching = 0;
 		for (int i = 0; i < matching.length; ++i) {
-			double startx = speechTimes.get(i).getStartTime();
-			double end = speechTimes.get(i).getEndTime();
+			double startx = speeches.get(i).getStartTime();
+			double end = speeches.get(i).getEndTime();
 			String label = "";
 			if (matching[i] >= sentences.length) break;
 			for (int j = lastMatching; j <= matching[i]; ++j) label += ". " + sentences[j];
 			
 			while ((i + 1 < matching.length) && (matching[i + 1] < matching[i] + 1)) {
 				++i;
-				end = speechTimes.get(i).getEndTime();
+				end = speeches.get(i).getEndTime();
 			}
 			
 			labels.add(new AudioLabel(label, startx, end));

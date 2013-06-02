@@ -4,7 +4,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 
-public class TextImporter {
+public class TextImporter implements ITextProducer {
 	private String filePath;
 	public TextImporter(String filePath) {
 		this.filePath = filePath;

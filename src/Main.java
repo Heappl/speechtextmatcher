@@ -20,19 +20,19 @@ public class Main {
     	String textFile = "/home/bartek/workspace/speechtextmatcher/doktor-piotr_2.txt";
 
     	WaveImporter waveImporter = new WaveImporter(waveFile);
-    	OfflineSpeechRecognizer speechRecognizer = new OfflineSpeechRecognizer(12, 10);
+    	OfflineSpeechRecognizer speechRecognizer = new OfflineSpeechRecognizer(10, 10);
 //    	WaveDisplay display = new WaveDisplay(); 
 //    	waveImporter.registerObserver(new WaveDataPacker(display, 1.0, 0.01));
     	waveImporter.registerObserver(new WaveDataPacker(speechRecognizer, 1.0, 0.1));
     	waveImporter.process();
     	
-    	ArrayList<Speech> speechTimes = speechRecognizer.findSpeechParts();
+    	Speeches speeches = speechRecognizer.findSpeechParts();
     	ArrayList<Data> allData = speechRecognizer.getAllData();
-        System.err.println("speeches " + speechTimes.size());
+        System.err.println("speeches " + speeches.size());
         
-        String text = new TextImporter(textFile).getText();
-        
-        AudioLabel[] labels = new TextToSpeechByLengthAligner().findMatching(text, speechTimes);
+        Text text = new Text(new TextImporter(textFile), speeches.getTotalTime());
+       
+        AudioLabel[] labels = new TextToSpeechByLengthAligner().findMatching(text, speeches);
         
 //        Map<String, Integer> prefixes = new TreeMap<String, Integer>();
 //        

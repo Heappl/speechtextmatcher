@@ -23,36 +23,8 @@ public class OfflineSpeechRecognizer implements IWaveObserver {
 		return allData;
 	}
 	
-	public ArrayList<Speech> findSpeechParts()
+	public Speeches findSpeechParts()
 	{
-//		double[] averages = new double[this.spectrumSize];
-//	    for (int i = 0; i < allData.size(); ++i)
-//	    {
-//	    	double[] curr = allData.get(i).getSpectrum();
-//	    	for (int j = 0; j < spectrumSize; ++j)
-//	    		averages[j] += curr[j];
-//	    }
-//	    for (int j = 0; j < spectrumSize; ++j) averages[j] /= allData.size();
-//	    double[] deviations = new double[spectrumSize];
-//	    for (int i = 0; i < allData.size(); ++i)
-//	    {
-//	    	double[] curr = allData.get(i).getSpectrum();
-//	    	for (int j = 0; j < spectrumSize; ++j)
-//	    		deviations[j] += Math.abs(averages[j] - curr[j]);
-//	    }
-//	    for (int j = 0; j < spectrumSize; ++j) deviations[j] /= allData.size();
-//	    
-//	    boolean[] isSpeech = new boolean[allData.size() + 2];
-//	    for (int i = 0; i < allData.size(); ++i)
-//	    {
-//	    	int count = 0;
-//	    	double[] curr = allData.get(i).getSpectrum();
-//	    	for (int j = 0; j < spectrumSize; ++j)
-//	    		if ((curr[j] - averages[j]) > deviations[j])
-//	    			++count;
-//	    	isSpeech[i + 1] = (count > 0);
-//	    }
-		
 		double average = 0;
 	    for (int i = 0; i < allData.size(); ++i)
 	    {
@@ -100,14 +72,16 @@ public class OfflineSpeechRecognizer implements IWaveObserver {
 	    	{
 	    		Speech speech = new Speech(
 	    				allData.get(start).getStartTime(),
-	    				allData.get(i).getStartTime());
+	    				allData.get(i).getStartTime(),
+	    				start,
+	    				i);
 	    		out.add(speech);
 	    		start = -1;
 	    	}
 	    	if ((start < 0) && isSpeech[i])
 	    		start = i;
 	    }
-	    return out;
+	    return new Speeches(out);
 	}
 	
 	private boolean isOfType(boolean[] data, int index, boolean type)
