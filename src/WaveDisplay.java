@@ -50,6 +50,12 @@ class WaveFormPanel extends JPanel {
 			g.setColor(Color.BLUE);
 			g.fillRect(x, this.height / 2 - height - 1, barWidth, height + 1);
 		}
+		
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 }
 

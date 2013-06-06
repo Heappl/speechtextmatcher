@@ -7,6 +7,8 @@ import edu.cmu.sphinx.frontend.DataProcessor;
 import edu.cmu.sphinx.frontend.DoubleData;
 import edu.cmu.sphinx.frontend.FloatData;
 import edu.cmu.sphinx.frontend.FrontEnd;
+import edu.cmu.sphinx.frontend.endpoint.SpeechEndSignal;
+import edu.cmu.sphinx.frontend.endpoint.SpeechStartSignal;
 import edu.cmu.sphinx.frontend.filter.Preemphasizer;
 import edu.cmu.sphinx.frontend.transform.DiscreteFourierTransform;
 import edu.cmu.sphinx.frontend.util.AudioFileDataSource;
@@ -18,6 +20,7 @@ public class WaveImporter
 {
 	private String waveFilePath = "";
 	private ArrayList<IWaveObserver> observers = new ArrayList<IWaveObserver>();
+	private ArrayList<ISpeechObserver> speechObservers = new ArrayList<ISpeechObserver>();
 	
 	public WaveImporter(String waveFilePath)
 	{
@@ -39,28 +42,40 @@ public class WaveImporter
 		
 		Data data = null;
 		while ((data = frontend.getData()) != null) {
-			for (IWaveObserver observer : this.observers) {
-				if (data.getClass() == DoubleData.class)
-				{
-					DoubleData doubleData = (DoubleData)data;
-					double startTime = (double)doubleData.getFirstSampleNumber() / (double)doubleData.getSampleRate();
-					double endTime = startTime + (double)doubleData.getValues().length / (double)doubleData.getSampleRate();
-					observer.process(startTime, endTime, doubleData.getValues());
-				}
-				if (data.getClass() == FloatData.class)
-				{
-					FloatData floatData = (FloatData)data;
-					double startTime = (double)floatData.getFirstSampleNumber() / (double)floatData.getSampleRate();
-					double endTime = startTime + (double)floatData.getValues().length / (double)floatData.getSampleRate();
-					double[] doubleData = new double[floatData.getValues().length];
-					for (int i = 0; i < doubleData.length; ++i)
-						doubleData[i] = floatData.getValues()[i];
-					observer.process(startTime, endTime, doubleData);
-				}
+
+			double startTime = 0;
+			double endTime = 0;
+			double[] doubleData = null;
+			
+			if (data.getClass() == DoubleData.class) {
+				DoubleData dataT = (DoubleData)data;
+				startTime = (double)dataT.getFirstSampleNumber() / (double)dataT.getSampleRate();
+				endTime = startTime + (double)dataT.getValues().length / (double)dataT.getSampleRate();
+				doubleData = dataT.getValues();
+			} else if (data.getClass() == FloatData.class) {
+				FloatData dataT = (FloatData)data;
+				startTime = (double)dataT.getFirstSampleNumber() / (double)dataT.getSampleRate();
+				endTime = startTime + (double)dataT.getValues().length / (double)dataT.getSampleRate();
+				doubleData = new double[dataT.getValues().length];
+				for (int i = 0; i < doubleData.length; ++i)
+					doubleData[i] = dataT.getValues()[i];
+			} if (data.getClass() == SpeechStartSignal.class) {
+				for (ISpeechObserver observer : speechObservers)
+					observer.speechStarted();
+			} else if (data.getClass() == SpeechEndSignal.class) {
+				for (ISpeechObserver observer : speechObservers)
+					observer.speechEnded();
 			}
+			if (doubleData != null)
+				for (IWaveObserver observer : this.observers)
+					observer.process(startTime, endTime, doubleData);
 		}
 		
 		observers.clear();
 		System.gc();
+	}
+
+	public void registerSpeechObserver(ISpeechObserver speechObserver) {
+		this.speechObservers.add(speechObserver);
 	}
 }
