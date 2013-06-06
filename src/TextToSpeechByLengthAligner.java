@@ -18,7 +18,7 @@ public class TextToSpeechByLengthAligner {
         	String[] sentWords = sentences[i].split(" ");
         	int noChars = 0;
         	for (String word : sentWords) noChars += word.length();
-        	estimatedTimes[i] = (noChars * timePerChar + sentWords.length * timePerWord) / 2.0;
+        	estimatedTimes[i] = noChars * timePerChar * 0.95 + 0.05 * sentWords.length * timePerWord;
         }
         
         //matchingScores[i][j] - best matching when we matched `i` speeches and `j` sentences 

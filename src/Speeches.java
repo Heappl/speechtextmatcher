@@ -27,4 +27,7 @@ public class Speeches implements Iterable<Speech> {
 	public Iterator<Speech> iterator() {
 		return speeches.iterator();
 	}
+	
+	public void translate(ArrayList<Data> allData) {
+	}
 }

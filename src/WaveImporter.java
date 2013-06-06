@@ -16,15 +16,18 @@ import edu.cmu.sphinx.frontend.window.RaisedCosineWindower;
 import edu.cmu.sphinx.util.props.ConfigurationManager;
 
 
-public class WaveImporter
+public class WaveImporter implements Runnable
 {
 	private String waveFilePath = "";
+	private String configFile = "";
 	private ArrayList<IWaveObserver> observers = new ArrayList<IWaveObserver>();
 	private ArrayList<ISpeechObserver> speechObservers = new ArrayList<ISpeechObserver>();
+	Thread processThread = null;
 	
-	public WaveImporter(String waveFilePath)
+	public WaveImporter(String waveFilePath, String configFile)
 	{
 		this.waveFilePath = waveFilePath;
+		this.configFile = configFile;
 	}
 	
 	public void registerObserver(IWaveObserver observer)
@@ -34,7 +37,26 @@ public class WaveImporter
 	
 	public void process()
 	{
-		ConfigurationManager cm = new ConfigurationManager(Main.class.getResource("config.xml"));
+		this.processThread = new Thread(this);
+		this.processThread.start();
+	}
+
+	public void registerSpeechObserver(ISpeechObserver speechObserver) {
+		this.speechObservers.add(speechObserver);
+	}
+
+	public void done() {
+		if (this.processThread == null) return;
+		try {
+			this.processThread.join();
+		} catch (InterruptedException e) {
+		}
+		this.processThread = null;
+	}
+
+	@Override
+	public void run() {
+		ConfigurationManager cm = new ConfigurationManager(Main.class.getResource(this.configFile));
 		FrontEnd frontend = (FrontEnd)cm.lookup("frontend");
 		AudioFileDataSource audioSource = (AudioFileDataSource)cm.lookup("audioFileDataSource");
 		File sourceFile = new File(this.waveFilePath);
@@ -73,9 +95,5 @@ public class WaveImporter
 		
 		observers.clear();
 		System.gc();
-	}
-
-	public void registerSpeechObserver(ISpeechObserver speechObserver) {
-		this.speechObservers.add(speechObserver);
 	}
 }

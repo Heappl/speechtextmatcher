@@ -11,6 +11,8 @@ public class PhonemeDiff implements Comparator<PhonemeDiff> {
 		this.diff = diff;
 		this.first = first;
 		this.second = second;
+		this.width = width;
+		System.err.println(first + " " + second + " " + width + " " + diff);
 	}
 	
 	public int getFirstStart() { return first; }
