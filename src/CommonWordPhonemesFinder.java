@@ -1,19 +1,9 @@
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
-import edu.cmu.sphinx.tools.audio.AudioData;
-
 
 public class CommonWordPhonemesFinder {
-	Speeches speeches;
 	ArrayList<Data> allData;
 	Text text;
 	double frameTime = 0;
@@ -21,9 +11,8 @@ public class CommonWordPhonemesFinder {
 	double[] averages = null;
 	AudioLabel[] matched = null;
 	
-	public CommonWordPhonemesFinder(Speeches speeches, ArrayList<Data> allData, Text text, AudioLabel[] matched) {
-		this.speeches = speeches;
-		this.allData = mergeData(allData, 2);
+	public CommonWordPhonemesFinder(ArrayList<Data> allData, Text text, AudioLabel[] matched) {
+		this.allData = allData;//mergeData(allData, 2);
 		this.text = text;
 		this.frameTime = this.allData.get(1).getStartTime() - this.allData.get(0).getStartTime();
 		this.averages = calcAverages();
@@ -58,6 +47,11 @@ public class CommonWordPhonemesFinder {
 		String biggestCommon = "";
 		for (String word : words) {
 			word = word.toLowerCase();
+			if (word.equalsIgnoreCase("niespodziewanie")) continue;
+			if (word.equalsIgnoreCase("polichnowicza")) continue;
+			if (word.equalsIgnoreCase("bijakowskiego")) continue;
+			if (word.equalsIgnoreCase("polichnowicz")) continue;
+			if (word.equalsIgnoreCase("odpowiedział")) continue;
 			if (wordCounts.containsKey(word)) {
 				int count = wordCounts.get(word) + 1;
 				wordCounts.put(word, count);
@@ -68,10 +62,11 @@ public class CommonWordPhonemesFinder {
 			}
 			else wordCounts.put(word, 1);
 		}
-		System.err.println("biggest: " + biggestCommon);
+		double phonemeTime = (3 * biggestCommonSize / 4) * text.getEstimatedTimePerCharacter();
+		System.err.println("biggest: " + biggestCommon + " " + phonemeTime);
 		
 		ArrayList<ArrayList<Speech>> usedSpeeches = new ArrayList<ArrayList<Speech>>();
-		int neigh = (int)Math.ceil(Math.sqrt(Math.sqrt(speeches.size())));
+		int neigh = (int)Math.ceil(Math.sqrt(Math.sqrt(matched.length)));
 		for (int i = 0; i < matched.length; ++i) {
 			AudioLabel matching = matched[i];
 			if (matching.getLabel().toLowerCase().indexOf(biggestCommon) >= 0) {
@@ -85,71 +80,85 @@ public class CommonWordPhonemesFinder {
 					surroundingSpeeches.add(new Speech(startTime, endTime, dataStartIndex, dataEndIndex));
 				}
 				usedSpeeches.add(surroundingSpeeches);
-				System.err.println(surroundingSpeeches.size());
 			}
 		}
-		double phonemeTime = biggestCommon.length() * text.getEstimatedTimePerCharacter();
 		int frames = (int)Math.ceil(phonemeTime / frameTime);
 		
-		double[][] diffs = new double[usedSpeeches.size() * 2 * neigh][usedSpeeches.size() * 2 * neigh];
-		System.err.println("neigh: " + neigh + " diffs " + diffs.length);
-		for (int i = 0; i < diffs.length; ++i)
-			for (int j = 0; j < diffs.length; ++j)
-				diffs[i][j] = Double.MAX_VALUE;
+		int[] bestMatchings = findBestMatchings(usedSpeeches.get(0), usedSpeeches.subList(1, usedSpeeches.size()), frames);
 		
-		for (int i = 0; i < usedSpeeches.size(); ++i) {
-			System.err.println("A: " + i + "/" + usedSpeeches.size());
-			for (int j = i + 1; j < usedSpeeches.size(); ++j) {
-				System.err.println("B: " + j + "/" + usedSpeeches.size());
-				for (int k = 0; k < usedSpeeches.get(i).size(); ++k) {
-					System.err.println("C: " + k + "/" + usedSpeeches.get(i).size());
-					for (int l = 0; l < usedSpeeches.get(j).size(); ++l) {
-						System.err.println("D: " + l + "/" + usedSpeeches.get(j).size());
-						double bestDiff = findBest(usedSpeeches.get(i).get(k), usedSpeeches.get(j).get(l), frames);
-						int index1 = i * 2 * neigh + k;
-						int index2 = j * 2 * neigh + l; 
-						diffs[index1][index2] = bestDiff;
-						diffs[index2][index1] = bestDiff;
-					}
-				}
-			}
-		}
-		
-		int[] indexes = new int[usedSpeeches.size()];
-		int[] bestIndexes = new int[usedSpeeches.size()];
-		double bestScore = Double.MAX_VALUE;
-		while (true) {
-			double score = 0;
-			for (int i = 0; i < indexes.length; ++i) {
-				for (int j = i + 1; j < indexes.length; ++j) {
-					score += diffs[i * 2 * neigh + indexes[i]][j * 2 * neigh + indexes[j]];
-				}
-			}
-			if (score < bestScore) {
-				bestScore = score;
-				for (int i = 0; i < indexes.length; ++i) bestIndexes[i] = indexes[i];
-			}
-			if (next(indexes, 2 * neigh)) break;
-		}
-		
-		AudioLabel[] res = new AudioLabel[usedSpeeches.size()];
-		for (int i = 0; i < indexes.length; ++i) {
-			ArrayList<Speech> auxSpeeches = usedSpeeches.get(i);
-			Speech speech = auxSpeeches.get(bestIndexes[i]);
-			res[i] = new AudioLabel(biggestCommon, speech.getStartTime(), speech.getEndTime());
+		AudioLabel[] res = new AudioLabel[bestMatchings.length];
+		for (int i = 0; i < bestMatchings.length; ++i) {
+			double start = allData.get(bestMatchings[i]).getStartTime();
+			double end = allData.get(bestMatchings[i] + frames).getEndTime();
+			res[i] = new AudioLabel(biggestCommon + "_" + i, start, end);
 		}
 		return res;
 	}
 	
-	private boolean next(int[] indexes, int top)
+	private int[] findBestMatchings(ArrayList<Speech> target, List<ArrayList<Speech>> witnesses, int frames)
 	{
-		for (int j = indexes.length - 1; j >= 0; --j) {
-			if (indexes[j] == top - 1) continue;
-			indexes[j]++;
-			for (int k = j + 1; k < indexes.length; ++k) indexes[k] = 0;
-			return false;
+		double smallestDiff = Double.MAX_VALUE;
+		int[] bestMatching = new int[witnesses.size() + 1];
+		
+		int totalStarts = 0;
+		for (Speech speech : target) totalStarts += Math.max(0, speech.getEndDataIndex() - frames - speech.getStartDataIndex());
+		
+		int count = 0;
+		int speechCount = 0;
+		for (Speech speech : target) {
+			for (int i = speech.getStartDataIndex(); i < speech.getEndDataIndex() - frames; ++i) {
+				if (i % 100 == 0)
+					System.err.println("searching for target " + (count += 100) + "/" + totalStarts + " (" + allData.get(i).getStartTime() + ")");
+				int[] aux = new int[witnesses.size()];
+				double diff = findBests(aux, witnesses, i, frames);
+				double mult = 1;
+//				for (int j = Math.abs(speechCount - target.size() / 2); j >= 0; --j) mult *= 1.1;
+				diff = diff * mult;
+				if (diff < smallestDiff) {
+					smallestDiff = diff;
+					bestMatching[0] = i;
+					for (int j = 0; j < aux.length; ++j) bestMatching[j + 1] = aux[j];
+				}
+			}
+			++speechCount;
 		}
-		return true;
+		return bestMatching;
+	}
+
+	private double findBests(int[] bestMatching, List<ArrayList<Speech>> witnesses, int targetStart, int frames)
+	{
+		int index = 0;
+		double totalDiff = 1;
+		for (ArrayList<Speech> speeches : witnesses) {
+			PhonemeDiff diff = findBest(speeches, targetStart, frames);
+			totalDiff += diff.getDiff();
+			bestMatching[index] = diff.getSecondStart();
+			++index;
+		}
+		return totalDiff;
+	}
+
+	private PhonemeDiff findBest(ArrayList<Speech> speeches, int targetStart, int frames)
+	{
+		double bestDiff = Double.MAX_VALUE;
+		int bestIndex = 0;
+		int speechCount = 0;
+		for (Speech speech : speeches) {
+			if ((speech.getStartDataIndex() <= targetStart) && (targetStart <= speech.getEndDataIndex()))
+				continue;
+			for (int i = speech.getStartDataIndex(); i < speech.getEndDataIndex() - frames; ++i) {
+				double diff = calculateDiff(targetStart, i, frames);
+				double mult = 1;
+//				for (int j = Math.abs(speechCount - speeches.size() / 2); j >= 0; --j) mult *= 1.1;
+				diff *= mult;
+				if (diff < bestDiff) {
+					bestDiff = diff;
+					bestIndex = i;
+				}
+			}
+			++speechCount;
+		}
+		return new PhonemeDiff(bestDiff, targetStart, bestIndex, frames);
 	}
 
 	private int findIndex(double time, int bottom, int top)
@@ -161,39 +170,17 @@ public class CommonWordPhonemesFinder {
 		else return findIndex(time, between + 1, top);
 	}
 
-//	private PhonemeDiff findBest(Speech speech1, Speech speech2, int frames)
-	private double findBest(Speech speech1, Speech speech2, int frames)
-	{
-		System.err.println("find best in speeches: " +
-			(speech1.getEndDataIndex() - speech1.getStartDataIndex() - frames) + " " +
-			(speech2.getEndDataIndex() - speech2.getStartDataIndex() - frames) + " " +
-			frames);
-		double smallestDiff = Double.MAX_VALUE;
-		for (int i = speech1.getStartDataIndex(); i < speech1.getEndDataIndex() - frames; i += 2) {
-			if ((i - speech1.getStartDataIndex()) % 100 == 0)
-				System.err.println((i - speech1.getStartDataIndex()) + "/" + (speech1.getEndDataIndex() - frames - speech1.getStartDataIndex()));
-			for (int j = speech2.getStartDataIndex(); j < speech2.getEndDataIndex() - frames; j += 2) {
-				double diff = calculateDiff(i, j, frames);
-				if (diff < smallestDiff) {
-					smallestDiff = diff;
-				}
-			}
-		}
-		return smallestDiff;
-	}
-
 	private double calculateDiff(int firstStart, int secondStart, int frames)
 	{
+		if (firstStart == secondStart) return Double.MAX_VALUE;
 		double diff = 0;
-		for (int i = firstStart; i < firstStart + frames; ++i) {
-			for (int j = secondStart; j < secondStart + frames; ++j) {
-				double[] spectrum1 = allData.get(i).getSpectrum();
-				double[] spectrum2 = allData.get(j).getSpectrum();
-				for (int k = 0; k < spectrum1.length; ++k) {
-					double aux = (spectrum1[k] - spectrum2[k]) * (spectrum1[k] - spectrum2[k]);
-					if (aux < variances[k]) aux = variances[k];
-					diff += aux;
-				}
+		for (int i = 0; i < frames; ++i) {
+			double[] spectrum1 = allData.get(firstStart + i).getSpectrum();
+			double[] spectrum2 = allData.get(secondStart + i).getSpectrum();
+			for (int k = 0; k < spectrum1.length; ++k) {
+				double aux = (spectrum1[k] - spectrum2[k]) * (spectrum1[k] - spectrum2[k]);
+//				if (aux < variances[k]) aux = variances[k];
+				diff += (int)Math.round(aux / variances[k]);
 			}
 		}
 		return diff;
@@ -208,6 +195,7 @@ public class CommonWordPhonemesFinder {
 				out[i] += (averages[i] - data.getSpectrum()[i]) * (averages[i] - data.getSpectrum()[i]);
 		}
 		for (int i = 0; i < spectrumSize; ++i) out[i] /= allData.size();
+		for (int i = 0; i < spectrumSize; ++i) out[i] = Math.sqrt(out[i]);
 		return out;
 	}
 

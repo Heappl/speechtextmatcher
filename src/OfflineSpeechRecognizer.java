@@ -72,7 +72,7 @@ public class OfflineSpeechRecognizer implements IWaveObserver {
 	    	{
 	    		Speech speech = new Speech(
 	    				allData.get(start).getStartTime(),
-	    				allData.get(i).getStartTime(),
+	    				allData.get(i).getEndTime() + 0.2,
 	    				start,
 	    				i);
 	    		out.add(speech);
