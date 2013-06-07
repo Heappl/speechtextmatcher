@@ -23,7 +23,7 @@ public class CommonWordPhonemesFinder {
 	
 	public CommonWordPhonemesFinder(Speeches speeches, ArrayList<Data> allData, Text text, AudioLabel[] matched) {
 		this.speeches = speeches;
-		this.allData = mergeData(allData, 10);
+		this.allData = mergeData(allData, 2);
 		this.text = text;
 		this.frameTime = this.allData.get(1).getStartTime() - this.allData.get(0).getStartTime();
 		this.averages = calcAverages();
@@ -129,8 +129,6 @@ public class CommonWordPhonemesFinder {
 				bestScore = score;
 				for (int i = 0; i < indexes.length; ++i) bestIndexes[i] = indexes[i];
 			}
-			for (int i = 0; i < indexes.length; ++i) System.err.print(indexes[i] + " ");
-			System.err.println();
 			if (next(indexes, 2 * neigh)) break;
 		}
 		
@@ -171,8 +169,6 @@ public class CommonWordPhonemesFinder {
 			(speech2.getEndDataIndex() - speech2.getStartDataIndex() - frames) + " " +
 			frames);
 		double smallestDiff = Double.MAX_VALUE;
-		int bestFirstIndex = 0;
-		int bestSecondIndex = 0;
 		for (int i = speech1.getStartDataIndex(); i < speech1.getEndDataIndex() - frames; i += 2) {
 			if ((i - speech1.getStartDataIndex()) % 100 == 0)
 				System.err.println((i - speech1.getStartDataIndex()) + "/" + (speech1.getEndDataIndex() - frames - speech1.getStartDataIndex()));
@@ -180,13 +176,10 @@ public class CommonWordPhonemesFinder {
 				double diff = calculateDiff(i, j, frames);
 				if (diff < smallestDiff) {
 					smallestDiff = diff;
-					bestFirstIndex = i;
-					bestSecondIndex = j;
 				}
 			}
 		}
 		return smallestDiff;
-//		return new PhonemeDiff(smallestDiff, bestFirstIndex, bestSecondIndex, frames);
 	}
 
 	private double calculateDiff(int firstStart, int secondStart, int frames)
