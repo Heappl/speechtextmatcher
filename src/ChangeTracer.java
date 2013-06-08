@@ -5,11 +5,15 @@ public class ChangeTracer {
 
 	ArrayList<Data> allData = null;
 	Speeches speeches;
+	int spectrumSize = 0;
+	double[] weights;
 	
 	public ChangeTracer(ArrayList<Data> allData, Speeches speeches)
 	{
 		this.allData = allData;
 		this.speeches = speeches;
+		spectrumSize = allData.get(0).getSpectrum().length;
+		weights = new SpectrumWeights(allData).getWeights();
 	}
 
 	AudioLabel[] process()
@@ -59,7 +63,7 @@ public class ChangeTracer {
 		double end = -1;
 		int count = 0;
 		for (int i = 0; i < changes.length; ++i) {
-			if (changes[i] < average / 4) {
+			if (changes[i] < average) {
 				if (start < 0) start = allData.get(i + startIndex).getStartTime();
 				end = allData.get(i + 1 + startIndex).getStartTime();
 			} else if (start > 0) {
@@ -103,7 +107,7 @@ public class ChangeTracer {
 		double diff = 0;
 		for (int k = 0; k < first.length; ++k) {
 //			double aux = Math.abs(first[k] - second[k]);// * (first[k] - second[k]);
-			double aux = (first[k] - second[k]) * (first[k] - second[k]);
+			double aux = (first[k] - second[k]) * (first[k] - second[k]) * weights[k];
 //			diff = Math.max(aux, diff);
 			diff += aux;
 		}

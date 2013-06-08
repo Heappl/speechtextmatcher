@@ -12,6 +12,7 @@ public class StartingPhonemeFinder {
 	AudioLabel[] matched = null;
 	double[] averages = null;
 	double[] variances = null;
+	SpectrumDiffCalculator diffCalculator = null;
 	
 	public StartingPhonemeFinder(ArrayList<Data> allData, Text text, AudioLabel[] matched) {
 		this.allData = allData;
@@ -19,6 +20,7 @@ public class StartingPhonemeFinder {
 		this.matched = matched;
 		this.averages = calcAverages();
 		this.variances = calcVariances(averages);
+		this.diffCalculator = new SpectrumDiffCalculator(new SpectrumWeights(allData).getWeights());
 	}
 	
 	AudioLabel[] process()
@@ -126,14 +128,7 @@ public class StartingPhonemeFinder {
 			{
 				double[] spectrum = allData.get(j).getSpectrum();
 				double[] targetSpectrum = allData.get(targetStartIndex + j - i).getSpectrum();
-				for (int k = 0; k < spectrum.length / 3; ++k)
-				{
-					double aux = (spectrum[k] - targetSpectrum[k]) * (spectrum[k] - targetSpectrum[k]);
-//					double aux = Math.abs(spectrum[k] - targetSpectrum[k]);
-					if (aux < variances[k]) aux = variances[k];
-//					aux = Math.floor(aux / variances[k]);
-					diff += aux;// * variances[k];
-				}
+				diff += diffCalculator.diffNorm1(spectrum, targetSpectrum);
 			}
 			if (diff < smallestDiff) {
 				smallestDiff = diff;

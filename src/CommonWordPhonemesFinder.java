@@ -10,32 +10,16 @@ public class CommonWordPhonemesFinder {
 	double[] variances = null;
 	double[] averages = null;
 	AudioLabel[] matched = null;
+	SpectrumDiffCalculator diffCalculator = null;
 	
 	public CommonWordPhonemesFinder(ArrayList<Data> allData, Text text, AudioLabel[] matched) {
-		this.allData = allData;//mergeData(allData, 2);
+		this.allData = allData;
 		this.text = text;
 		this.frameTime = this.allData.get(1).getStartTime() - this.allData.get(0).getStartTime();
 		this.averages = calcAverages();
 		this.variances = calcVariances(averages);
 		this.matched = matched;
-	}
-	
-	private ArrayList<Data> mergeData(ArrayList<Data> allData, int neigh)
-	{
-		ArrayList<Data> res = new ArrayList<Data>();
-		for (int i = neigh; i < allData.size() - neigh; i += neigh) {
-			int spectrumSize = allData.get(i).getSpectrum().length;
-			double[] newSpectrum = new double[spectrumSize];
-			for (int j = i - neigh; j < i + neigh; ++j) {
-				for (int k = 0; k < spectrumSize; ++k)
-					newSpectrum[k] += allData.get(j).getSpectrum()[k];
-			}
-			for (int k = 0; k < spectrumSize; ++k) newSpectrum[k] /= neigh * 2;
-			res.add(new Data(allData.get(i - neigh).getStartTime(),
-							 allData.get(i + neigh).getEndTime(),
-							 newSpectrum));
-		}
-		return res;
+		this.diffCalculator = new SpectrumDiffCalculator(new SpectrumWeights(allData).getWeights());
 	}
 
 	AudioLabel[] process()
@@ -51,7 +35,7 @@ public class CommonWordPhonemesFinder {
 			if (word.equalsIgnoreCase("polichnowicza")) continue;
 			if (word.equalsIgnoreCase("bijakowskiego")) continue;
 			if (word.equalsIgnoreCase("polichnowicz")) continue;
-			if (word.equalsIgnoreCase("odpowiedział")) continue;
+//			if (word.equalsIgnoreCase("odpowiedział")) continue;
 			if (wordCounts.containsKey(word)) {
 				int count = wordCounts.get(word) + 1;
 				wordCounts.put(word, count);
@@ -177,11 +161,7 @@ public class CommonWordPhonemesFinder {
 		for (int i = 0; i < frames; ++i) {
 			double[] spectrum1 = allData.get(firstStart + i).getSpectrum();
 			double[] spectrum2 = allData.get(secondStart + i).getSpectrum();
-			for (int k = 0; k < spectrum1.length; ++k) {
-				double aux = (spectrum1[k] - spectrum2[k]) * (spectrum1[k] - spectrum2[k]);
-//				if (aux < variances[k]) aux = variances[k];
-				diff += (int)Math.round(aux / variances[k]);
-			}
+			diff += diffCalculator.diffNorm1(spectrum1, spectrum2);
 		}
 		return diff;
 	}
