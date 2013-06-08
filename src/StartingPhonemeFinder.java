@@ -20,7 +20,7 @@ public class StartingPhonemeFinder {
 		this.matched = matched;
 		this.averages = calcAverages();
 		this.variances = calcVariances(averages);
-		this.diffCalculator = new SpectrumDiffCalculator(new SpectrumWeights(allData).getWeights());
+		this.diffCalculator = new SpectrumDiffCalculator();//new SpectrumWeights(allData).getWeights());
 	}
 	
 	AudioLabel[] process()

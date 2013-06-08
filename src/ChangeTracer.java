@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Collection;
 
 
 public class ChangeTracer {
@@ -6,25 +7,94 @@ public class ChangeTracer {
 	ArrayList<Data> allData = null;
 	Speeches speeches;
 	int spectrumSize = 0;
-	double[] weights;
+	SpectrumDiffCalculator diffCalculator = null;
+	double[] weights = null;
 	
 	public ChangeTracer(ArrayList<Data> allData, Speeches speeches)
 	{
 		this.allData = allData;
 		this.speeches = speeches;
-		spectrumSize = allData.get(0).getSpectrum().length;
-		weights = new SpectrumWeights(allData).getWeights();
+		this.spectrumSize = allData.get(0).getSpectrum().length;
+		this.weights = new SpectrumWeights(allData).getWeights();
+		for (int i = 0; i < spectrumSize; ++i) this.weights[i] = Math.pow(this.weights[i], 2);
+		this.diffCalculator = new SpectrumDiffCalculator(this.weights);
 	}
 
 	AudioLabel[] process()
 	{
 		ArrayList<AudioLabel> auxLabels = new ArrayList<AudioLabel>();
 		for (Speech speech : speeches) {
-			auxLabels.addAll(processSpeech(speech));
+			auxLabels.addAll(processSpeech2(speech));
 		}
 		return auxLabels.toArray(new AudioLabel[0]);
 	}
 	
+	private Collection<? extends AudioLabel> processSpeech2(Speech speech)
+	{
+		int startIndex = findIndex(speech.getStartTime(), 0, allData.size() - 1);
+		int endIndex = findIndex(speech.getEndTime(), 0, allData.size() - 1);
+		
+		int size = endIndex - startIndex;
+		double average = 0;
+	    for (int i = startIndex; i < endIndex; ++i)
+	    {
+	    	double[] curr = allData.get(i).getSpectrum();
+	    	for (int j = 0; j < spectrumSize; ++j) average += Math.log(curr[j]) * weights[j];
+	    }
+	    average /= size;
+	    
+	    double backgroundAverage = 0;
+	    int count = 0;
+	    for (int i = startIndex; i < endIndex; ++i)
+	    {
+	    	double[] curr = allData.get(i).getSpectrum();
+	    	double sum = 0;
+	    	for (int j = 0; j < spectrumSize; ++j)
+	    		sum += Math.log(curr[j]) * weights[j];
+	    	if (sum < average) {
+	    		backgroundAverage += sum;
+	    		count++;
+	    	}
+	    }
+	    backgroundAverage /= count;
+	    
+	    boolean[] isSpeech = new boolean[size + 2];
+	    for (int i = 0; i < size; ++i)
+	    {
+	    	double[] curr = allData.get(i + startIndex).getSpectrum();
+	    	double sum = 0;
+	    	for (int j = 0; j < spectrumSize; ++j) sum += Math.log(curr[j]) * weights[j];
+	    	isSpeech[i + 1] = (sum > backgroundAverage);
+	    }
+        fillHoles(isSpeech, true, 2, 0);
+        fillHoles(isSpeech, true, 2, 0);
+        fillHoles(isSpeech, false, 2, 3);
+        fillHoles(isSpeech, false, 2, 3);
+//	    
+	    int start = -1;
+	    ArrayList<AudioLabel> out = new ArrayList<AudioLabel>();
+	    count = 0;
+	    for (int i = startIndex; i < endIndex; ++i)
+	    {
+	    	if ((start >= 0) && ((i == endIndex - 1) || !isSpeech[i - startIndex + 1]))
+	    	{
+	    		AudioLabel label = new AudioLabel(
+	    				(count++) + "",
+	    				allData.get(start).getStartTime(),
+	    				allData.get(i).getEndTime());
+	    		out.add(label);
+	    		start = -1;
+	    	}
+	    	if ((start < 0) && isSpeech[i - startIndex + 1])
+	    		start = i;
+	    }
+	    if (start >= 0) out.add(new AudioLabel(
+	    		count + "",
+	    		allData.get(start).getStartTime(),
+	    		allData.get(endIndex - 1).getEndTime()));
+		return out;
+	}
+
 	ArrayList<AudioLabel> processSpeech(Speech speech)
 	{
 		int spectrumSize = allData.get(0).getSpectrum().length;
@@ -48,7 +118,7 @@ public class ChangeTracer {
 				double[] diff = calculateDiff(allData.get(j - 1).getSpectrum(), allData.get(j).getSpectrum());
 				totalDiffForward = sumDiff(totalDiffForward, diff);
 			}
-			double dist = calculateDist(totalDiffBackward, totalDiffForward);
+			double dist = diffCalculator.diffNorm2(totalDiffBackward, totalDiffForward);
 			changes[i - frames - startIndex] = dist;
 		}
 		
@@ -73,6 +143,47 @@ public class ChangeTracer {
 			}
 		}
 		return auxLabels;
+	}
+	
+	private void fillHoles(boolean[] data, boolean type, int gravity, int margin)
+	{
+		int countLeft = gravity;
+		int countRight = gravity;
+		boolean[] newData = new boolean[gravity + 1];
+		int newDataInd = 0;
+        for (int i = -gravity; i < data.length + 3 * gravity; ++i)
+        {
+        	int index = i - gravity;
+        	
+    		int dataReceding = index - gravity - 1;
+    		if ((dataReceding >= 0) && (dataReceding < data.length)) {
+    			data[dataReceding] = newData[newDataInd];
+    		}
+    		
+    		if ((index >= margin) && (index < allData.size() - margin)
+    			&& (countRight > 0) && (countLeft > 0)) {
+    			newData[newDataInd] = type;
+    		}
+    		else if ((index >= 0) && (index < data.length)) {
+    			newData[newDataInd] = data[index];
+    		}
+    		newDataInd = (newDataInd + 1) % newData.length;
+        	
+        	int recedingForLeft = index - gravity;
+        	int incomingForLeft = index;
+        	int recedingForRight = index + 1;
+        	int incomingForRight = i + 1;
+        	
+        	if (isOfType(data, recedingForLeft, type)) countLeft--;
+        	if (isOfType(data, incomingForLeft, type)) countLeft++;
+        	if (isOfType(data, recedingForRight, type)) countRight--;
+        	if (isOfType(data, incomingForRight, type)) countRight++;
+        }
+	}
+	
+	private boolean isOfType(boolean[] data, int index, boolean type)
+	{
+		return ((index < 0) || (index >= data.length) || (data[index] == type));
 	}
 
 	private int findIndex(double time, int bottom, int top)
@@ -100,17 +211,5 @@ public class ChangeTracer {
 			out[i] = first[i] + second[i];
 		}
 		return out;
-	}
-
-	private double calculateDist(double[] first, double[] second)
-	{
-		double diff = 0;
-		for (int k = 0; k < first.length; ++k) {
-//			double aux = Math.abs(first[k] - second[k]);// * (first[k] - second[k]);
-			double aux = (first[k] - second[k]) * (first[k] - second[k]) * weights[k];
-//			diff = Math.max(aux, diff);
-			diff += aux;
-		}
-		return diff;
 	}
 }

@@ -25,6 +25,14 @@ public class OfflineSpeechRecognizer implements IWaveObserver {
 	
 	public Speeches findSpeechParts()
 	{
+		double[] weights = new SpectrumWeights(allData).getWeights();
+		for (int i = 0; i < spectrumSize; ++i) weights[i] *= 1000;
+		for (int i = 0; i < allData.size(); ++i) {
+			for (int j = 0; j < spectrumSize; ++j) {
+				allData.get(i).getSpectrum()[j] = Math.log(allData.get(i).getSpectrum()[j]) * weights[j];
+			}
+		}
+		
 		double average = 0;
 	    for (int i = 0; i < allData.size(); ++i)
 	    {
@@ -34,35 +42,19 @@ public class OfflineSpeechRecognizer implements IWaveObserver {
 	    }
 	    average /= allData.size();
 	    
-	    double backgroundAverage = 0;
-	    int count = 0;
-	    for (int i = 0; i < allData.size(); ++i)
-	    {
-	    	double[] curr = allData.get(i).getSpectrum();
-	    	double sum = 0;
-	    	for (int j = 0; j < spectrumSize; ++j)
-	    		sum += curr[j];
-	    	if (sum < average) {
-	    		backgroundAverage += sum;
-	    		count++;
-	    	}
-	    }
-	    backgroundAverage /= count;
-	    
 	    boolean[] isSpeech = new boolean[allData.size() + 2];
 	    for (int i = 0; i < allData.size(); ++i)
 	    {
 	    	double[] curr = allData.get(i).getSpectrum();
 	    	double sum = 0;
 	    	for (int j = 0; j < spectrumSize; ++j) sum += curr[j];
-	    	isSpeech[i + 1] = (sum >= backgroundAverage / 2);
+	    	isSpeech[i + 1] = (sum >= average);
 	    }
 	    
         fillHoles(isSpeech, true, this.speechGravity, 0);
         fillHoles(isSpeech, true, this.speechGravity, 0);
         fillHoles(isSpeech, false, this.nonSpeechGravity, 2 * this.nonSpeechGravity);
         fillHoles(isSpeech, false, this.nonSpeechGravity, 2 * this.nonSpeechGravity);
-	    
 	    
 	    int start = -1;
 	    ArrayList<Speech> out = new ArrayList<Speech>();

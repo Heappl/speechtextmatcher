@@ -40,22 +40,18 @@ public class Main {
 //    	
 //    	Speeches speeches = speechExtractor.getSpeeches();
     	Speeches speeches = speechRecognizer.findSpeechParts();
-    	ArrayList<Data> allData = speechExtractor.getAllData();
+//    	ArrayList<Data> allData = speechExtractor.getAllData();
     	
         Text text = new Text(new TextImporter(textFile), speeches.getTotalTime());
         
 //        AudioLabel[] prepared = new AudacityLabelImporter(new TextImporter("labels.txt")).getLabels();
         AudioLabel[] matched = new TextToSpeechByLengthAligner().findMatching(text, speeches);
   
-//        ChangeTracer changeTracer = new ChangeTracer(allData, speeches);
-//        AudioLabel[] bigChanges = changeTracer.process();
+        ChangeTracer changeTracer = new ChangeTracer(speechRecognizer.getAllData(), speeches);
+        AudioLabel[] bigChanges = changeTracer.process();
         
-        CommonWordPhonemesFinder finder = new CommonWordPhonemesFinder(allData, text, matched);
-        AudioLabel[] labels = finder.process();
-        
-//    	new AudacityLabelsExporter("/home/bartek/workspace/speechtextmatcher/labels1.txt").export(bigChanges);
-        new AudacityLabelsExporter("/home/bartek/workspace/speechtextmatcher/labels1.txt").export(labels);
-//    	new AudacityLabelsExporter("/home/bartek/workspace/speechtextmatcher/labels2.txt").export(matched);
+    	new AudacityLabelsExporter("/home/bartek/workspace/speechtextmatcher/labels2.txt").export(matched);
+    	new AudacityLabelsExporter("/home/bartek/workspace/speechtextmatcher/labels3.txt").export(bigChanges);
         System.err.println("END");
     }
 }
