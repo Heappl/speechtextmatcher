@@ -1,8 +1,8 @@
 
 public class KMeans {
-	double[][] means;
-	int[] classification;
-	final static int SEED = 179424673;
+	private double[][] means;
+	private int[] classification;
+	private final static int SEED = 179424673;
 	
 	public KMeans(double[][] data, int k) {
 		this.classification = new int[data.length];

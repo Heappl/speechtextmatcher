@@ -45,13 +45,15 @@ public class Main {
     	
     	
         Text text = new Text(new TextImporter(textFile), speeches.getTotalTime());
+        
+        AudioLabel[] prepared = new AudacityLabelImporter(new TextImporter("labels.txt")).getLabels();
 //        AudioLabel[] matched = new TextToSpeechByLengthAligner().findMatching(text, speeches);
 //        StartingPhonemeFinder fonemFinder = new StartingPhonemeFinder(allData, text, matched);
 //        CommonWordPhonemesFinder fonemFinder = new CommonWordPhonemesFinder(allData, text, matched);
         
         PhonemeDestructurer destructurer = new PhonemeDestructurer(speeches, text, allData);
         
-        AudioLabel[] labels = destructurer.process();
+        AudioLabel[] labels = destructurer.process(prepared);
         
 //        AudioLabel[] labels = fonemFinder.process();//auxLabels.toArray(new AudioLabel[0]);
     	new AudacityLabelsExporter("/home/bartek/workspace/speechtextmatcher/labels1.txt").export(labels);
