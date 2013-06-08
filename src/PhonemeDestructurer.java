@@ -33,7 +33,7 @@ public class PhonemeDestructurer {
 			for (int k = 0; k < spectrumSize; ++k) points[outer][k] /= frames;
 		}
 		
-		KMeans kmeans = new KMeans(points, 100);
+		KMeans kmeans = new KMeans(points, 10);
 		
 		for (AudioLabel label : prepared) {
 			System.err.println(label.getLabel() + ":");

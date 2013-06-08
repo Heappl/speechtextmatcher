@@ -14,7 +14,6 @@
             <item>melFilterBank</item>
             <item>dct </item>
             <item>liveCMN</item>
-            <item>featureExtraction</item>
         </propertylist>
     </component>
     
