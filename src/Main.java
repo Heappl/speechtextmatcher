@@ -11,8 +11,6 @@ import edu.cmu.sphinx.result.MAPConfidenceScorer;
 public class Main {
 	
     public static void main(String[] args) {
-    	
-    	
 //    	String waveFile = "/home/bartek/workspace/speechtextmatcher/przedwiosnie-rodowod.wav";
 //    	String textFile = "/home/bartek/workspace/speechtextmatcher/przedwiosnie_rodowod.txt";
     	
@@ -43,7 +41,6 @@ public class Main {
 //    	Speeches speeches = speechExtractor.getSpeeches();
     	Speeches speeches = speechRecognizer.findSpeechParts();
     	ArrayList<Data> allData = speechExtractor.getAllData();
-    	
     	
 //        Text text = new Text(new TextImporter(textFile), speeches.getTotalTime());
         

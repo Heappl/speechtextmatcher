@@ -18,13 +18,13 @@ public class NormalDistribution
 		double currTo = from + step;
 		double integral = 0;
 		for (int i = 0; i < PRECISION; ++i) {
-			double integralFrom = (currFrom - average) / deviation;
-			double integralTo = (currTo - average) / deviation;
-			double bottom = Math.pow(Math.E, -integralFrom / 2.0);
-			double top = Math.pow(Math.E, -integralTo / 2.0);
-			integral += top - bottom;
+			double integralFrom = - (currFrom - average) * (currFrom - average) / (2 * deviation * deviation);
+			double integralTo = - (currTo - average) * (currTo - average) / (2 * deviation * deviation);
+			double bottom = Math.pow(Math.E, integralFrom) / (Math.sqrt(2 * Math.PI) * deviation);
+			double top = Math.pow(Math.E, integralTo) / (Math.sqrt(2 * Math.PI) * deviation);
+			integral += (top + bottom) * step / 2.0;
 		}
-		double prob = integral / Math.sqrt(2 * Math.PI);
+		double prob = integral;
 		return prob * numberOfTries;
 	}
 }
