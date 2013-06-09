@@ -21,10 +21,15 @@ public class TextToSpeechByLengthAligner {
         	estimatedTimes[i] = noChars * timePerChar * 0.95 + 0.05 * sentWords.length * timePerWord;
         }
         
-        //matchingScores[i][j] - best matching when we matched `i` speeches and `j` sentences 
-        //however we only need previous (for `i - 1`) results 
-        double[] matchingScores = new double[sentences.length + 1];
-        int[][] matchingIndexes = new int[speeches.size()][sentences.length + 1];
+        //matchingScores[i][j] - best matching when we matched `i` speeches and `j+1` sentences 
+        //however we only need previous (for `i - 1`) results
+        double[] matchingScores = new double[sentences.length];
+        //indexes of previous matchings to recreate whole matching
+        //for [i][j] we keep index of previous matching (for i-1) used to obtain current result
+        int[][] matchingIndexes = new int[speeches.size()][sentences.length];
+        // estimates of time for sentences form i to j (including)
+        // with special value [i][i+1] meaning empty estimate
+        // for [i][i+k] (k>1) it is invalid so inf
         double[][] estimates = new double[sentences.length][sentences.length + 1];
         double totalEstTime = 0;
         for (int i = 0; i < sentences.length; ++i)
@@ -36,15 +41,15 @@ public class TextToSpeechByLengthAligner {
         	for (int j = i + 1; j < sentences.length; ++j)
         		estimates[i][j + 1] = Double.MAX_VALUE;
         }
+        
+        //initial state is for matching first speech
+        //calculating a difference of matching first speech to i sentences
         for (int i = 0; i < sentences.length; ++i)
         {
         	double time = speeches.get(0).getTime();
-        	double auxEst = (estimates[i][0] * 10.0 - time * 10.0);
-        	matchingScores[i + 1] = auxEst * auxEst;
-        	matchingIndexes[0][i + 1] = 0;
+        	double auxEst = (estimates[i][0] * 10 - time * 10);
+        	matchingScores[i] = auxEst * auxEst;
         }
-        matchingScores[0] = speeches.get(0).getTime() * speeches.get(0).getTime();
-        matchingIndexes[0][0] = -1;
         
         for (int i = 1; i < speeches.size(); ++i)
         {
@@ -56,7 +61,7 @@ public class TextToSpeechByLengthAligner {
         		for (int k = 0; k <= j; ++k)
         		{
         			double prevScore = matchingScores[j - k];
-        			double auxDiff = time * 10.0 - estimates[j][j - k + 1] * 10.0;
+        			double auxDiff = time * 10 - estimates[j][j - k + 1] * 10;
         			double diff = auxDiff * auxDiff;
         			double scoreCand = prevScore + diff;
         			if (scoreCand < newMatchingScores[j])
