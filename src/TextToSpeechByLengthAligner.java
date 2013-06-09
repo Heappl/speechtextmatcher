@@ -3,9 +3,9 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 
-public class TextToSpeechByLengthAligner {
+public class TextToSpeechByLengthAligner implements ITextToSpeechAligner {
 
-	AudioLabel[] findMatching(Text text, Speeches speeches)
+	public AudioLabel[] findMatching(Text text, Speeches speeches)
 	{
         String[] sentences = text.getSentences();
         double timePerChar = text.getEstimatedTimePerCharacter();
@@ -86,7 +86,7 @@ public class TextToSpeechByLengthAligner {
 			double end = speeches.get(i).getEndTime();
 			String label = "";
 			if (matching[i] >= sentences.length) break;
-			for (int j = lastMatching; j <= matching[i]; ++j) label += ". " + sentences[j];
+			for (int j = lastMatching; j <= matching[i]; ++j) label += (label.isEmpty() ? "" : ".") + sentences[j];
 			
 			while ((i + 1 < matching.length) && (matching[i + 1] < matching[i] + 1)) {
 				++i;

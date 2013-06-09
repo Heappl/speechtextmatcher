@@ -16,6 +16,16 @@ public class Speeches implements Iterable<Speech> {
 	public double getTotalTime() { return this.totalTime; }
 	public int size() { return this.speeches.size(); }
 	public Speech get(int i) { return speeches.get(i); }
+	public void pop_front()
+	{
+		totalTime -= speeches.get(0).getTime();
+		speeches.remove(0);
+	}
+	public void pop_back()
+	{
+		totalTime -= speeches.get(speeches.size() - 1).getTime();
+		speeches.remove(speeches.size() - 1);
+	}
 	
 	public void add(Speech speech)
 	{

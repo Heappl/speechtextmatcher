@@ -34,8 +34,8 @@ public class Main {
 //    	waveImporter.registerObserver(speechRecognizer);//new WaveDataPacker(speechRecognizer, 1.0, 0.1));
     	
     	waveImporterForOfflineSpeechRecognition.process();
-    	waveImporterForPhonemeRecognition.process();
-    	waveImporterForPhonemeRecognition.done();
+//    	waveImporterForPhonemeRecognition.process();
+//    	waveImporterForPhonemeRecognition.done();
     	waveImporterForOfflineSpeechRecognition.done();
 //    	
 //    	Speeches speeches = speechExtractor.getSpeeches();
@@ -45,13 +45,15 @@ public class Main {
         Text text = new Text(new TextImporter(textFile), speeches.getTotalTime());
         
 //        AudioLabel[] prepared = new AudacityLabelImporter(new TextImporter("labels.txt")).getLabels();
-        AudioLabel[] matched = new TextToSpeechByLengthAligner().findMatching(text, speeches);
+        IncrementalTextToSpeechAligner incrementalAligner =
+        		new IncrementalTextToSpeechAligner(new TextToSpeechByLengthAligner());
+        AudioLabel[] matched = incrementalAligner.findMatching(text, speeches);
   
-        ChangeTracer changeTracer = new ChangeTracer(speechRecognizer.getAllData(), speeches);
-        AudioLabel[] bigChanges = changeTracer.process();
+//        ChangeTracer changeTracer = new ChangeTracer(speechRecognizer.getAllData(), speeches);
+//        AudioLabel[] bigChanges = changeTracer.process();
         
     	new AudacityLabelsExporter("/home/bartek/workspace/speechtextmatcher/labels2.txt").export(matched);
-    	new AudacityLabelsExporter("/home/bartek/workspace/speechtextmatcher/labels3.txt").export(bigChanges);
+//    	new AudacityLabelsExporter("/home/bartek/workspace/speechtextmatcher/labels3.txt").export(bigChanges);
         System.err.println("END");
     }
 }
