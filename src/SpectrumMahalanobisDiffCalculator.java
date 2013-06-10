@@ -30,10 +30,10 @@ public class SpectrumMahalanobisDiffCalculator {
 		}
 		for (int k = 0; k < spectrumSize; ++k)
 			for (int j = 0; j < spectrumSize; ++j)
-				covariances[k][j] /= allData.size();
+				covariances[k][j] /= allData.size() - 1;
 		
 		RealMatrix covariancesMatrix = new Array2DRowRealMatrix(covariances);
-		this.inversedCovariancesMatrix = new LUDecomposition(covariancesMatrix).getSolver().getInverse().transpose();
+		this.inversedCovariancesMatrix = new LUDecomposition(covariancesMatrix).getSolver().getInverse();
 	}
 	
 	public double diff(double[] first, double[] second)

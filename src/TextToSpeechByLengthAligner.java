@@ -5,6 +5,10 @@ import java.util.TreeSet;
 
 public class TextToSpeechByLengthAligner implements ITextToSpeechAligner {
 
+	double[][] estimates = null;
+	double averageIsSpeechValue = 0;
+	public TextToSpeechByLengthAligner() {}
+	
 	public AudioLabel[] findMatching(Text text, Speeches speeches)
 	{
         String[] sentences = text.getSentences();
@@ -30,7 +34,7 @@ public class TextToSpeechByLengthAligner implements ITextToSpeechAligner {
         // estimates of time for sentences form i to j (including)
         // with special value [i][i+1] meaning empty estimate
         // for [i][i+k] (k>1) it is invalid so inf
-        double[][] estimates = new double[sentences.length][sentences.length + 1];
+        estimates = new double[sentences.length][sentences.length + 1];
         double totalEstTime = 0;
         for (int i = 0; i < sentences.length; ++i)
         {
@@ -46,14 +50,11 @@ public class TextToSpeechByLengthAligner implements ITextToSpeechAligner {
         //calculating a difference of matching first speech to i sentences
         for (int i = 0; i < sentences.length; ++i)
         {
-        	double time = speeches.get(0).getTime();
-        	double auxEst = (estimates[i][0] * 10 - time * 10);
-        	matchingScores[i] = auxEst * auxEst;
+        	matchingScores[i] = calculateDiff1(speeches.get(0), sentences, 0, i);
         }
         
         for (int i = 1; i < speeches.size(); ++i)
         {
-        	double time = speeches.get(i).getTime();
         	double[] newMatchingScores = new double[sentences.length];
         	for (int j = 0; j < sentences.length; ++j)
         	{
@@ -61,8 +62,7 @@ public class TextToSpeechByLengthAligner implements ITextToSpeechAligner {
         		for (int k = 0; k <= j; ++k)
         		{
         			double prevScore = matchingScores[j - k];
-        			double auxDiff = time * 10 - estimates[j][j - k + 1] * 10;
-        			double diff = auxDiff * auxDiff;
+        			double diff = calculateDiff1(speeches.get(i), sentences, j - k + 1, j);
         			double scoreCand = prevScore + diff;
         			if (scoreCand < newMatchingScores[j])
         			{
@@ -97,5 +97,11 @@ public class TextToSpeechByLengthAligner implements ITextToSpeechAligner {
 			lastMatching = matching[i] + 1;
 		}
 		return labels.toArray(new AudioLabel[0]);
+	}
+
+	private double calculateDiff1(Speech speech, String[] sentences, int s, int e)
+	{
+		double aux = speech.getTime() * 10 - estimates[e][s] * 10;
+		return aux * aux;
 	}
 }

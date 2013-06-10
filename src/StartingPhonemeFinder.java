@@ -13,7 +13,8 @@ public class StartingPhonemeFinder {
 	double[] averages = null;
 	double[] variances = null;
 //	SpectrumDiffCalculator diffCalculator = null;
-	SpectrumMahalanobisDiffCalculator diffCalculator = null;
+//	SpectrumMahalanobisDiffCalculator diffCalculator = null;
+	DynamicTimeWarpDiffCalculator diffCalculator = null;
 	
 	public StartingPhonemeFinder(ArrayList<Data> allData, Text text, AudioLabel[] matched) {
 		this.allData = allData;
@@ -22,7 +23,8 @@ public class StartingPhonemeFinder {
 		this.averages = calcAverages();
 		this.variances = calcVariances(averages);
 //		this.diffCalculator = new SpectrumDiffCalculator();//new SpectrumWeights(allData).getWeights());
-		this.diffCalculator = new SpectrumMahalanobisDiffCalculator(allData);
+//		this.diffCalculator = new SpectrumMahalanobisDiffCalculator(allData);
+		this.diffCalculator = new DynamicTimeWarpDiffCalculator(allData);
 	}
 	
 	AudioLabel[] process()
@@ -125,13 +127,16 @@ public class StartingPhonemeFinder {
 		int bestIndex = 0;
 		for (int i = start; i < end - frames; ++i)
 		{
-			double diff = 0;
-			for (int j = i; j < i + frames; ++j)
-			{
-				double[] spectrum = allData.get(j).getSpectrum();
-				double[] targetSpectrum = allData.get(targetStartIndex + j - i).getSpectrum();
-				diff += diffCalculator.diff(spectrum, targetSpectrum);
-			}
+//			double diff = 0;
+//			for (int j = i; j < i + frames; ++j)
+//			{
+//				double[] spectrum = allData.get(j).getSpectrum();
+//				double[] targetSpectrum = allData.get(targetStartIndex + j - i).getSpectrum();
+//				diff += diffCalculator.diff(spectrum, targetSpectrum);
+//			}
+			double diff = diffCalculator.diff(
+					allData.subList(i, i + frames).toArray(new Data[0]),
+					allData.subList(targetStartIndex, targetStartIndex + frames).toArray(new Data[0]));
 			if (diff < smallestDiff) {
 				smallestDiff = diff;
 				bestIndex = i;

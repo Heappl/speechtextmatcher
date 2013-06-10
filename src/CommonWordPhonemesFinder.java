@@ -48,8 +48,8 @@ public class CommonWordPhonemesFinder {
 			}
 			else wordCounts.put(word, 1);
 		}
-		double phonemeTime = (3 * biggestCommonSize / 4) * text.getEstimatedTimePerCharacter();
-		int neigh = (int)Math.ceil(Math.sqrt(Math.sqrt(matched.length)));
+		double phonemeTime = biggestCommonSize * text.getEstimatedTimePerCharacter();
+		int neigh = 1;//(int)Math.ceil(Math.sqrt(Math.sqrt(Math.sqrt(matched.length))));
 		System.err.println("biggest: " + biggestCommon + " " + phonemeTime + " neigh:" + neigh);
 		
 		ArrayList<ArrayList<Speech>> usedSpeeches = new ArrayList<ArrayList<Speech>>();
@@ -91,23 +91,22 @@ public class CommonWordPhonemesFinder {
 		
 		int count = 0;
 		int speechCount = 0;
-		for (Speech speech : target) {
-			for (int i = speech.getStartDataIndex(); i < speech.getEndDataIndex() - frames; ++i) {
-				if (i % 100 == 0)
-					System.err.println("searching for target " + (count += 100) + "/" + totalStarts + " (" + allData.get(i).getStartTime() + ")");
+//		for (Speech speech : target) {
+//			for (int i = speech.getStartDataIndex(); i < speech.getEndDataIndex() - frames; ++i) {
+				int start = findIndex(517.261, 0, allData.size() - 1);
+				int end = findIndex(518.193, 0, allData.size() - 1);
+//				System.err.println("searching for target " + count + "/" + totalStarts + " (" + allData.get(i).getStartTime() + ")");
 				int[] aux = new int[witnesses.size()];
-				double diff = findBests(aux, witnesses, i, frames);
-				double mult = 1;
-//				for (int j = Math.abs(speechCount - target.size() / 2); j >= 0; --j) mult *= 1.1;
-				diff = diff * mult;
+				double diff = findBests(aux, witnesses, start, end - start);
 				if (diff < smallestDiff) {
 					smallestDiff = diff;
-					bestMatching[0] = i;
+					bestMatching[0] = start;
 					for (int j = 0; j < aux.length; ++j) bestMatching[j + 1] = aux[j];
 				}
-			}
-			++speechCount;
-		}
+				++count;
+//			}
+//			++speechCount;
+//		}
 		return bestMatching;
 	}
 
@@ -132,11 +131,9 @@ public class CommonWordPhonemesFinder {
 		for (Speech speech : speeches) {
 			if ((speech.getStartDataIndex() <= targetStart) && (targetStart <= speech.getEndDataIndex()))
 				continue;
+			if (speechCount % 100 == 0) System.err.println("findBest " + speechCount);
 			for (int i = speech.getStartDataIndex(); i < speech.getEndDataIndex() - frames; ++i) {
 				double diff = calculateDiff(targetStart, i, frames);
-				double mult = 1;
-//				for (int j = Math.abs(speechCount - speeches.size() / 2); j >= 0; --j) mult *= 1.1;
-				diff *= mult;
 				if (diff < bestDiff) {
 					bestDiff = diff;
 					bestIndex = i;
@@ -159,13 +156,9 @@ public class CommonWordPhonemesFinder {
 	private double calculateDiff(int firstStart, int secondStart, int frames)
 	{
 		if (firstStart == secondStart) return Double.MAX_VALUE;
-		double diff = 0;
-		for (int i = 0; i < frames; ++i) {
-			double[] spectrum1 = allData.get(firstStart + i).getSpectrum();
-			double[] spectrum2 = allData.get(secondStart + i).getSpectrum();
-			diff += diffCalculator.diff(spectrum1, spectrum2);
-		}
-		return diff;
+		return new DynamicTimeWarpDiffCalculator(allData).diff(
+				allData.subList(firstStart, firstStart + frames).toArray(new Data[0]),
+				allData.subList(secondStart, secondStart + frames).toArray(new Data[0]));
 	}
 
 	private double[] calcVariances(double[] averages) {
