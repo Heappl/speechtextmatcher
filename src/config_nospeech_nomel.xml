@@ -5,8 +5,10 @@
         <propertylist name="pipeline">
             <item>audioFileDataSource </item>
             <item>dataBlocker </item>
+            <item>preemphasizer </item>
             <item>windower </item>
             <item>fft </item>
+            <item>floatDataConverter</item>
         </propertylist>
     </component>
     
@@ -29,4 +31,5 @@
     <component name="speechMarker" type="edu.cmu.sphinx.frontend.endpoint.SpeechMarker" >
         <property name="speechTrailer" value="0"/>
     </component>
+    <component name="floatDataConverter" type="FloatDataToDoubleConverter"/>
 </config>
