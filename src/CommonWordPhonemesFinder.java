@@ -10,7 +10,8 @@ public class CommonWordPhonemesFinder {
 	double[] variances = null;
 	double[] averages = null;
 	AudioLabel[] matched = null;
-	SpectrumDiffCalculator diffCalculator = null;
+//	SpectrumDiffCalculator diffCalculator = null;
+	SpectrumMahalanobisDiffCalculator diffCalculator = null;
 	
 	public CommonWordPhonemesFinder(ArrayList<Data> allData, Text text, AudioLabel[] matched) {
 		this.allData = allData;
@@ -19,7 +20,8 @@ public class CommonWordPhonemesFinder {
 		this.averages = calcAverages();
 		this.variances = calcVariances(averages);
 		this.matched = matched;
-		this.diffCalculator = new SpectrumDiffCalculator();//new SpectrumWeights(allData).getWeights());
+//		this.diffCalculator = new SpectrumDiffCalculator();//new SpectrumWeights(allData).getWeights());
+		this.diffCalculator = new SpectrumMahalanobisDiffCalculator(allData);
 	}
 
 	AudioLabel[] process()
@@ -161,7 +163,7 @@ public class CommonWordPhonemesFinder {
 		for (int i = 0; i < frames; ++i) {
 			double[] spectrum1 = allData.get(firstStart + i).getSpectrum();
 			double[] spectrum2 = allData.get(secondStart + i).getSpectrum();
-			diff += diffCalculator.diffNorm2(spectrum1, spectrum2);
+			diff += diffCalculator.diff(spectrum1, spectrum2);
 		}
 		return diff;
 	}
