@@ -7,13 +7,15 @@ public class OfflineSpeechRecognizer implements IWaveObserver {
 	private int speechGravity;
 	private int nonSpeechGravity;
 	
-	public OfflineSpeechRecognizer(int speechGravity, int nonSpeechGravity) {
+	public OfflineSpeechRecognizer(int speechGravity, int nonSpeechGravity)
+	{
 		this.speechGravity = speechGravity;
 		this.nonSpeechGravity = nonSpeechGravity;
 	}
 	
 	@Override
-	public void process(double startTime, double endTime, double[] values) {
+	public void process(double startTime, double endTime, double[] values)
+	{
 		allData.add(new Data(startTime, endTime, values));
 		this.spectrumSize = Math.max(values.length, this.spectrumSize);
 	}
