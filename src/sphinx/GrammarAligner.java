@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import javax.sound.sampled.AudioInputStream;
 
 import edu.cmu.sphinx.frontend.util.AudioFileDataSource;
+import edu.cmu.sphinx.linguist.language.grammar.AlignerGrammar;
 import edu.cmu.sphinx.recognizer.Recognizer;
 import edu.cmu.sphinx.result.Result;
 import edu.cmu.sphinx.result.WordResult;

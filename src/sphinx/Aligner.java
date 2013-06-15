@@ -36,91 +36,11 @@ public class Aligner {
     
     static int diff = 200;
 
-    public static ArrayList<WordResult> align(String args[]) throws Exception {
-
-        URL acousticModel = new URL(args[0]);
-        URL dictionary = new URL(args[1]);
-        GrammarAligner aligner = new GrammarAligner(acousticModel, dictionary,
-                null);
-
-        AudioInputStream stream = AudioSystem.getAudioInputStream(new File(
-                args[2]));
-        String text = readFileText(args[3]);
-
+    public static ArrayList<WordResult> align(URL acousticModel, URL dictionary, AudioInputStream stream, String text) throws Exception
+    {
+        GrammarAligner aligner = new GrammarAligner(acousticModel, dictionary, null);
         ArrayList<WordResult> results = aligner.align(stream, text);
         return results;
     } 
-    
-    public static void copyAudio(String sourceFileName,
-            String destinationFileName, int startMs, int endMs) throws UnsupportedAudioFileException, IOException {
-        AudioInputStream inputStream = null;
-        AudioInputStream cutStream = null;
-        File file = new File(sourceFileName);
-        AudioFileFormat fileFormat = AudioSystem.getAudioFileFormat(file);
-        AudioFormat format = fileFormat.getFormat();
-        inputStream = AudioSystem.getAudioInputStream(file);
-        int bytesPerMsSecond = format.getFrameSize()
-                * (int) format.getFrameRate() / 1000;
-        inputStream.skip(startMs * bytesPerMsSecond);
-        long framesOfAudioToCopy = endMs * (int) format.getFrameRate() / 1000;
-        cutStream = new AudioInputStream(inputStream, format,
-                framesOfAudioToCopy);
-        File destinationFile = new File(destinationFileName);
-        AudioSystem.write(cutStream, fileFormat.getType(),
-                destinationFile);
-        inputStream.close();
-        cutStream.close();
-    }
-
-    private static void dumpDatabase(String input,
-            ArrayList<WordResult> results) throws UnsupportedAudioFileException, IOException {        
-        ArrayList<ArrayList<WordResult>> utts = new ArrayList<ArrayList<WordResult>>();
-        ArrayList<WordResult> currentUtt = null;
-        int fillerLength = 0;
-        for (WordResult result : results) {
-            if (!result.isFiller()) {
-                fillerLength = 0;
-                if (currentUtt == null) {
-                    currentUtt = new ArrayList<WordResult>(1);
-                }
-                currentUtt.add(result);
-            } else {
-                fillerLength += result.getEndFrame() - result.getStartFrame();
-                if (fillerLength > diff) {
-                    if (currentUtt != null)
-                        utts.add(currentUtt);
-                    currentUtt = null;
-                }
-            }
-        }
-        
-        int count = 0;
-        for (ArrayList<WordResult> utt : utts) {
-            String uttId = String.format("%03d", count) + "0";
-            String outFile = input.substring(0, input.length() - 4) + "-" + uttId + ".wav";
-            int startMs = utt.get(0).getStartFrame() - diff;
-            int lengthMs = utt.get(utt.size() - 1).getEndFrame() - startMs + diff;            
-            for (WordResult result : utt) {
-                System.out.print(result.getPronunciation().getWord());
-                System.out.print(' ');
-            }
-            copyAudio(input, outFile, startMs, lengthMs);
-            System.out.println("(" + uttId + ")");
-            count++;
-        }
-    }
-
-    private static String readFileText(String file) throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader(file));
-        StringBuilder sb = new StringBuilder();
-        String line = br.readLine();
-        while (line != null) {
-            sb.append(line.trim());
-            sb.append(" ");
-            line = br.readLine();
-        }
-        br.close();
-        return sb.toString();
-    }
 }
 
