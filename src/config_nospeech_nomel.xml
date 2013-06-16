@@ -7,6 +7,7 @@
             <item>dataBlocker </item>
             <item>windower </item>
             <item>fft </item>
+            <item>fft2 </item>
             <item>floatDataConverter</item>
         </propertylist>
     </component>
@@ -20,6 +21,7 @@
     <component name="preemphasizer" type="edu.cmu.sphinx.frontend.filter.Preemphasizer"/>
     <component name="windower" type="edu.cmu.sphinx.frontend.window.RaisedCosineWindower"/>
     <component name="fft" type="edu.cmu.sphinx.frontend.transform.DiscreteFourierTransform"/>
+    <component name="fft2" type="edu.cmu.sphinx.frontend.transform.DiscreteFourierTransform"/>
     <component name="dct" type="edu.cmu.sphinx.frontend.transform.DiscreteCosineTransform"/>
     <component name="liveCMN" type="edu.cmu.sphinx.frontend.feature.LiveCMN"/>
     <component name="featureExtraction" type="edu.cmu.sphinx.frontend.feature.DeltasFeatureExtractor"/>

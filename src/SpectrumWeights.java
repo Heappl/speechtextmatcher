@@ -5,7 +5,7 @@ public class SpectrumWeights
 {
 	private double[] weights;
 
-	public SpectrumWeights(ArrayList<Data> allData)
+	public SpectrumWeights(DataSequence allData)
 	{
 		int spectrumSize = allData.get(0).getSpectrum().length;
 		SpectrumHistograms histograms = new SpectrumHistograms(allData, 100);

@@ -3,14 +3,14 @@ import java.util.ArrayList;
 
 public class OfflineDataNormalizer
 {
-	private ArrayList<Data> allData;
+	private DataSequence allData;
 	
-	public OfflineDataNormalizer(ArrayList<Data> allData)
+	public OfflineDataNormalizer(DataSequence allData)
 	{
 		this.allData = allData;
 	}
 	
-	ArrayList<Data> normalize()
+	DataSequence normalize()
 	{
 		int spectrumSize = allData.get(0).getSpectrum().length;
 		double[] averages = new double[spectrumSize];

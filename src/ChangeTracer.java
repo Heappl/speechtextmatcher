@@ -4,13 +4,13 @@ import java.util.Collection;
 
 public class ChangeTracer {
 
-	ArrayList<Data> allData = null;
+	DataSequence allData = null;
 	Speeches speeches;
 	int spectrumSize = 0;
 	SpectrumDiffCalculator diffCalculator = null;
 	double[] weights = null;
 	
-	public ChangeTracer(ArrayList<Data> allData, Speeches speeches)
+	public ChangeTracer(DataSequence allData, Speeches speeches)
 	{
 		this.allData = allData;
 		this.speeches = speeches;

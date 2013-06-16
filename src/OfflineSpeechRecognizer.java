@@ -2,7 +2,7 @@ import java.util.ArrayList;
 
 public class OfflineSpeechRecognizer implements IWaveObserver {
 
-	private ArrayList<Data> allData = new ArrayList<Data>();
+	private DataSequence allData = new DataSequence();
 	private int spectrumSize = 0;
 	private int speechGravity;
 	private int nonSpeechGravity;
@@ -20,7 +20,7 @@ public class OfflineSpeechRecognizer implements IWaveObserver {
 		this.spectrumSize = Math.max(values.length, this.spectrumSize);
 	}
 	
-	public ArrayList<Data> getAllData()
+	public DataSequence getAllData()
 	{
 		return allData;
 	}

@@ -5,7 +5,7 @@ public class SpectrumHistograms
 {
 	private Histogram[] histograms = null; 
 	
-	public SpectrumHistograms(ArrayList<Data> allData, int baskets)
+	public SpectrumHistograms(DataSequence allData, int baskets)
 	{
 		int spectrumSize = allData.get(0).getSpectrum().length;
 		this.histograms = new Histogram[spectrumSize];
