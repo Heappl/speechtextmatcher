@@ -3,6 +3,13 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.image.PixelGrabber;
 
+import edu.cmu.sphinx.frontend.BaseDataProcessor;
+import edu.cmu.sphinx.frontend.Data;
+import edu.cmu.sphinx.frontend.DataProcessingException;
+import edu.cmu.sphinx.frontend.DoubleData;
+import edu.cmu.sphinx.frontend.databranch.DataBufferProcessor;
+import edu.cmu.sphinx.frontend.transform.DiscreteFourierTransform;
+
 
 public class ImageDFT
 {
@@ -21,27 +28,54 @@ public class ImageDFT
 		}
 	}
 	
+	class SpectrumDataFeeder extends BaseDataProcessor
+	{
+		int[] data = null;
+		int N = 0;
+		int frame = 0;
+		
+		public SpectrumDataFeeder(int[] data)
+		{
+			this.data = data;
+			this.N = (int)Math.round(Math.sqrt(data.length));
+		}
+		@Override
+		public Data getData() throws DataProcessingException
+		{
+			if (frame >= N) return null;
+			double[] nextChunk = new double[N];
+			for (int i = 0; i < N; ++i)
+				nextChunk[i] = new Color(data[frame * N + i]).getRed();
+			++frame;
+			return new DoubleData(nextChunk, 1, 1);
+		}
+	}
+	
 	BufferedImage process()
 	{
-		double[][] values = new double[N][N];
+		DiscreteFourierTransform dft = new DiscreteFourierTransform();
+		dft.setPredecessor(new SpectrumDataFeeder(data));
+		dft.initialize();
+		
+		double[][] values = new double[N][];
 		for (int i = 0; i < N; ++i) {
-			for (int j = 0; j < N; ++j) {
-				values[i][j] = calculatePoint(i, j);
-			}
+			values[i] = ((DoubleData)dft.getData()).getValues();
 		}
 		return convertValuesToImage(values);
 	}
 
 	private BufferedImage convertValuesToImage(double[][] values)
 	{
-		BufferedImage ret = new BufferedImage(N, N, BufferedImage.TYPE_INT_ARGB);
+		
+		BufferedImage ret = new BufferedImage(values.length, values[0].length, BufferedImage.TYPE_INT_ARGB);
 		int[][] imageData = new DataScaler().scale(values, 0, 256);
-		for (int i = 0; i < N; ++i)
-			for (int j = 0; j < N; ++j) {
+		for (int i = 0; i < values.length; ++i) {
+			for (int j = 0; j < values[0].length; ++j) {
 				int value = imageData[i][j];
 				int rgb = new Color(value, value, value).getRGB();
 				ret.setRGB(i, j, rgb);
 			}
+		}
 		System.err.println("Image DFT calculated");
 		return ret;
 	}

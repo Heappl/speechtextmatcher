@@ -7,7 +7,6 @@
             <item>dataBlocker </item>
             <item>windower </item>
             <item>fft </item>
-            <item>fft2 </item>
             <item>floatDataConverter</item>
         </propertylist>
     </component>
@@ -33,4 +32,11 @@
         <property name="speechTrailer" value="0"/>
     </component>
     <component name="floatDataConverter" type="FloatDataToDoubleConverter"/>
+    <component name="logApplier" type="DataLogApplier"/>
+    <component name="windowTransposer1" type="WindowTransposer">
+        <property name="window" value="100"/>
+    </component>
+    <component name="windowTransposer2" type="WindowTransposer">
+        <property name="window" value="257"/>
+    </component>
 </config>

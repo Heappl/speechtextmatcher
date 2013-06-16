@@ -39,8 +39,8 @@ public class PhonemeLearner
 	void learn(ArrayList<AudioLabel> entryset, int size)
 	{
 		for (AudioLabel label : entryset) {
-			int start = findIndex(label.getStart(), 0, allData.size());
-			int end = findIndex(label.getStart() + 1, 0, allData.size());
+			int start = findIndex(label.getStart(), 0, allData.size() - 1);
+			int end = findIndex(label.getStart() + 1, 0, allData.size() - 1);
 			System.err.println(label.getLabel() + " " + label.getStart() + " " + label.getEnd() + " " + (end - start));
 			PhonemeDisplay display = new PhonemeDisplay();
 			display.draw(new DataSequence(allData.subList(start, end)));

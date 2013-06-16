@@ -53,7 +53,7 @@ public class PhonemeDisplay extends JFrame {
 	{
 		setTitle("PhonemeDisplay");
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
-		setMinimumSize(new Dimension(width + 200, height + 100));
+		setMinimumSize(new Dimension(width + 200, 2 * height + 100));
 		createNextButton();
 		setVisible(true);
 	}
@@ -69,7 +69,9 @@ public class PhonemeDisplay extends JFrame {
 	public void draw(DataSequence dataSequence)
 	{
 		BufferedImage image = convertToImage(dataSequence);
-		draw(image, true);
+		draw(image, false);
+		BufferedImage dfted = new DataSequenceDFT(dataSequence).process();
+		draw(dfted, true);
 		try {
 			synchronized (this) {
 				this.wait();
@@ -98,7 +100,6 @@ public class PhonemeDisplay extends JFrame {
 		
 		int size = dataSequence.size();
 		int spectrumSize = dataSequence.get(0).getSpectrum().length;
-		System.err.println("spectrum size " + spectrumSize);
 		
 		BufferedImage ret = new BufferedImage(size, spectrumSize, BufferedImage.TYPE_INT_RGB);
 		int[][] scaled = new DataScaler().scale(dataSequence.getRawData(), 0, 256);

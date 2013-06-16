@@ -35,8 +35,9 @@ public class DataScaler
 		int[][] ret = new int[data.length][data[0].length];
 		MinAndMax minAndMax = findMinAndMax(data);
 		double scaleFactor = getScaleFactor(minAndMax, minValue, maxValue);
+		System.err.println("scale: " + scaleFactor + " " + minAndMax.min + " " + minAndMax.max);
 		for (int i = 0; i < data.length; ++i)
-			for (int j = 0; j < data.length; ++j)
+			for (int j = 0; j < data[i].length; ++j)
 				ret[i][j] = (int)Math.floor((data[i][j] - minAndMax.min) / scaleFactor) + minValue;
 		return ret;
 	}
