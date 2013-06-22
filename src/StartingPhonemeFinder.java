@@ -1,37 +1,48 @@
 import java.util.ArrayList;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.SortedSet;
 import java.util.TreeSet;
+
+import common.AudioLabel;
+import common.Data;
+import common.DataSequence;
+import common.PhonemeDiff;
+import common.Speech;
+import common.Text;
+import diffCalculators.HungarianMatchDiffCalculator;
+import diffCalculators.ISequenceDiffCalculator;
+
 
 import edu.cmu.sphinx.tools.audio.AudioData;
 
 
 public class StartingPhonemeFinder {
-	ArrayList<Data> allData;
+	DataSequence allData;
 	Text text;
 	AudioLabel[] matched = null;
 	double[] averages = null;
 	double[] variances = null;
 //	SpectrumDiffCalculator diffCalculator = null;
 //	SpectrumMahalanobisDiffCalculator diffCalculator = null;
-	DynamicTimeWarpDiffCalculator diffCalculator = null;
+	ISequenceDiffCalculator diffCalculator = null;
 	
-	public StartingPhonemeFinder(ArrayList<Data> allData, Text text, AudioLabel[] matched) {
-		this.allData = allData;
+	public StartingPhonemeFinder(DataSequence allData2, Text text, AudioLabel[] matched) {
+		this.allData = allData2;
 		this.text = text;
 		this.matched = matched;
 		this.averages = calcAverages();
 		this.variances = calcVariances(averages);
 //		this.diffCalculator = new SpectrumDiffCalculator();//new SpectrumWeights(allData).getWeights());
 //		this.diffCalculator = new SpectrumMahalanobisDiffCalculator(allData);
-		this.diffCalculator = new DynamicTimeWarpDiffCalculator(allData);
+		this.diffCalculator = new HungarianMatchDiffCalculator();
 	}
 	
 	AudioLabel[] process()
 	{
 		int prefixSize = 3;
 		String searchedFor = matched[0].getLabel().substring(0, prefixSize).toLowerCase();
-		double estTime = (prefixSize + 1) * text.getEstimatedTimePerCharacter();
+		double estTime = (prefixSize * 1.5) * text.getEstimatedTimePerCharacter();
 		
 		ArrayList<ArrayList<Speech>> candidates = new ArrayList<ArrayList<Speech>>();
 		candidates.add(new ArrayList<Speech>());
@@ -127,13 +138,6 @@ public class StartingPhonemeFinder {
 		int bestIndex = 0;
 		for (int i = start; i < end - frames; ++i)
 		{
-//			double diff = 0;
-//			for (int j = i; j < i + frames; ++j)
-//			{
-//				double[] spectrum = allData.get(j).getSpectrum();
-//				double[] targetSpectrum = allData.get(targetStartIndex + j - i).getSpectrum();
-//				diff += diffCalculator.diff(spectrum, targetSpectrum);
-//			}
 			double diff = diffCalculator.diff(
 					allData.subList(i, i + frames).toArray(new Data[0]),
 					allData.subList(targetStartIndex, targetStartIndex + frames).toArray(new Data[0]));

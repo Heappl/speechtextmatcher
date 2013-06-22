@@ -3,25 +3,28 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import common.AudioLabel;
+import common.Data;
+import common.DataSequence;
+import common.PhonemeDiff;
+import common.Speech;
+import common.Text;
+import diffCalculators.HungarianMatchDiffCalculator;
+import diffCalculators.ISequenceDiffCalculator;
+
+
 public class CommonWordPhonemesFinder {
-	ArrayList<Data> allData;
+	DataSequence allData;
 	Text text;
 	double frameTime = 0;
-	double[] variances = null;
-	double[] averages = null;
 	AudioLabel[] matched = null;
-//	SpectrumDiffCalculator diffCalculator = null;
-	SpectrumMahalanobisDiffCalculator diffCalculator = null;
+	ISequenceDiffCalculator diffCalculator = new HungarianMatchDiffCalculator();
 	
-	public CommonWordPhonemesFinder(ArrayList<Data> allData, Text text, AudioLabel[] matched) {
+	public CommonWordPhonemesFinder(DataSequence allData, Text text, AudioLabel[] matched) {
 		this.allData = allData;
 		this.text = text;
 		this.frameTime = this.allData.get(1).getStartTime() - this.allData.get(0).getStartTime();
-		this.averages = calcAverages();
-		this.variances = calcVariances(averages);
 		this.matched = matched;
-//		this.diffCalculator = new SpectrumDiffCalculator();//new SpectrumWeights(allData).getWeights());
-		this.diffCalculator = new SpectrumMahalanobisDiffCalculator(allData);
 	}
 
 	AudioLabel[] process()
@@ -33,10 +36,10 @@ public class CommonWordPhonemesFinder {
 		String biggestCommon = "";
 		for (String word : words) {
 			word = word.toLowerCase();
-//			if (word.equalsIgnoreCase("niespodziewanie")) continue;
-//			if (word.equalsIgnoreCase("polichnowicza")) continue;
-//			if (word.equalsIgnoreCase("bijakowskiego")) continue;
-//			if (word.equalsIgnoreCase("polichnowicz")) continue;
+			if (word.equalsIgnoreCase("niespodziewanie")) continue;
+			if (word.equalsIgnoreCase("polichnowicza")) continue;
+			if (word.equalsIgnoreCase("bijakowskiego")) continue;
+			if (word.equalsIgnoreCase("polichnowicz")) continue;
 //			if (word.equalsIgnoreCase("odpowiedział")) continue;
 			if (wordCounts.containsKey(word)) {
 				int count = wordCounts.get(word) + 1;
@@ -49,7 +52,7 @@ public class CommonWordPhonemesFinder {
 			else wordCounts.put(word, 1);
 		}
 		double phonemeTime = biggestCommonSize * text.getEstimatedTimePerCharacter();
-		int neigh = 1;//(int)Math.ceil(Math.sqrt(Math.sqrt(Math.sqrt(matched.length))));
+		int neigh = (int)Math.ceil(Math.sqrt(Math.sqrt(Math.sqrt(matched.length))));
 		System.err.println("biggest: " + biggestCommon + " " + phonemeTime + " neigh:" + neigh);
 		
 		ArrayList<ArrayList<Speech>> usedSpeeches = new ArrayList<ArrayList<Speech>>();
@@ -86,16 +89,12 @@ public class CommonWordPhonemesFinder {
 		double smallestDiff = Double.MAX_VALUE;
 		int[] bestMatching = new int[witnesses.size() + 1];
 		
-		int totalStarts = 0;
-		for (Speech speech : target) totalStarts += Math.max(0, speech.getEndDataIndex() - frames - speech.getStartDataIndex());
-		
-		int count = 0;
-		int speechCount = 0;
-//		for (Speech speech : target) {
-//			for (int i = speech.getStartDataIndex(); i < speech.getEndDataIndex() - frames; ++i) {
-				int start = findIndex(517.261, 0, allData.size() - 1);
-				int end = findIndex(518.193, 0, allData.size() - 1);
-//				System.err.println("searching for target " + count + "/" + totalStarts + " (" + allData.get(i).getStartTime() + ")");
+		for (Speech speech : target) {
+			for (int i = speech.getStartDataIndex(); i < speech.getEndDataIndex() - frames; ++i) {
+				int start = findIndex(allData.get(i).getStartTime(), 0, allData.size() - 1);
+				int end = findIndex(allData.get(i + frames).getStartTime(), 0, allData.size() - 1);
+//				int start = findIndex(517.261, 0, allData.size() - 1);
+//				int end = findIndex(518.193, 0, allData.size() - 1);
 				int[] aux = new int[witnesses.size()];
 				double diff = findBests(aux, witnesses, start, end - start);
 				if (diff < smallestDiff) {
@@ -103,10 +102,8 @@ public class CommonWordPhonemesFinder {
 					bestMatching[0] = start;
 					for (int j = 0; j < aux.length; ++j) bestMatching[j + 1] = aux[j];
 				}
-				++count;
-//			}
-//			++speechCount;
-//		}
+			}
+		}
 		return bestMatching;
 	}
 
@@ -127,11 +124,9 @@ public class CommonWordPhonemesFinder {
 	{
 		double bestDiff = Double.MAX_VALUE;
 		int bestIndex = 0;
-		int speechCount = 0;
 		for (Speech speech : speeches) {
 			if ((speech.getStartDataIndex() <= targetStart) && (targetStart <= speech.getEndDataIndex()))
 				continue;
-			if (speechCount % 100 == 0) System.err.println("findBest " + speechCount);
 			for (int i = speech.getStartDataIndex(); i < speech.getEndDataIndex() - frames; ++i) {
 				double diff = calculateDiff(targetStart, i, frames);
 				if (diff < bestDiff) {
@@ -139,7 +134,6 @@ public class CommonWordPhonemesFinder {
 					bestIndex = i;
 				}
 			}
-			++speechCount;
 		}
 		return new PhonemeDiff(bestDiff, targetStart, bestIndex, frames);
 	}
@@ -156,33 +150,8 @@ public class CommonWordPhonemesFinder {
 	private double calculateDiff(int firstStart, int secondStart, int frames)
 	{
 		if (firstStart == secondStart) return Double.MAX_VALUE;
-		return new DynamicTimeWarpDiffCalculator(allData).diff(
+		return diffCalculator.diff(
 				allData.subList(firstStart, firstStart + frames).toArray(new Data[0]),
 				allData.subList(secondStart, secondStart + frames).toArray(new Data[0]));
-	}
-
-	private double[] calcVariances(double[] averages) {
-		int spectrumSize = allData.get(0).getSpectrum().length;
-		double[] out = new double[spectrumSize];
-		
-		for (Data data : allData) {
-			for (int i = 0; i < spectrumSize; ++i)
-				out[i] += (averages[i] - data.getSpectrum()[i]) * (averages[i] - data.getSpectrum()[i]);
-		}
-		for (int i = 0; i < spectrumSize; ++i) out[i] /= allData.size();
-		for (int i = 0; i < spectrumSize; ++i) out[i] = Math.sqrt(out[i]);
-		return out;
-	}
-
-	private double[] calcAverages() {
-		int spectrumSize = allData.get(0).getSpectrum().length;
-		double[] out = new double[spectrumSize];
-		
-		for (Data data : allData) {
-			for (int i = 0; i < spectrumSize; ++i)
-				out[i] += data.getSpectrum()[i];
-		}
-		for (int i = 0; i < spectrumSize; ++i) out[i] /= allData.size();
-		return out;
 	}
 }

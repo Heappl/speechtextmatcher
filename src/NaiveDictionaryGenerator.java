@@ -6,6 +6,9 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import common.Text;
+
+
 
 public class NaiveDictionaryGenerator
 {

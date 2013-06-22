@@ -1,5 +1,13 @@
 import java.util.ArrayList;
 
+import algorithms.KMeans;
+
+import common.AudioLabel;
+import common.Data;
+import common.Speeches;
+import common.Text;
+
+
 
 public class PhonemeDestructurer {
 	

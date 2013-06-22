@@ -1,6 +1,15 @@
 import java.util.ArrayList;
 import java.util.Collection;
 
+import common.AudioLabel;
+import common.DataSequence;
+import common.Speech;
+import common.Speeches;
+
+import diffCalculators.SpectrumDiffCalculator;
+import diffCalculators.SpectrumWeights;
+
+
 
 public class ChangeTracer {
 

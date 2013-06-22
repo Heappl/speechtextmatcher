@@ -1,16 +1,29 @@
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+
+import common.AudioLabel;
+import common.Data;
+import common.DataSequence;
+
+import algorithms.HungarianAlgorithm;
+
+import diffCalculators.SpectrumDiffCalculator;
+import diffCalculators.SpectrumWeights;
+
 
 
 public class PhonemeLearner
 {
 	private AudioLabel[] prepared;
 	DataSequence allData;
+	SpectrumDiffCalculator diffCalculator = new SpectrumDiffCalculator();
 	
 	public PhonemeLearner(AudioLabel[] prepared, DataSequence allData)
 	{
 		this.prepared = prepared;
 		this.allData = allData;
+		this.diffCalculator = new SpectrumDiffCalculator(new SpectrumWeights(allData).getWeights());
 	}
 	
 	public void process()
@@ -29,8 +42,9 @@ public class PhonemeLearner
         }
         for (String prefix : starts.keySet())
         {
-        	if (prefix.length() < 5) continue;
+        	if (prefix.length() < 3) continue;
         	if (starts.get(prefix).size() < 10) continue;
+        	System.err.println(prefix + " " + starts.get(prefix).size());
         	learn(starts.get(prefix), prefix.length());
         	break;
         }
@@ -38,13 +52,87 @@ public class PhonemeLearner
 	
 	void learn(ArrayList<AudioLabel> entryset, int size)
 	{
-		for (AudioLabel label : entryset) {
-			int start = findIndex(label.getStart(), 0, allData.size() - 1);
-			int end = findIndex(label.getStart() + 1, 0, allData.size() - 1);
-			System.err.println(label.getLabel() + " " + label.getStart() + " " + label.getEnd() + " " + (end - start));
-			PhonemeDisplay display = new PhonemeDisplay();
-			display.draw(new DataSequence(allData.subList(start, end)));
+		int[][][] assignments = new int[entryset.size()][entryset.size()][];
+		int ind = 0;
+		for (AudioLabel label1 : entryset) {
+			int start1 = findIndex(label1.getStart(), 0, allData.size() - 1);
+			int end1 = findIndex(label1.getStart() + size * 0.1, 0, allData.size() - 1);
+			if (end1 == start1) { ++ind; continue; }
+			
+			int j = 0;
+			System.err.println(ind + " " + label1.getLabel());
+			for (AudioLabel label2 : entryset) {
+				if (label1 == label2) { ++j; continue; };
+				System.err.println("	" + j + " " + label2.getLabel());
+				int start2 = findIndex(label2.getStart(), 0, allData.size() - 1);
+				int end2 = findIndex(label2.getStart() + size * 0.1, 0, allData.size() - 1);
+				if (end2 == start2) { ++j; continue; }
+				
+				double[][] weights = calculateDiffs(
+						allData.subList(start1, end1).toArray(new Data[0]),
+						allData.subList(start2, end2).toArray(new Data[0]));
+				
+				HungarianAlgorithm ha = new HungarianAlgorithm(weights);
+				assignments[ind][j] = ha.execute();
+				++j;
+			}
+			++ind;
 		}
+		
+		int s = assignments.length;
+		int windowSize = 3;
+		for (int i = 0; i < s * s * s; ++i) {
+			int third = i % s;
+			int second = (i / s) % s;
+			int first = i / s / s;
+			if (second <= first) continue;
+			if (third <= second) continue;
+			if (assignments[first] == null) continue;
+			if (assignments[second] == null) continue;
+			if (assignments[first][second] == null) continue;
+			if (assignments[first][third] == null) continue;
+			if (assignments[second][third] == null) continue;
+			
+			for (int j = 0; j < assignments[first][second].length - windowSize; ++j) {
+				boolean continous = true;
+				boolean triplet = true;
+				boolean full = true;
+				for (int k = j; k < j + windowSize; ++k) {
+					int secondMatch = assignments[first][second][k];
+					if (secondMatch < 0) {
+						full = false;
+						break;
+					}
+					int thirdThroughFirstMatch = assignments[first][third][k];
+					int thirdThroughSecondMatch = assignments[second][third][secondMatch];
+					if (thirdThroughFirstMatch != thirdThroughSecondMatch) {
+						triplet = false;
+						break;
+					}
+					if ((secondMatch != assignments[first][second][j] + k - j)
+						 || (thirdThroughFirstMatch != assignments[first][third][j] + k - j)) {
+						continous = false;
+						break;
+					}
+				}
+				if (full && continous && triplet) {
+					System.err.println(first + " " + second + " " + third + " " + j);
+				}
+			}
+		}
+	}
+
+	private double[][] calculateDiffs(Data[] first, Data[] second)
+	{
+		double[][] weights = new double[first.length - 2][second.length - 2];
+		for (int i = 1; i < first.length - 1; ++i) {
+			for (int j = 1; j < second.length - 1; ++j) {
+				weights[i - 1][j - 1] = diffCalculator.diffNorm2(first[i].getSpectrum(), second[j].getSpectrum());
+				weights[i - 1][j - 1] += diffCalculator.diffNorm2(first[i - 1].getSpectrum(), second[j - 1].getSpectrum()) / 10.0;
+				weights[i - 1][j - 1] += diffCalculator.diffNorm2(first[i + 1].getSpectrum(), second[j + 1].getSpectrum()) / 10.0;
+			}
+		}
+		return weights;
 	}
 
 	private int findIndex(double time, int bottom, int top)

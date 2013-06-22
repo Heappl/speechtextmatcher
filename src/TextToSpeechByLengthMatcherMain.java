@@ -1,4 +1,14 @@
 
+import speechDetection.OfflineSpeechRecognizer;
+import textAligners.IncrementalTextToSpeechAligner;
+import textAligners.TextToSpeechByLengthAligner;
+import common.AudioLabel;
+import common.Speeches;
+import common.Text;
+import dataProducers.TextImporter;
+import dataProducers.WaveImporter;
+
+
 public class TextToSpeechByLengthMatcherMain
 {
 	public static void main(String[] args)

@@ -9,6 +9,10 @@ import java.util.ArrayList;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 
+import common.Text;
+import dataProducers.TextImporter;
+
+
 import edu.cmu.sphinx.result.WordResult;
 import sphinx.Aligner;
 import sphinx.GrammarAligner;
