@@ -5,6 +5,7 @@ import common.AudioLabel;
 import common.DataSequence;
 import common.Speeches;
 import common.Text;
+import dataExporters.AudacityLabelsExporter;
 import dataProducers.AudacityLabelImporter;
 import dataProducers.TextImporter;
 import dataProducers.WaveImporter;
@@ -48,13 +49,13 @@ public class Main {
     	
     	AudioLabel[] prepared = new AudacityLabelImporter(new TextImporter("by_length_labels.txt")).getLabels();
     	
-    	PhonemeLearner phonemeLearner = new PhonemeLearner(prepared, allData);
-    	phonemeLearner.process();
+//    	PhonemeLearner phonemeLearner = new PhonemeLearner(prepared, allData);
+//    	phonemeLearner.process();
     	
-//        StartingPhonemeFinder finder = new StartingPhonemeFinder(allData, text, prepared);
+        StartingPhonemeFinder finder = new StartingPhonemeFinder(allData, text, prepared);
 //        CommonWordPhonemesFinder finder = new CommonWordPhonemesFinder(allData, text, prepared);
-//        AudioLabel[] phonemeLabels = finder.process();
-//    	new AudacityLabelsExporter("/home/bartek/workspace/speechtextmatcher/labels3.txt").export(phonemeLabels);
+        AudioLabel[] phonemeLabels = finder.process();
+    	new AudacityLabelsExporter("/home/bartek/workspace/speechtextmatcher/labels3.txt").export(phonemeLabels);
         System.err.println("END");
     }
 }

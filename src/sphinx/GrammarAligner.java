@@ -34,7 +34,7 @@ public class GrammarAligner implements IAligner {
 
 	public GrammarAligner(URL acousticModel, URL dictionary, URL g2p) throws PropertyException, MalformedURLException {
 		ConfigurationManager cm = new ConfigurationManager(ConfigurationManagerUtils.resourceToURL("resource:/edu/cmu/sphinx/config/aligner.xml"));
-
+		
 		cm.setGlobalProperty("acousticModel", acousticModel.toString());
 		cm.setGlobalProperty("dictionary", dictionary.toString());
 		cm.setGlobalProperty("filler", acousticModel.toString() + "/noisedict");
@@ -51,6 +51,7 @@ public class GrammarAligner implements IAligner {
 		dataSource.setInputStream(stream, "input");
 		grammar.setText(text);
 		Result result = recognizer.recognize();
+		recognizer.deallocate();
 		return result.getWords();
 	}
 }

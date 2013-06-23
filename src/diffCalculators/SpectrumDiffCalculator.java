@@ -11,6 +11,8 @@ public class SpectrumDiffCalculator implements ISpectrumDiffCalculator
 	public SpectrumDiffCalculator(double[] weights)
 	{
 		this.weights = weights;
+		for (int i = 0; i < weights.length; ++i) 
+			this.weights[i] = Math.pow(2, weights[i]);
 	}
 	
 	public double diff(double[] first, double[] second)

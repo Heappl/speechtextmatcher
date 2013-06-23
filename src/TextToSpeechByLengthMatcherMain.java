@@ -5,6 +5,7 @@ import textAligners.TextToSpeechByLengthAligner;
 import common.AudioLabel;
 import common.Speeches;
 import common.Text;
+import dataExporters.AudacityLabelsExporter;
 import dataProducers.TextImporter;
 import dataProducers.WaveImporter;
 

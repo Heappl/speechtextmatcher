@@ -11,6 +11,8 @@ import common.Speech;
 import common.Text;
 import diffCalculators.HungarianMatchDiffCalculator;
 import diffCalculators.ISequenceDiffCalculator;
+import diffCalculators.SpectrumDiffCalculator;
+import diffCalculators.SpectrumWeights;
 
 
 public class CommonWordPhonemesFinder {
@@ -18,13 +20,15 @@ public class CommonWordPhonemesFinder {
 	Text text;
 	double frameTime = 0;
 	AudioLabel[] matched = null;
-	ISequenceDiffCalculator diffCalculator = new HungarianMatchDiffCalculator();
+	ISequenceDiffCalculator diffCalculator = new HungarianMatchDiffCalculator(new SpectrumDiffCalculator());
 	
 	public CommonWordPhonemesFinder(DataSequence allData, Text text, AudioLabel[] matched) {
 		this.allData = allData;
 		this.text = text;
 		this.frameTime = this.allData.get(1).getStartTime() - this.allData.get(0).getStartTime();
 		this.matched = matched;
+		this.diffCalculator = new HungarianMatchDiffCalculator(
+				new SpectrumDiffCalculator());
 	}
 
 	AudioLabel[] process()
@@ -36,10 +40,10 @@ public class CommonWordPhonemesFinder {
 		String biggestCommon = "";
 		for (String word : words) {
 			word = word.toLowerCase();
-			if (word.equalsIgnoreCase("niespodziewanie")) continue;
-			if (word.equalsIgnoreCase("polichnowicza")) continue;
-			if (word.equalsIgnoreCase("bijakowskiego")) continue;
-			if (word.equalsIgnoreCase("polichnowicz")) continue;
+//			if (word.equalsIgnoreCase("niespodziewanie")) continue;
+//			if (word.equalsIgnoreCase("polichnowicza")) continue;
+//			if (word.equalsIgnoreCase("bijakowskiego")) continue;
+//			if (word.equalsIgnoreCase("polichnowicz")) continue;
 //			if (word.equalsIgnoreCase("odpowiedział")) continue;
 			if (wordCounts.containsKey(word)) {
 				int count = wordCounts.get(word) + 1;
@@ -89,12 +93,12 @@ public class CommonWordPhonemesFinder {
 		double smallestDiff = Double.MAX_VALUE;
 		int[] bestMatching = new int[witnesses.size() + 1];
 		
-		for (Speech speech : target) {
-			for (int i = speech.getStartDataIndex(); i < speech.getEndDataIndex() - frames; ++i) {
-				int start = findIndex(allData.get(i).getStartTime(), 0, allData.size() - 1);
-				int end = findIndex(allData.get(i + frames).getStartTime(), 0, allData.size() - 1);
-//				int start = findIndex(517.261, 0, allData.size() - 1);
-//				int end = findIndex(518.193, 0, allData.size() - 1);
+//		for (Speech speech : target) {
+//			for (int i = speech.getStartDataIndex(); i < speech.getEndDataIndex() - frames; ++i) {
+//				int start = findIndex(allData.get(i).getStartTime(), 0, allData.size() - 1);
+//				int end = findIndex(allData.get(i + frames).getStartTime(), 0, allData.size() - 1);
+				int start = findIndex(517.261, 0, allData.size() - 1);
+				int end = findIndex(518.193, 0, allData.size() - 1);
 				int[] aux = new int[witnesses.size()];
 				double diff = findBests(aux, witnesses, start, end - start);
 				if (diff < smallestDiff) {
@@ -102,8 +106,8 @@ public class CommonWordPhonemesFinder {
 					bestMatching[0] = start;
 					for (int j = 0; j < aux.length; ++j) bestMatching[j + 1] = aux[j];
 				}
-			}
-		}
+//			}
+//		}
 		return bestMatching;
 	}
 

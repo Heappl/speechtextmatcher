@@ -124,12 +124,18 @@ public class PhonemeLearner
 
 	private double[][] calculateDiffs(Data[] first, Data[] second)
 	{
-		double[][] weights = new double[first.length - 2][second.length - 2];
-		for (int i = 1; i < first.length - 1; ++i) {
-			for (int j = 1; j < second.length - 1; ++j) {
-				weights[i - 1][j - 1] = diffCalculator.diffNorm2(first[i].getSpectrum(), second[j].getSpectrum());
-				weights[i - 1][j - 1] += diffCalculator.diffNorm2(first[i - 1].getSpectrum(), second[j - 1].getSpectrum()) / 10.0;
-				weights[i - 1][j - 1] += diffCalculator.diffNorm2(first[i + 1].getSpectrum(), second[j + 1].getSpectrum()) / 10.0;
+		int window = 5;
+		double divisor = 2.0;
+		double[][] weights = new double[first.length - 2 * window][second.length - 2 * window];
+		for (int i = window; i < first.length - window; ++i) {
+			for (int j = window; j < second.length - window; ++j) {
+				for (int k = -window; k <= window; ++k) {
+					double currDivisor = (k == j) ? 1.0 : Math.pow(divisor, Math.abs(j - k));
+					double[] firstSpectrum = first[i + k].getSpectrum();
+					double[] secondSpectrum = second[j + k].getSpectrum();
+					double diff = diffCalculator.diffNorm2(firstSpectrum, secondSpectrum);
+					weights[i - window][j - window] += diff / currDivisor;
+				}
 			}
 		}
 		return weights;

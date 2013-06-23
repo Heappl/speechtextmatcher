@@ -12,6 +12,9 @@ import common.Speech;
 import common.Text;
 import diffCalculators.HungarianMatchDiffCalculator;
 import diffCalculators.ISequenceDiffCalculator;
+import diffCalculators.SpectrumDiffCalculator;
+import diffCalculators.SpectrumMahalanobisDiffCalculator;
+import diffCalculators.SpectrumWeights;
 
 
 import edu.cmu.sphinx.tools.audio.AudioData;
@@ -35,19 +38,20 @@ public class StartingPhonemeFinder {
 		this.variances = calcVariances(averages);
 //		this.diffCalculator = new SpectrumDiffCalculator();//new SpectrumWeights(allData).getWeights());
 //		this.diffCalculator = new SpectrumMahalanobisDiffCalculator(allData);
-		this.diffCalculator = new HungarianMatchDiffCalculator();
+		this.diffCalculator = new HungarianMatchDiffCalculator(
+				new SpectrumMahalanobisDiffCalculator(allData));
 	}
 	
 	AudioLabel[] process()
 	{
 		int prefixSize = 3;
 		String searchedFor = matched[0].getLabel().substring(0, prefixSize).toLowerCase();
-		double estTime = (prefixSize * 1.5) * text.getEstimatedTimePerCharacter();
+		double estTime = (prefixSize) * text.getEstimatedTimePerCharacter();
 		
 		ArrayList<ArrayList<Speech>> candidates = new ArrayList<ArrayList<Speech>>();
 		candidates.add(new ArrayList<Speech>());
 		candidates.get(0).add(createSpeech(matched[0].getStart(), matched[0].getEnd()));
-		int neigh = (int)Math.ceil(Math.sqrt(Math.sqrt(matched.length)));
+		int neigh = (int)Math.ceil(Math.sqrt(Math.sqrt(matched.length))) + 2;
 		
 		for (int i = 1; i < matched.length; ++i) {
 			AudioLabel matching = matched[i];

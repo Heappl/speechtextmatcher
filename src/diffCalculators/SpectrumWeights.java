@@ -19,7 +19,7 @@ public class SpectrumWeights
 		}
 		weights = new double[spectrumSize];
 		for (int i = 0; i < spectrumSize; ++i)
-			weights[i] = 10 * spectrumFromNormalDiff[i] / max;
+			weights[i] = spectrumFromNormalDiff[i] / max;
 	}
 
 	public double[] getWeights() {

@@ -1,3 +1,5 @@
+package audioSupportedAlignment;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
@@ -9,12 +11,14 @@ import java.util.ArrayList;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 
+
+import common.AudioLabel;
 import common.Text;
+import dataExporters.AudacityLabelsExporter;
 import dataProducers.TextImporter;
 
 
 import edu.cmu.sphinx.result.WordResult;
-import sphinx.Aligner;
 import sphinx.GrammarAligner;
 
 
@@ -44,16 +48,9 @@ public class UsingEnglishAudioModelMain
 
         new NaiveDictionaryGenerator(text).store(dictTempPath);
     	
-    	ArrayList<WordResult> results = Aligner.align(acousticModel, dictionary, stream, rawText);
-    	
-    	File outputFile = new File(outputPath);
-		OutputStreamWriter outputStream = new OutputStreamWriter(new FileOutputStream(outputFile));
-        for (WordResult result : results) {
-        	outputStream.write(((double)result.getStartFrame() / 1000)
-                    + " " + ((double)result.getEndFrame() / 1000)
-                    + " " + result.getPronunciation().getWord() + "\n");
-        }
-		outputStream.close();
+    	ArrayList<AudioLabel> results = Aligner.align(acousticModel, dictionary, stream, rawText);
+    	new AudacityLabelsExporter(outputPath).export(results.toArray(new AudioLabel[0]));
+    	stream.close();
     }
 
 	private static String join(String[] words, String delimiter)
