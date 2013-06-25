@@ -1,4 +1,4 @@
-package audioSupportedAlignment;
+package audioModelSupportedAlignment;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
@@ -14,13 +14,14 @@ import edu.cmu.sphinx.result.WordResult;
 
 public class Aligner {
     
-    static double chunkTime = 60;
+    static double chunkTime = 1000;
 
     public static ArrayList<AudioLabel> align(URL acousticModel, URL dictionary, AudioInputStream stream, String text) throws Exception
     {
         
         double totalTime = (double)stream.getFrameLength() / (double)stream.getFormat().getFrameRate();
         double timePerChar = totalTime / text.length();
+        System.err.println(totalTime + " " + stream.getFrameLength());
         
         ArrayList<AudioLabel> results = new ArrayList<AudioLabel>();
         AudioChunkExtractor audioChunker = new AudioChunkExtractor(stream);
@@ -28,10 +29,11 @@ public class Aligner {
         text = text.toLowerCase();
         double chunkStart = 0;
         int count = 0;
+        double prevChunkStart = -1;
         while (!text.isEmpty()) {
-    		System.err.println("extracting " + chunkStart + " " + (chunkStart + chunkTime));
-        	AudioInputStream streamChunk = audioChunker.extract(
-        			chunkStart, (chunkStart + chunkTime));
+        	double endTime = Math.min(chunkStart + chunkTime, totalTime + 5.0);
+    		System.err.println("extracting " + chunkStart + " " + endTime);
+        	AudioInputStream streamChunk = audioChunker.extract(chunkStart, endTime);
         	if (streamChunk == null) break;
         	int textChunkEnd = Math.min((int)Math.ceil(chunkTime / timePerChar), text.length() - 1);
     		String auxtext = text.substring(0, textChunkEnd);
@@ -45,18 +47,19 @@ public class Aligner {
         	ArrayList<WordResult> partial = aligner.align(streamChunk, auxtext);
         	System.err.println("partial alignment finished " + partial.size());
         	if (partial.isEmpty()) break;
-        	int partialPartIndex = Math.min(partial.size() - 1, Math.max(1, partial.size() / 2));
-        	partial = new ArrayList<WordResult>(partial.subList(0, partialPartIndex));
+        	int partialPartIndex = Math.min(partial.size() - 1, Math.max(20, partial.size() / 10));
         	double chunkMove = 0;
         	streamChunk.close();
         	
-          	File tempWavFile = new File("chunk.temp.wav." + count);
-    		streamChunk = audioChunker.extract(chunkStart, (chunkStart + chunkTime));
-    		AudioSystem.write(streamChunk, AudioFileFormat.Type.WAVE, tempWavFile);
-    		streamChunk.close();
+//          	File tempWavFile = new File("/home/bartek/workspace/speechtextmatcher/chunk.temp.wav." + count);
+//    		streamChunk = audioChunker.extract(chunkStart, (chunkStart + chunkTime));
+//          	System.err.println("saving: " + chunkStart + " " + (chunkStart + chunkTime) + " " + streamChunk.getFrameLength());
+//    		AudioSystem.write(streamChunk, AudioFileFormat.Type.WAVE, tempWavFile);
+//    		streamChunk.close();
         	
         	ArrayList<AudioLabel> partialLabels = new ArrayList<AudioLabel>();
         	String partialText = text;
+        	int added = 0;
         	for (WordResult result : partial) {
         		String nextWord = result.getPronunciation().getWord().toString();
         		double frameSize = (stream.getFormat().getSampleRate() / stream.getFormat().getSampleSizeInBits());
@@ -64,20 +67,23 @@ public class Aligner {
         		double end = (double)result.getEndFrame() / frameSize;
         		AudioLabel label = new AudioLabel(nextWord, start + chunkStart, end + 0.1 + chunkStart);
         		if (!nextWord.equalsIgnoreCase("<sil>")) {
-        			System.err.println(nextWord + " " + start + " " + label.getStart());
         			partialLabels.add(label);
 	        		int index = partialText.indexOf(nextWord);
 	        		if (index != 0) break;
 	        		partialText = partialText.substring(nextWord.length() + 1);
-        		} else if (end - start > 0.5) {
+        		} else if ((end - start > 0.4) || (partialLabels.size() == partial.size())) {
         			results.addAll(partialLabels);
+        			added += partialLabels.size();
         			partialLabels = new ArrayList<AudioLabel>();
-            		chunkMove = (start + end) / 2;
+            		chunkMove = start + 0.1;
             		text = partialText;
+            		if (added > partialPartIndex) break;
         		}
         	}
+        	prevChunkStart = chunkStart;
         	chunkStart += chunkMove;
-        	if (count++ == 2) break;
+        	++count;
+        	if (prevChunkStart == chunkStart) break;
         }
         return results;
     } 

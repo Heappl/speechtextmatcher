@@ -1,4 +1,5 @@
 package common;
+import java.awt.Frame;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ public class AudioChunkExtractor
 		readBytes(endFrame);
 		if (startFrame >= audioData.size()) return null;
 		endFrame = Math.min(endFrame, audioData.size());
-		System.err.println(chunkSize + " " + endFrame + " " + startFrame);
+		System.err.println("actually extracting to " + (double)endFrame / (double)format.getFrameRate());
 		
 		byte[] chunkData = new byte[chunkSize];
 		for (int i = startFrame; i < endFrame; ++i) {
@@ -42,13 +43,13 @@ public class AudioChunkExtractor
 		return new AudioInputStream(
 				byteStream,
 				format,
-				chunkData.length);
+				chunkData.length / (format.getSampleSizeInBits() / Byte.SIZE));
 	}
 
 	private void deleteBytes(int toIndex)
 	{
-//		audioData = new ArrayList<byte[]>(audioData.subList(toIndex, audioData.size()));
-//		start = toIndex;
+		audioData = new ArrayList<byte[]>(audioData.subList(toIndex, audioData.size()));
+		start += toIndex;
 	}
 	private void readBytes(int i)
 	{
