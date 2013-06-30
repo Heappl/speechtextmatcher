@@ -46,10 +46,18 @@ public class GrammarAligner implements IAligner {
 		dataSource = (AudioFileDataSource)cm.lookup("audioFileDataSource");
 		recognizer.allocate();
 	}
+	
+	private void log(String text) {
+		if (text.length() <= 40)
+			System.err.println("aligning " + text);
+		else
+			System.err.println("aligning " + text.substring(0, 20) +
+							   " [...] " + text.substring(text.length() - 20));
+	}
 
 	@Override
 	public Result align(AudioInputStream stream, String text) {
-		System.err.println("aligning " + text.substring(0, 20) + " [...] " + text.substring(text.length() - 20));
+		log(text);
 		dataSource.setInputStream(stream, "input");
 		grammar.setText(text);
 		Result result =  recognizer.recognize();

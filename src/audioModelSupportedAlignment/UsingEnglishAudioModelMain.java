@@ -64,8 +64,8 @@ public class UsingEnglishAudioModelMain
     	new NaiveDictionaryGenerator(text).store(dictTempPath);
         
     	String rawText = join(text.getWords(), " ").toLowerCase();
-    	ArrayList<AudioLabel> results = new Aligner().align(acousticModel, dictionary, stream, rawText);
-//    	ArrayList<AudioLabel> results = new PauseBasedAligner(acousticModel, dictionary).align(stream, text, speeches);
+//    	ArrayList<AudioLabel> results = new Aligner().align(acousticModel, dictionary, stream, rawText);
+    	ArrayList<AudioLabel> results = new PauseBasedAligner(acousticModel, dictionary).align(stream, text, speeches);
     	new AudacityLabelsExporter(outputPath).export(results.toArray(new AudioLabel[0]));
     	stream.close();
     }
