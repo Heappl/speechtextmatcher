@@ -57,10 +57,11 @@ public class GrammarAligner implements IAligner {
 
 	@Override
 	public Result align(AudioInputStream stream, String text) {
-		log(text);
+//		log(text);
 		dataSource.setInputStream(stream, "input");
 		grammar.setText(text);
 		Result result =  recognizer.recognize();
+		recognizer.deallocate();
 		return result;
 	}
 }

@@ -20,13 +20,13 @@ public class Main {
 //    	String waveFile = "/home/bartek/workspace/speechtextmatcher/przedwiosnie-rodowod.wav";
 //    	String textFile = "/home/bartek/workspace/speechtextmatcher/przedwiosnie_rodowod.txt";
     	
-    	String waveFile = "/home/bartek/workspace/speechtextmatcher/stefan-zeromski-doktor-piotr_test.wav";
-    	String textFile = "stefan-zeromski-doktor-piotr_test.txt";
+//    	String waveFile = "/home/bartek/workspace/speechtextmatcher/stefan-zeromski-doktor-piotr_test.wav";
+//    	String textFile = "stefan-zeromski-doktor-piotr_test.txt";
 //    	String waveFile = "/home/bartek/workspace/speechtextmatcher/song_test.wav";
 //    	String textFile = "song_test.txt";
     	
-//    	String waveFile = "/home/bartek/workspace/speechtextmatcher/stefan-zeromski-doktor-piotr.wav";
-//    	String textFile = "/home/bartek/workspace/speechtextmatcher/doktor-piotr_2.txt";
+    	String waveFile = "/home/bartek/workspace/speechtextmatcher/stefan-zeromski-doktor-piotr.wav";
+    	String textFile = "/home/bartek/workspace/speechtextmatcher/doktor-piotr_2.txt";
 
     	WaveImporter waveImporterForOfflineSpeechRecognition = new WaveImporter(waveFile, "config_nospeech_nomel.xml");
     	WaveImporter waveImporterForPhonemeRecognition = new WaveImporter(waveFile, "config_all.xml");

@@ -57,13 +57,16 @@ public class PauseBasedAligner {
 	    		double frameSize = (stream.getFormat().getSampleRate() / stream.getFormat().getSampleSizeInBits());
 	    		double start = (double)result.getStartFrame() / frameSize + chunkStartTime;
 	    		double end = (double)result.getEndFrame() / frameSize + chunkStartTime;
-	    		if (result.getEndFrame() < result.getStartFrame()) end = chunkEndTime;
+	    		if (result.getEndFrame() < result.getStartFrame()) {
+	    			end = chunkEndTime - 0.1;
+	    			System.err.println("END OF FRAME");
+	    		}
 	    		if (nextWord.equalsIgnoreCase("<sil>")) continue;
 	    		AudioLabel label = new AudioLabel(nextWord, start, end);
 	    		results.add(label);
         	}
         	startingSentence += bestResult.bestLength;
-        	prevSpeechEndTime = speech.getEndTime() + 0.2;
+        	prevSpeechEndTime = results.get(results.size() - 1).getEnd() + 0.1;
         }
         
 		return results;
@@ -96,7 +99,7 @@ public class PauseBasedAligner {
 		int toLength = Math.min(chunks.length - startIndex - 1, initialNumberOfWords + neigh);
 		String textCandidate = join(startIndex, fromLength, chunks);
 		
-		System.err.println(fromLength + " " + toLength);
+//		System.err.println(fromLength + " " + toLength);
 		ArrayList<WordResult> bestWordResult = new ArrayList<WordResult>();
 		int bestLength = 0;
 		boolean seenNonZero = false;
@@ -109,12 +112,12 @@ public class PauseBasedAligner {
 				break;
 			}
 			double candidateScore = calculateScore(result);
-			System.err.println(candidateScore);
+//			System.err.println(candidateScore);
 			if (candidateScore != 0) {
 				bestWordResult = result.getWords();
 				bestLength = i;
 				seenNonZero = true;
-			} else if (seenNonZero) break;
+			} else if (seenNonZero || (i > initialNumberOfWords + 1)) break;
 			textCandidate += " " + chunks[startIndex + i];
 		}
 		return new BestResult(bestWordResult, bestLength);

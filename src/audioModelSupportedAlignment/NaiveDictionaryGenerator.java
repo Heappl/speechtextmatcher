@@ -128,7 +128,7 @@ public class NaiveDictionaryGenerator
 			{{"nió"}, {"nn u"}},
 			{{"niu"}, {"nn u"}},
 			{{"ń"}, {"nn"}},
-			{{"o"}, {"oo"}},
+			{{"o"}, {"oo", "ay"}},
 			{{"ó"}, {"uu"}},
 			{{"p"}, {"p"}},
 			{{"pi"}, {"pp ii"}},
@@ -268,6 +268,11 @@ public class NaiveDictionaryGenerator
 		for (String word : text.getWords()) {
 			wordMap.put(word, generate(word.toLowerCase().replace("'", "")).toArray(new String[0]));
 		}
+	}
+	
+	public HashMap<String, String[]> getDictionary()
+	{
+		return wordMap;
 	}
 	
 	boolean store(String outputFilePath)

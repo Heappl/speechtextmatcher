@@ -48,22 +48,23 @@ public class UsingEnglishAudioModelMain
     	String dictTempPath = args[2] + ".temp";
         URL dictionary = new URL("file:" + dictTempPath);
 
-    	WaveImporter waveImporterForOfflineSpeechRecognition = new WaveImporter(inputWavePath, "config_nospeech_nomel.xml");
-    	OfflineSpeechRecognizer speechRecognizer = new OfflineSpeechRecognizer(20, 10);
-//    	
-    	waveImporterForOfflineSpeechRecognition.registerObserver(speechRecognizer);
-//    	
-    	waveImporterForOfflineSpeechRecognition.process();
-    	waveImporterForOfflineSpeechRecognition.done();   	
-        
-        AudioInputStream stream = AudioSystem.getAudioInputStream(new File(inputWavePath));
+        Speeches speeches = null;
+        {
+	    	WaveImporter waveImporterForOfflineSpeechRecognition = new WaveImporter(inputWavePath, "config_nospeech_nomel.xml");
+	    	OfflineSpeechRecognizer speechRecognizer = new OfflineSpeechRecognizer(20, 10);
+	//    	
+	    	waveImporterForOfflineSpeechRecognition.registerObserver(speechRecognizer);
+	//    	
+	    	waveImporterForOfflineSpeechRecognition.process();
+	    	waveImporterForOfflineSpeechRecognition.done();   	
+	        
 
-    	
-    	Speeches speeches = speechRecognizer.findSpeechParts();
-    	Text text = new Text(new TextImporter(inputTextPath), speeches.getTotalTime());
-    	new NaiveDictionaryGenerator(text).store(dictTempPath);
+	        speeches = speechRecognizer.findSpeechParts();
+        }
         
-    	String rawText = join(text.getWords(), " ").toLowerCase();
+        Text text = new Text(new TextImporter(inputTextPath), speeches.getTotalTime());
+        new NaiveDictionaryGenerator(text).store(dictTempPath);
+        AudioInputStream stream = AudioSystem.getAudioInputStream(new File(inputWavePath));
 //    	ArrayList<AudioLabel> results = new Aligner().align(acousticModel, dictionary, stream, rawText);
     	ArrayList<AudioLabel> results = new PauseBasedAligner(acousticModel, dictionary).align(stream, text, speeches);
     	new AudacityLabelsExporter(outputPath).export(results.toArray(new AudioLabel[0]));
