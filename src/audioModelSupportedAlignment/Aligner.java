@@ -10,11 +10,12 @@ import javax.sound.sampled.AudioSystem;
 import common.AudioChunkExtractor;
 import common.AudioLabel;
 import sphinx.GrammarAligner;
+import edu.cmu.sphinx.result.Result;
 import edu.cmu.sphinx.result.WordResult;
 
 public class Aligner {
     
-    static double chunkTime = 1000;
+    static double chunkTime = 300;
 
     public static ArrayList<AudioLabel> align(URL acousticModel, URL dictionary, AudioInputStream stream, String text) throws Exception
     {
@@ -42,12 +43,14 @@ public class Aligner {
     		auxtext = auxtext.substring(0, lastSpace);
     		System.err.println(streamChunk.getFormat().getFrameSize() + " " +
     						   streamChunk.getFrameLength() + " " +
-    						   auxtext);
+    						   auxtext.substring(0, 30));
             GrammarAligner aligner = new GrammarAligner(acousticModel, dictionary, null);
-        	ArrayList<WordResult> partial = aligner.align(streamChunk, auxtext);
+            Result result = aligner.align(streamChunk, auxtext);
+            if (result == null) break;
+        	ArrayList<WordResult> partial = result.getWords();
         	System.err.println("partial alignment finished " + partial.size());
         	if (partial.isEmpty()) break;
-        	int partialPartIndex = Math.min(partial.size() - 1, Math.max(20, partial.size() / 10));
+        	int partialPartIndex = Math.min(partial.size() - 1, partial.size() / 10);
         	double chunkMove = 0;
         	streamChunk.close();
         	
@@ -60,13 +63,13 @@ public class Aligner {
         	ArrayList<AudioLabel> partialLabels = new ArrayList<AudioLabel>();
         	String partialText = text;
         	int added = 0;
-        	for (WordResult result : partial) {
-        		String nextWord = result.getPronunciation().getWord().toString();
+        	for (WordResult wresult : partial) {
+        		String nextWord = wresult.getPronunciation().getWord().toString();
         		double frameSize = (stream.getFormat().getSampleRate() / stream.getFormat().getSampleSizeInBits());
-        		double start = (double)result.getStartFrame() / frameSize;
-        		double end = (double)result.getEndFrame() / frameSize;
-        		AudioLabel label = new AudioLabel(nextWord, start + chunkStart, end + 0.1 + chunkStart);
-        		if (!nextWord.equalsIgnoreCase("<sil>")) {
+        		double start = (double)wresult.getStartFrame() / frameSize;
+        		double end = (double)wresult.getEndFrame() / frameSize;
+        		AudioLabel label = new AudioLabel(nextWord, start + chunkStart, end + 0.02 + chunkStart);
+        		if ((!nextWord.equalsIgnoreCase("<sil>")) && (end - start < 1.5)) {
         			partialLabels.add(label);
 	        		int index = partialText.indexOf(nextWord);
 	        		if (index != 0) break;

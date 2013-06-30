@@ -23,6 +23,8 @@ public class AudioChunkExtractor
 	
 	public AudioInputStream extract(double startTime, double endTime)
 	{
+		startTime = Math.max(0, startTime);
+		endTime = Math.max(0, endTime);
 		int startFrame = (int)((long)Math.floor(startTime * format.getFrameRate()) - start);
 		int endFrame = (int)((long)Math.ceil(endTime * format.getFrameRate()) - start);
 		int chunkSize = (endFrame - startFrame) * format.getFrameSize();
@@ -30,7 +32,6 @@ public class AudioChunkExtractor
 		readBytes(endFrame);
 		if (startFrame >= audioData.size()) return null;
 		endFrame = Math.min(endFrame, audioData.size());
-		System.err.println("actually extracting to " + (double)endFrame / (double)format.getFrameRate());
 		
 		byte[] chunkData = new byte[chunkSize];
 		for (int i = startFrame; i < endFrame; ++i) {
@@ -66,3 +67,4 @@ public class AudioChunkExtractor
 		}
 	}
 }
+

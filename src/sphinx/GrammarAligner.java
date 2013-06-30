@@ -17,6 +17,7 @@ import java.util.ArrayList;
 
 import javax.sound.sampled.AudioInputStream;
 
+import edu.cmu.sphinx.decoder.search.Token;
 import edu.cmu.sphinx.frontend.util.AudioFileDataSource;
 import edu.cmu.sphinx.linguist.language.grammar.AlignerGrammar;
 import edu.cmu.sphinx.recognizer.Recognizer;
@@ -47,12 +48,12 @@ public class GrammarAligner implements IAligner {
 	}
 
 	@Override
-	public ArrayList<WordResult> align(AudioInputStream stream, String text) {
+	public Result align(AudioInputStream stream, String text) {
+		System.err.println("aligning " + text.substring(0, 20) + " [...] " + text.substring(text.length() - 20));
 		dataSource.setInputStream(stream, "input");
 		grammar.setText(text);
-		Result result = recognizer.recognize();
-		recognizer.deallocate();
-		return result.getWords();
+		Result result =  recognizer.recognize();
+		return result;
 	}
 }
 

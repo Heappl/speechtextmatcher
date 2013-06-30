@@ -5,9 +5,9 @@
         <propertylist name="pipeline">
             <item>audioFileDataSource </item>
             <item>dataBlocker </item>
+            <item>preemphasizer </item>
             <item>windower </item>
             <item>fft </item>
-            <item>logApplier2</item>
             <item>floatDataConverter</item>
         </propertylist>
     </component>

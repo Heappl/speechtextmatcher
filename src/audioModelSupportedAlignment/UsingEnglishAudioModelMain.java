@@ -13,12 +13,16 @@ import javax.sound.sampled.AudioSystem;
 
 
 import common.AudioLabel;
+import common.Speeches;
 import common.Text;
 import dataExporters.AudacityLabelsExporter;
 import dataProducers.TextImporter;
+import dataProducers.WaveImporter;
 
 
 import edu.cmu.sphinx.result.WordResult;
+import speechDetection.OfflineSpeechRecognizer;
+import speechDetection.OnlineSpeechesExtractor;
 import sphinx.GrammarAligner;
 
 
@@ -27,9 +31,11 @@ public class UsingEnglishAudioModelMain
 {
 	public static URL audioModelUrl() throws MalformedURLException
 	{
-    	URL[] urls = new URL[]{new File("sphinx/lib/WSJ_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar").toURI().toURL()};
-    	URLClassLoader classLoader = new URLClassLoader(urls);
-    	return classLoader.findResource("WSJ_8gau_13dCep_16k_40mel_130Hz_6800Hz");
+//    	URL[] urls = new URL[]{new File("sphinx/lib/WSJ_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar").toURI().toURL()};
+//    	URLClassLoader classLoader = new URLClassLoader(urls);
+//    	return classLoader.findResource("WSJ_8gau_13dCep_16k_40mel_130Hz_6800Hz");
+		return new URL(
+			"file:/home/bartek/workspace/speechtextmatcher/voxforge-ru-0.2/model_parameters/msu_ru_nsh.cd_cont_1000_8gau_16000/");
 	}
 	
     public static void main(String[] args) throws Exception
@@ -42,13 +48,24 @@ public class UsingEnglishAudioModelMain
     	String dictTempPath = args[2] + ".temp";
         URL dictionary = new URL("file:" + dictTempPath);
 
+    	WaveImporter waveImporterForOfflineSpeechRecognition = new WaveImporter(inputWavePath, "config_nospeech_nomel.xml");
+    	OfflineSpeechRecognizer speechRecognizer = new OfflineSpeechRecognizer(20, 10);
+//    	
+    	waveImporterForOfflineSpeechRecognition.registerObserver(speechRecognizer);
+//    	
+    	waveImporterForOfflineSpeechRecognition.process();
+    	waveImporterForOfflineSpeechRecognition.done();   	
+        
         AudioInputStream stream = AudioSystem.getAudioInputStream(new File(inputWavePath));
-        Text text = new Text(new TextImporter(inputTextPath), 1);
-        String rawText = join(text.getWords(), " ");
 
-        new NaiveDictionaryGenerator(text).store(dictTempPath);
     	
-    	ArrayList<AudioLabel> results = Aligner.align(acousticModel, dictionary, stream, rawText);
+    	Speeches speeches = speechRecognizer.findSpeechParts();
+    	Text text = new Text(new TextImporter(inputTextPath), speeches.getTotalTime());
+    	new NaiveDictionaryGenerator(text).store(dictTempPath);
+        
+    	String rawText = join(text.getWords(), " ").toLowerCase();
+    	ArrayList<AudioLabel> results = new Aligner().align(acousticModel, dictionary, stream, rawText);
+//    	ArrayList<AudioLabel> results = new PauseBasedAligner(acousticModel, dictionary).align(stream, text, speeches);
     	new AudacityLabelsExporter(outputPath).export(results.toArray(new AudioLabel[0]));
     	stream.close();
     }
