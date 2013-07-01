@@ -16,8 +16,27 @@ import edu.cmu.sphinx.result.WordResult;
 public class Aligner {
     
     static double chunkTime = 300;
+    public ArrayList<AudioLabel> align(URL acousticModel, URL dictionary, AudioInputStream stream, String text) throws Exception
+    {
+        double totalTime = (double)stream.getFrameLength() / (double)stream.getFormat().getFrameRate();
+    	GrammarAligner aligner = new GrammarAligner(acousticModel, dictionary, null);
+    	Result result = aligner.align(stream, text);
+    	if (result == null) return new ArrayList<AudioLabel>();
+    	ArrayList<AudioLabel> ret = new ArrayList<AudioLabel>();
+    	for (WordResult wresult : result.getWords()) {
+    		String nextWord = wresult.getPronunciation().getWord().toString();
+    		double frameSize = (stream.getFormat().getSampleRate() / stream.getFormat().getSampleSizeInBits());
+    		double start = (double)wresult.getStartFrame() / frameSize;
+    		double end = (double)wresult.getEndFrame() / frameSize;
+    		if (end < start) end = totalTime;
+    		AudioLabel label = new AudioLabel(nextWord, start, end + 0.02);
+    		if (!nextWord.equalsIgnoreCase("<sil>"))
+    			ret.add(label);
+    	}
+    	return ret;
+    }
 
-    public static ArrayList<AudioLabel> align(URL acousticModel, URL dictionary, AudioInputStream stream, String text) throws Exception
+    public ArrayList<AudioLabel> align2(URL acousticModel, URL dictionary, AudioInputStream stream, String text) throws Exception
     {
         
         double totalTime = (double)stream.getFrameLength() / (double)stream.getFormat().getFrameRate();

@@ -57,11 +57,11 @@ public class PauseBasedAligner {
 	    		double frameSize = (stream.getFormat().getSampleRate() / stream.getFormat().getSampleSizeInBits());
 	    		double start = (double)result.getStartFrame() / frameSize + chunkStartTime;
 	    		double end = (double)result.getEndFrame() / frameSize + chunkStartTime;
+	    		if (nextWord.equalsIgnoreCase("<sil>")) continue;
 	    		if (result.getEndFrame() < result.getStartFrame()) {
 	    			end = chunkEndTime - 0.1;
-	    			System.err.println("END OF FRAME");
+	    			System.err.println("END OF FRAME " + (end - start));
 	    		}
-	    		if (nextWord.equalsIgnoreCase("<sil>")) continue;
 	    		AudioLabel label = new AudioLabel(nextWord, start, end);
 	    		results.add(label);
         	}
