@@ -21,6 +21,8 @@ import dataProducers.WaveImporter;
 
 
 import edu.cmu.sphinx.result.WordResult;
+import graphemesToPhonemesConverters.DictionaryGenerator;
+import graphemesToPhonemesConverters.GraphemesToRussianPhonemesConverter;
 import speechDetection.OfflineSpeechRecognizer;
 import speechDetection.OnlineSpeechesExtractor;
 import sphinx.GrammarAligner;
@@ -64,7 +66,7 @@ public class UsingEnglishAudioModelMain
         
         Text text = new Text(new TextImporter(inputTextPath), speeches.getTotalTime());
         String rawText = join(text.getWords(), " ");
-        new NaiveDictionaryGenerator(text).store(dictTempPath);
+        new DictionaryGenerator(text, new GraphemesToRussianPhonemesConverter()).store(dictTempPath);
         AudioInputStream stream = AudioSystem.getAudioInputStream(new File(inputWavePath));
     	ArrayList<AudioLabel> results = new Aligner().align(acousticModel, dictionary, stream, rawText);
 //    	ArrayList<AudioLabel> results = new PauseBasedAligner(acousticModel, dictionary).align(stream, text, speeches);

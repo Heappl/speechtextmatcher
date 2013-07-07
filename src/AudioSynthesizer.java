@@ -1,3 +1,6 @@
+import graphemesToPhonemesConverters.DictionaryGenerator;
+import graphemesToPhonemesConverters.GraphemesToRussianPhonemesConverter;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -8,7 +11,6 @@ import java.util.HashMap;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 
-import audioModelSupportedAlignment.NaiveDictionaryGenerator;
 
 import common.AudioChunkExtractor;
 import common.AudioLabel;
@@ -268,7 +270,10 @@ public class AudioSynthesizer
 
 	private ArrayList<ArrayList<AudioLabel>> createPhonemeRepr(String word)
 	{
-		String repr = new NaiveDictionaryGenerator(new Text(word, 0)).getDictionary().get(word)[0];
+		String repr = new DictionaryGenerator(
+				new Text(word, 0),
+				new GraphemesToRussianPhonemesConverter()
+			).getDictionary().get(word)[0];
 		String[] phonemes = repr.split(" ");
 		String[] phonemesSeqs = new String[phonemes.length / 2];
 		for (int i = 0; i < phonemes.length / 2; ++i) {
