@@ -21,10 +21,11 @@ public class AudioChunkExtractor
 		this.stream = stream;
 	}
 	
-	public AudioInputStream extract(double startTime, double endTime)
+	public AudioInputStream extract(double startTime, double endTime) throws IOException
 	{
 		startTime = Math.max(0, startTime);
 		endTime = Math.max(0, endTime);
+		readAndDeleteBytes((int)((long)Math.floor(startTime * format.getFrameRate())));
 		int startFrame = (int)((long)Math.floor(startTime * format.getFrameRate()) - start);
 		int endFrame = (int)((long)Math.ceil(endTime * format.getFrameRate()) - start);
 		int chunkSize = (endFrame - startFrame) * format.getFrameSize();
@@ -51,6 +52,17 @@ public class AudioChunkExtractor
 	{
 		audioData = new ArrayList<byte[]>(audioData.subList(toIndex, audioData.size()));
 		start += toIndex;
+	}
+	private void readAndDeleteBytes(int i) throws IOException
+	{
+		for (long j = start; j < i; j += 1000) {
+			readBytes((int)(j - start));
+			deleteBytes((int)(j - start));
+		}
+		readBytes((int)(i - start));
+		deleteBytes((int)(i - start));
+//		stream.skip(i * format.getFrameSize());
+//		start += i;
 	}
 	private void readBytes(int i)
 	{

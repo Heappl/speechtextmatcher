@@ -1,5 +1,6 @@
 package audioModelSupportedAlignment;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ public class PauseBasedAligner {
 		this.dictionary = dictionary;
 	}
 	
-	public ArrayList<AudioLabel> align(AudioInputStream stream, Text text, Speeches speeches) throws PropertyException, MalformedURLException
+	public ArrayList<AudioLabel> align(AudioInputStream stream, Text text, Speeches speeches) throws PropertyException, IOException
 	{
         ArrayList<AudioLabel> results = new ArrayList<AudioLabel>();
         AudioChunkExtractor audioChunker = new AudioChunkExtractor(stream);
@@ -90,7 +91,7 @@ public class PauseBasedAligner {
 			double chunkStartTime,
 			double chunkEndTime,
 			double timePerChar,
-			AudioChunkExtractor audioChunker) throws PropertyException, MalformedURLException
+			AudioChunkExtractor audioChunker) throws PropertyException, IOException
 	{
 		double chunkTime = chunkEndTime - chunkStartTime;
 		int initialNumberOfWords = calculateTnitialLength(chunkTime, chunks, timePerChar);
