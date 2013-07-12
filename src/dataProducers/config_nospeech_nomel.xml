@@ -19,7 +19,10 @@
     </component>
     <component name="dataBlocker" type="edu.cmu.sphinx.frontend.DataBlocker"/>
     <component name="preemphasizer" type="edu.cmu.sphinx.frontend.filter.Preemphasizer"/>
-    <component name="windower" type="edu.cmu.sphinx.frontend.window.RaisedCosineWindower"/>
+    <component name="windower" type="edu.cmu.sphinx.frontend.window.RaisedCosineWindower">
+    	<property name="windowSizeInMs" value="17"/>
+    	<property name="windowShiftInMs" value="2"/>
+    </component>
     <component name="fft" type="edu.cmu.sphinx.frontend.transform.DiscreteFourierTransform"/>
     <component name="fft2" type="edu.cmu.sphinx.frontend.transform.DiscreteFourierTransform"/>
     <component name="dct" type="edu.cmu.sphinx.frontend.transform.DiscreteCosineTransform"/>

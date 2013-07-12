@@ -239,7 +239,7 @@ public class AudioSynthesizer
 
 	private AudioMergeDiff calcDiff(AudioCandidate ending, AudioCandidate starting)
 	{
-		int neigh = 50;
+		int neigh = 30;
 		
 		double bestScore = Double.MAX_VALUE;
 		int bestEnding = 0;
@@ -275,18 +275,11 @@ public class AudioSynthesizer
 				new GraphemesToRussianPhonemesConverter()
 			).getDictionary().get(word)[0];
 		String[] phonemes = repr.split(" ");
-		String[] phonemesSeqs = new String[phonemes.length / 2];
-		for (int i = 0; i < phonemes.length / 2; ++i) {
-			phonemesSeqs[i] = phonemes[2 * i] + phonemes[2 * i + 1];
-			if ((i + 1 >= phonemes.length / 2) && (2 * i + 2 < phonemes.length)) {
-				phonemesSeqs[i] += phonemes[2 * i + 2];
-			}
-		}
 		
 		ArrayList<ArrayList<AudioLabel>> ret = new ArrayList<ArrayList<AudioLabel>>();
-		for (String phonemeSeq : phonemesSeqs) {
-			System.err.println(phonemeSeq + " " + this.phonemeLabels.containsKey(phonemeSeq));
-			ret.add(this.phonemeLabels.get(phonemeSeq));
+		for (String phoneme : phonemes) {
+			System.err.println(phoneme + " " + this.phonemeLabels.containsKey(phoneme));
+			ret.add(this.phonemeLabels.get(phoneme));
 		}
 		return ret;
 	}
