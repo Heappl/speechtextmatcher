@@ -1,9 +1,9 @@
+package dataProducers;
 import java.util.ArrayList;
 
 import common.Data;
 import common.DataSequence;
 
-import dataProducers.IWaveObserver;
 
 
 public class PowerExtractor implements IWaveObserver {

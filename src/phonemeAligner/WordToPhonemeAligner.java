@@ -1,3 +1,4 @@
+package phonemeAligner;
 import graphemesToPhonemesConverters.IWordToPhonemesConverter;
 
 import java.util.ArrayList;

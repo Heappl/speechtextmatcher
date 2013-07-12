@@ -1,3 +1,4 @@
+package phonemeAligner;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -223,7 +224,7 @@ public class PhonemeSearch {
 		}
 		return ret;
 	}
-	ArrayList<AudioLabel> findPhonemes(AudioLabel word, FloatData[] wordSequence, common.Data[] wordSpectrumSequence) throws ImplementationError
+	public ArrayList<AudioLabel> findPhonemes(AudioLabel word, FloatData[] wordSequence, common.Data[] wordSpectrumSequence) throws ImplementationError
 	{
 		double dataTimeDiff = (word.getEnd() - word.getStart()) / (double)wordSequence.length;
 //		if (wordSequence.length != wordSpectrumSequence.length)

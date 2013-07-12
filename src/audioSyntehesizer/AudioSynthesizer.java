@@ -1,3 +1,4 @@
+package audioSyntehesizer;
 import graphemesToPhonemesConverters.DictionaryGenerator;
 import graphemesToPhonemesConverters.GraphemesToRussianPhonemesConverter;
 

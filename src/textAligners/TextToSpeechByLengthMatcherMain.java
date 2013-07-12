@@ -1,7 +1,6 @@
+package textAligners;
 
 import speechDetection.OfflineSpeechRecognizer;
-import textAligners.IncrementalTextToSpeechAligner;
-import textAligners.TextToSpeechByLengthAligner;
 import common.AudioLabel;
 import common.Speeches;
 import common.Text;

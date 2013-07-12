@@ -1,3 +1,5 @@
+package audioModelSupportedAlignment;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -9,6 +11,7 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
+
 import graphemesToPhonemesConverters.GraphemesToPolishPhonemesConverter;
 import graphemesToPhonemesConverters.GraphemesToRussianPhonemesConverter;
 
@@ -19,6 +22,7 @@ import commonExceptions.ImplementationError;
 
 import dataExporters.AudacityLabelsExporter;
 import dataProducers.AudacityLabelImporter;
+import dataProducers.PowerExtractor;
 import dataProducers.TextImporter;
 import dataProducers.WaveImporter;
 import diffCalculators.SpectrumDiffCalculator;

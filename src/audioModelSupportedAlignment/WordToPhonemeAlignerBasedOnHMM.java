@@ -1,9 +1,13 @@
+package audioModelSupportedAlignment;
+
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 
 import javax.sound.sampled.AudioInputStream;
+
+import phonemeAligner.PhonemeSearch;
 
 import common.AudioLabel;
 import common.DataSequence;
