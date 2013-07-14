@@ -12,6 +12,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 
 
 import common.AudioLabel;
+import commonExceptions.ImplementationError;
 
 import dataExporters.AudacityLabelsExporter;
 import dataProducers.AudacityLabelImporter;
@@ -28,7 +29,8 @@ public class SynthesizerMain {
 			"file:/home/bartek/workspace/speechtextmatcher/voxforge-ru-0.2/model_parameters/msu_ru_nsh.cd_cont_1000_8gau_16000/");
 	}
 	
-	public static void main(String[] args) throws UnsupportedAudioFileException, IOException {
+	public static void main(String[] args) throws UnsupportedAudioFileException, IOException, ImplementationError
+	{
 		
 		String wavFile = args[0];
 		String labelsFile = args[1];
@@ -47,7 +49,8 @@ public class SynthesizerMain {
 //		}
 //		new AudacityLabelsExporter("test.labels.txt").export(allPhonemes.toArray(new AudioLabel[0]));
         
-        AudioSynthesizer synthesizer = new AudioSynthesizer(stream, prepared, phonemes);
+//        SimpleAudioSynthesizer synthesizer = new SimpleAudioSynthesizer(stream, prepared, phonemes);
+		LargestSequenceAudioSynthesizer synthesizer = new LargestSequenceAudioSynthesizer(stream, prepared, phonemes);
         AudioInputStream synthesized = synthesizer.synthesize(text);
         AudioSystem.write(synthesized, AudioFileFormat.Type.WAVE, new File(outputFile));
 	}

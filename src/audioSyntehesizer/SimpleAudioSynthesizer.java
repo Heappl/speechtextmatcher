@@ -18,14 +18,14 @@ import common.AudioLabel;
 import common.Text;
 
 
-public class AudioSynthesizer
+public class SimpleAudioSynthesizer
 {
 	private HashMap<String, ArrayList<AudioLabel>> wordLabels = new HashMap<String, ArrayList<AudioLabel>>();
 	private HashMap<String, ArrayList<AudioLabel>> phonemeLabels = new HashMap<String, ArrayList<AudioLabel>>();
 	private AudioChunkExtractor extractor = null;
 	private AudioFormat audioFormat = null;
 	
-	public AudioSynthesizer(AudioInputStream audio, AudioLabel[] wordLabels, AudioLabel[] phonemeLabels)
+	public SimpleAudioSynthesizer(AudioInputStream audio, AudioLabel[] wordLabels, AudioLabel[] phonemeLabels)
 	{
 		this.audioFormat = audio.getFormat();
 		for (AudioLabel wordLabel : wordLabels) {
@@ -60,32 +60,7 @@ public class AudioSynthesizer
 			}
 			else candidates.addAll(createPhonemeRepr(word));
 		}
-		return mergeAudio(findBestSequence(candidates));
-	}
-
-	private AudioInputStream mergeAudio(ArrayList<AudioInputStream> repr) throws IOException
-	{
-		if (repr.size() == 0) return null;
-		if (repr.size() == 1) return repr.get(0);
-		
-		AudioInputStream ret = merge(repr.get(0), repr.get(1));
-		for (int i = 2; i < repr.size(); ++i)
-			ret = merge(ret, repr.get(i));
-		return ret;
-	}
-
-	private AudioInputStream merge(AudioInputStream first, AudioInputStream second) throws IOException
-	{
-		int firstChunkSize = (int)(first.getFrameLength() * first.getFormat().getFrameSize());
-		int secondChunkSize = (int)(second.getFrameLength() * second.getFormat().getFrameSize());
-		byte[] chunkData = new byte[firstChunkSize + secondChunkSize];
-		first.read(chunkData, 0, firstChunkSize);
-		second.read(chunkData, firstChunkSize, secondChunkSize);
-		ByteArrayInputStream byteStream = new ByteArrayInputStream(chunkData);
-		return new AudioInputStream(
-				byteStream,
-				first.getFormat(),
-				chunkData.length / (first.getFormat().getSampleSizeInBits() / Byte.SIZE));
+		return new AudioMerger().mergeAudio(findBestSequence(candidates));
 	}
 	
 	private class AudioElement
@@ -134,7 +109,7 @@ public class AudioSynthesizer
 	private ArrayList<AudioInputStream> findBestSequence(ArrayList<ArrayList<AudioLabel>> candidates) throws IOException
 	{
 		int maxCandidates = Integer.MIN_VALUE;
-		ArrayList<AudioElement> elementsAux = new ArrayList<AudioSynthesizer.AudioElement>();
+		ArrayList<AudioElement> elementsAux = new ArrayList<SimpleAudioSynthesizer.AudioElement>();
 		for (int i = 0; i < candidates.size(); ++i) {
 			if (candidates.get(i).size() > maxCandidates)
 				maxCandidates = candidates.get(i).size();

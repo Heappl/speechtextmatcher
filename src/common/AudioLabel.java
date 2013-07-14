@@ -15,4 +15,5 @@ public class AudioLabel {
 	public String getLabel() { return this.label; }
 	public double getStart() { return this.start; }
 	public double getEnd() { return this.end; }
+	public String toString() { return this.label + " [start: " + this.start + " end: " + this.end + "]"; }
 }
