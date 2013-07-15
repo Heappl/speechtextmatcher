@@ -163,9 +163,12 @@ public class MiddleToMiddleAudioSynthesizer
 				initialCandidate.resetScore();
 			}
 			for (int i = 1; i < wordCandidates.size(); ++i) {
-				for (int j = 0; j < wordCandidates.get(i - 1).size(); ++j) {
-					for (int k = 0; k < wordCandidates.get(i).size(); ++k) {
-						wordCandidates.get(i).get(k).score(wordCandidates.get(i - 1).get(j), streams, frameSize);
+                for (int k = 0; k < wordCandidates.get(i).size(); ++k) {
+                    for (int prev = 0; prev < i; ++prev) {
+                        for (int j = 0; j < wordCandidates.get(prev).size(); ++j) {
+                            wordCandidates.get(i).get(k).score(
+                                    wordCandidates.get(prev).get(j), i - prev, streams, frameSize);
+                        }
 					}
 				}
 			}
@@ -293,10 +296,12 @@ public class MiddleToMiddleAudioSynthesizer
 
 		public void score(
 				PhonemeSequenceCandidate prev,
+				int phonemeDiff,
 				HashMap<AudioLabel, byte[]> streams, 
 				int frameSize)
 		{
 			if (!streams.containsKey(totalSequence)) return;
+			if (prev.phonemes.size() <= phonemeDiff) return;
 			
 			byte[] currentBytes = streams.get(totalSequence);
 			double currentTotalTime = totalSequence.getEnd() - totalSequence.getStart();
@@ -312,8 +317,8 @@ public class MiddleToMiddleAudioSynthesizer
 			double currentMergePhonemeMiddle = currentMergePhonemeTime / 2.0;
 			int currentMergePhonemeMiddleIndex = (int)Math.round(currentMergePhonemeMiddle / currentFrameTime);
 			
-			double previousMergePhonemeStart = prev.phonemes.get(1).getStart() - prev.totalSequence.getStart();
-			double previousMergePhonemeEnd = prev.phonemes.get(1).getEnd() - prev.totalSequence.getStart();
+			double previousMergePhonemeStart = prev.phonemes.get(phonemeDiff).getStart() - prev.totalSequence.getStart();
+			double previousMergePhonemeEnd = prev.phonemes.get(phonemeDiff).getEnd() - prev.totalSequence.getStart();
 			int previousPhonemeStartIndex = (int)Math.round(previousMergePhonemeStart / previousFrameTime);
 			double previousMergePhonemeTime = previousMergePhonemeEnd - previousMergePhonemeStart;
 			double previousMergePhonemeMiddle = previousMergePhonemeTime / 2.0;
@@ -328,7 +333,7 @@ public class MiddleToMiddleAudioSynthesizer
 				int currentStartIndex = i * frameSize + currentMergePhonemeMiddleIndex * frameSize;
 				for (int o = -maxPass; o < maxPass; ++o) {
     				int previousStartIndex = (i + o) * frameSize + previousMergePhonemeMiddleIndex * frameSize;
-    				double diff = 0;
+    				double diff = prev.getScore();
     				for (int j = 0; j < frameSize; ++j) {
     				    if ((currentStartIndex + j >= currentBytes.length)
     				         || (previousStartIndex + j >= previousBytes.length)) {
@@ -336,7 +341,7 @@ public class MiddleToMiddleAudioSynthesizer
     				        break;
     				    }
     					double auxDiff = currentBytes[currentStartIndex + j] - previousBytes[previousStartIndex + j];
-    					diff += auxDiff * auxDiff;
+    					diff += (1 + auxDiff) * (1 + auxDiff);
     				}
     				if (diff < bestScore) {
     					bestScore = diff;
