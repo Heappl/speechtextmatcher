@@ -50,7 +50,7 @@ public class SynthesizerMain {
 //		new AudacityLabelsExporter("test.labels.txt").export(allPhonemes.toArray(new AudioLabel[0]));
         
 //        SimpleAudioSynthesizer synthesizer = new SimpleAudioSynthesizer(stream, prepared, phonemes);
-		LargestSequenceAudioSynthesizer synthesizer = new LargestSequenceAudioSynthesizer(stream, prepared, phonemes);
+		MiddleToMiddleAudioSynthesizer synthesizer = new MiddleToMiddleAudioSynthesizer(stream, prepared, phonemes);
         AudioInputStream synthesized = synthesizer.synthesize(text);
         AudioSystem.write(synthesized, AudioFileFormat.Type.WAVE, new File(outputFile));
 	}
