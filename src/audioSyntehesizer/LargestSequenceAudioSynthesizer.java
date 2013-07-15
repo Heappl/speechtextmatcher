@@ -105,6 +105,14 @@ public class LargestSequenceAudioSynthesizer
 			}
 			this.streams.put(audioPart, streamBytes);
 		}
+
+        @Override
+        public ArrayList<AudioLabel> getCandidateLabels(int k)
+        {
+            ArrayList<AudioLabel> ret = new ArrayList<AudioLabel>();
+            ret.add(candidates.get(k));
+            return ret;
+        }
 	}
 	
 	public AudioInputStream synthesize(String text) throws IOException, ImplementationError
@@ -131,6 +139,7 @@ public class LargestSequenceAudioSynthesizer
 		private byte[] solved = null;
 		private HashMap<AudioLabel, byte[]> streams = new HashMap<AudioLabel, byte[]>();
 		private int frameSize = 0;
+		private ArrayList<AudioLabel> labels;
 		
 		public PhonemeSequenceWordCandidates(ArrayList<ArrayList<PhonemeSequenceCandidate>> wordCandidates)
 		{
@@ -175,6 +184,7 @@ public class LargestSequenceAudioSynthesizer
 			for (byte[] part : sequence)
 				for (byte b : part)
 					solved[index++] = b;
+			labels = bestCandidate.createLabelSequence(streams, frameSize, Integer.MAX_VALUE);
 		}
 		
 		@Override
@@ -187,6 +197,11 @@ public class LargestSequenceAudioSynthesizer
 		{
 			return solved;
 		}
+        @Override
+        public ArrayList<AudioLabel> getCandidateLabels(int k)
+        {
+            return labels;
+        }
 		@Override
 		public void supplyAudioPart(AudioLabel audioPart, AudioInputStream stream)
 		{
@@ -235,7 +250,11 @@ public class LargestSequenceAudioSynthesizer
 				ret = bestPrevious.createSequence(streams, frameSize, bestPreviousIndex);
 			}
 			byte[] currentBytes = streams.get(totalSequence);
-			trimSize = Math.min(currentBytes.length, trimSize);
+            double currentTotalTime = totalSequence.getEnd() - totalSequence.getStart();
+            double currentFrameTime = currentTotalTime / (double)(currentBytes.length / frameSize);
+            double maxTrimTime = phonemes.get(phonemes.size() - 1).getEnd();
+            int maxTrimIndex = (int)Math.floor(maxTrimTime / currentFrameTime) / frameSize;
+			trimSize = Math.min(currentBytes.length, Math.min(maxTrimIndex, trimSize));
 			trimSize -= trimSize % frameSize;
 			bestCurrentIndex -= bestCurrentIndex % frameSize;
 			int newSize = trimSize - bestCurrentIndex;
@@ -247,6 +266,25 @@ public class LargestSequenceAudioSynthesizer
 			ret.add(actualBytes);
 			return ret;
 		}
+        public ArrayList<AudioLabel> createLabelSequence(HashMap<AudioLabel, byte[]> streams, int frameSize, int trimSize)
+        {
+            ArrayList<AudioLabel> ret = new ArrayList<AudioLabel>();
+            if (bestPrevious != null) {
+                ret = bestPrevious.createLabelSequence(streams, frameSize, bestPreviousIndex);
+            }
+            byte[] currentBytes = streams.get(totalSequence);
+            double currentTotalTime = totalSequence.getEnd() - totalSequence.getStart();
+            double currentFrameTime = currentTotalTime / (double)(currentBytes.length / frameSize);
+            double maxTrimTime = phonemes.get(phonemes.size() - 1).getEnd();
+            int maxTrimIndex = (int)Math.floor(maxTrimTime / currentFrameTime) / frameSize;
+            trimSize = Math.min(currentBytes.length, Math.min(maxTrimIndex, trimSize));
+            trimSize -= trimSize % frameSize;
+            bestCurrentIndex -= bestCurrentIndex % frameSize;
+            
+            ret.add(phonemes.get(0));
+            ret.add(phonemes.get(1));
+            return ret;
+        }
 
 		public double getScore()
 		{
@@ -285,24 +323,27 @@ public class LargestSequenceAudioSynthesizer
 			int previousNeighSize = (int)Math.floor(previousMergePhonemeTime / previousFrameTime / 8.0);
 			int neigh = Math.min(currentNeighSize / frameSize, previousNeighSize / frameSize);
 			
+			int maxPass = neigh / 8;
 			for (int i = -neigh; i < neigh; ++i) {
 				int currentStartIndex = i * frameSize + currentMergePhonemeMiddleIndex * frameSize;
-				int previousStartIndex = i * frameSize + previousMergePhonemeMiddleIndex * frameSize;
-				double diff = 0;
-				for (int j = 0; j < frameSize; ++j) {
-				    if ((currentStartIndex + j >= currentBytes.length)
-				         || (previousStartIndex + j >= previousBytes.length)) {
-				        diff = Double.MAX_VALUE;
-				        break;
-				    }
-					double auxDiff = currentBytes[currentStartIndex + j] - previousBytes[previousStartIndex + j];
-					diff += auxDiff * auxDiff;
-				}
-				if (diff < bestScore) {
-					bestScore = diff;
-					bestPrevious = prev;
-					bestPreviousIndex = previousStartIndex * frameSize;
-					bestCurrentIndex = currentStartIndex * frameSize;
+				for (int o = -maxPass; o < maxPass; ++o) {
+    				int previousStartIndex = (i + o) * frameSize + previousMergePhonemeMiddleIndex * frameSize;
+    				double diff = 0;
+    				for (int j = 0; j < frameSize; ++j) {
+    				    if ((currentStartIndex + j >= currentBytes.length)
+    				         || (previousStartIndex + j >= previousBytes.length)) {
+    				        diff = Double.MAX_VALUE;
+    				        break;
+    				    }
+    					double auxDiff = currentBytes[currentStartIndex + j] - previousBytes[previousStartIndex + j];
+    					diff += auxDiff * auxDiff;
+    				}
+    				if (diff < bestScore) {
+    					bestScore = diff;
+    					bestPrevious = prev;
+    					bestPreviousIndex = previousStartIndex;
+    					bestCurrentIndex = currentStartIndex;
+    				}
 				}
 			}
 		}
@@ -311,13 +352,24 @@ public class LargestSequenceAudioSynthesizer
 	private PhonemeSequenceWordCandidates synthesizeWord(String word) throws ImplementationError
 	{
 		String[] phonemes = new GraphemesToRussianPhonemesConverter().convert(word).get(0).split(" +");
-		
-		int minimumSize = 2;
+		int minimumSize = 3;
 		ArrayList<ArrayList<PhonemeSequenceCandidate>> wordCandidates = new ArrayList<ArrayList<PhonemeSequenceCandidate>>();
+		int lastSize = minimumSize;
 		for (int i = 0; i <= phonemes.length - minimumSize; ++i) {
+		    lastSize = minimumSize;
 			ArrayList<PhonemeSequenceCandidate> phonemeSequenceCandidates =
 					findPhonemeSequenceCandidates(phonemes, i, minimumSize);
+			if (phonemeSequenceCandidates.size() < 3) {
+			    lastSize = minimumSize - 1;
+			    phonemeSequenceCandidates =
+	                    findPhonemeSequenceCandidates(phonemes, i, lastSize);
+			}
 			wordCandidates.add(phonemeSequenceCandidates);
+		}
+		if (lastSize < minimumSize) {
+            ArrayList<PhonemeSequenceCandidate> phonemeSequenceCandidates =
+                    findPhonemeSequenceCandidates(phonemes, phonemes.length - lastSize, lastSize);
+            wordCandidates.add(phonemeSequenceCandidates);
 		}
 		return new PhonemeSequenceWordCandidates(wordCandidates);
 	}

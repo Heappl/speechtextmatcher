@@ -12,4 +12,5 @@ public interface AudioCandidate {
 	void solveInternal();
 	int getNumberOfCandidates();
 	byte[] getCandidate(int k);
+    ArrayList<AudioLabel> getCandidateLabels(int k);
 }

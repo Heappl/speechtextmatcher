@@ -10,6 +10,7 @@ import javax.sound.sampled.AudioInputStream;
 
 import common.AudioChunkExtractor;
 import common.AudioLabel;
+import dataExporters.AudacityLabelsExporter;
 
 public class AudioCandidatesChooser
 {
@@ -86,7 +87,7 @@ public class AudioCandidatesChooser
 					if (candidates.get(i).getNumberOfCandidates() <= k) continue;
 					AudioMergeDiff diff = calcDiff(
 							candidates.get(i - 1).getCandidate(j), candidates.get(i).getCandidate(k));
-					if (diff.score < next[j]) {
+					if (diff.score < next[k]) {
 						next[k] = diff.score;
 						previous[i][k][0] = j;
 						previous[i][k][1] = diff.endingIndex;
@@ -106,12 +107,14 @@ public class AudioCandidatesChooser
 				bestScore = current[i];
 			}
 		}
-		
+
+		ArrayList<AudioLabel> labels = new ArrayList<AudioLabel>();
 		ArrayList<AudioInputStream> ret = new ArrayList<AudioInputStream>();
 		ret.add(createAudio(
 				candidates.get(candidates.size() - 1).getCandidate(cand),
 				previous[previous.length - 1][cand][2],
 				Integer.MAX_VALUE));
+		labels.addAll(candidates.get(candidates.size() - 1).getCandidateLabels(cand));
 		for (int i = 1; i < candidates.size(); ++i) {
 		    int prevCand = cand;
 			cand = previous[previous.length - i][cand][0];
@@ -119,15 +122,18 @@ public class AudioCandidatesChooser
 					candidates.get(candidates.size() - 1 - i).getCandidate(cand),
 					previous[previous.length - 1 - i][cand][2],
 					previous[previous.length - i][prevCand][1]));
+	        labels.addAll(candidates.get(candidates.size() - 1 - i).getCandidateLabels(cand));
 		}
+		new AudacityLabelsExporter("test.labels.txt").export(labels.toArray(new AudioLabel[0]));
 		Collections.reverse(ret);
 		return ret;
 	}
 	
 	private AudioInputStream createAudio(byte[] candidate, int start, int end)
 	{
-	    end = Math.min(candidate.length / audioFormat.getFrameSize(), end);
 	    System.err.println(start + " " + end + " " + (double)(end - start) / this.audioFormat.getFrameRate());
+	    end = Math.min(candidate.length / audioFormat.getFrameSize(), end);
+	    end = Math.max(start, end);
 		byte[] actualBytes = new byte[(end - start) * this.audioFormat.getFrameSize()];
 		for (int i = start; i < end; ++i) {
 			for (int j = i * audioFormat.getFrameSize(); j < (i + 1) * audioFormat.getFrameSize(); ++j) {
@@ -183,6 +189,7 @@ public class AudioCandidatesChooser
 				}
 			}
 		}
+		System.err.println("best: " + bestScore + " " + bestEnding + " " + bestStart);
 		return new AudioMergeDiff(bestScore, bestEnding, bestStart);
 	}
 }
