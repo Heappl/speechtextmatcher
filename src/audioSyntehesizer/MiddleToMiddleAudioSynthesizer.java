@@ -34,7 +34,7 @@ public class MiddleToMiddleAudioSynthesizer
 	private AudioCandidatesChooser chooser = null;
 
 	public MiddleToMiddleAudioSynthesizer(
-			AudioInputStream audio, AudioLabel[] wordLabels, AudioLabel[] phonemeLabels)
+			AudioInputStream audio, AudioLabel[] wordLabels, AudioLabel[] phonemeLabels) throws ImplementationError
 	{
 		this.chooser = new AudioCandidatesChooser(audio);
 		for (AudioLabel wordLabel : wordLabels) {
@@ -47,16 +47,36 @@ public class MiddleToMiddleAudioSynthesizer
 			labels.add(wordLabel);
 			this.wordLabels.put(word, labels);
 		}
-		for (AudioLabel phonemeLabel : phonemeLabels) {
-			if (phonemeLabel.getEnd() <= phonemeLabel.getStart()) continue;
-			ArrayList<AudioLabel> labels = new ArrayList<AudioLabel>();
-			if (this.phonemeLabels.containsKey(phonemeLabel.getLabel()))
-				labels = this.phonemeLabels.get(phonemeLabel.getLabel());
-			labels.add(phonemeLabel);
-            this.sortedPhonemes.add(phonemeLabel);
-			this.phonemeLabels.put(phonemeLabel.getLabel(), labels);
-		}
 		Collections.sort(this.sortedWords, this.timeComparator);
+		AudioLabel previousWord = null;
+		ArrayList<AudioLabel> wordPhonemeLabels = new ArrayList<AudioLabel>();
+		for (AudioLabel phonemeLabel : phonemeLabels) {
+		    AudioLabel wordContaing = findWordContaining(phonemeLabel);
+		    if (wordContaing == previousWord) {
+		        wordPhonemeLabels.add(phonemeLabel);
+		        continue;
+		    }
+		    previousWord = wordContaing;
+		    
+		    boolean ok = true;
+		    for (AudioLabel wordPhoneme : wordPhonemeLabels) {
+	            if ((wordPhoneme.getEnd() <= wordPhoneme.getStart())
+	                || (wordPhoneme.getEnd() - wordPhoneme.getStart() > 0.5)
+	                || (wordPhoneme.getEnd() - wordPhoneme.getStart() < 0.01))
+	                ok = false;
+		    }
+		    if (!ok) { wordPhonemeLabels.clear(); continue; }
+		    System.err.println("ok " + wordContaing.getLabel());
+            for (AudioLabel wordPhoneme : wordPhonemeLabels) {
+    			ArrayList<AudioLabel> labels = new ArrayList<AudioLabel>();
+    			if (this.phonemeLabels.containsKey(wordPhoneme.getLabel()))
+    				labels = this.phonemeLabels.get(wordPhoneme.getLabel());
+    			labels.add(wordPhoneme);
+                this.sortedPhonemes.add(wordPhoneme);
+    			this.phonemeLabels.put(wordPhoneme.getLabel(), labels);
+            }
+            wordPhonemeLabels.clear();
+		}
         Collections.sort(this.sortedPhonemes, this.timeComparator);
 	}
 	
@@ -328,7 +348,7 @@ public class MiddleToMiddleAudioSynthesizer
 			int previousNeighSize = (int)Math.floor(previousMergePhonemeTime / previousFrameTime / 8.0);
 			int neigh = Math.min(currentNeighSize / frameSize, previousNeighSize / frameSize);
 			
-			int maxPass = neigh / 8;
+			int maxPass = Math.max(1, neigh / 8);
 			int diffSize = Math.max(1, maxPass / 8);
 			for (int i = -neigh; i < neigh; ++i) {
 				int currentStartIndex = i * frameSize + currentMergePhonemeMiddleIndex * frameSize;

@@ -25,16 +25,16 @@ public class PhonemeGuasianTrainer
             this.data = data;
         }
 
-        public PhonemeScorer train(int numOfModels) throws ImplementationError
+        public GaussianMixturePhonemeScorer train(int numOfModels) throws ImplementationError
         {
             GaussianMixtureExpectedMaximalization em = new GaussianMixtureExpectedMaximalization();
             MixtureGaussianModel mixtureModel = new MixtureGaussianModel(em.calculate(data, numOfModels));
-            return new PhonemeScorer(mixtureModel, phoneme);
+            return new GaussianMixturePhonemeScorer(mixtureModel, phoneme);
         }
     }
     
     
-    public PhonemeScorer[] trainPhonemes(
+    public GaussianMixturePhonemeScorer[] trainPhonemes(
         int modelsPerPhoneme,
         AudioLabel[] phonemeLabels,
         FloatData[] data,
@@ -43,13 +43,13 @@ public class PhonemeGuasianTrainer
     {
         ArrayList<PhonemeData> phonemes = extractPhonemeData(phonemeLabels, data, powers, totalTime); 
         
-        ArrayList<PhonemeScorer> trainedScorers = new ArrayList<PhonemeScorer>();
+        ArrayList<GaussianMixturePhonemeScorer> trainedScorers = new ArrayList<GaussianMixturePhonemeScorer>();
         
         for (PhonemeData phoneme : phonemes) {
             trainedScorers.add(phoneme.train(modelsPerPhoneme));
         }
         
-        return trainedScorers.toArray(new PhonemeScorer[0]);
+        return trainedScorers.toArray(new GaussianMixturePhonemeScorer[0]);
     }
 
     private ArrayList<PhonemeData> extractPhonemeData(

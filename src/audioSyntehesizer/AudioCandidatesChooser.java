@@ -17,7 +17,7 @@ public class AudioCandidatesChooser
 	private AudioChunkExtractor extractor = null;
 	private AudioFormat audioFormat = null;
 	
-	private static final int DIFF_CHECK_SIZE = 30;
+	private static final int DIFF_CHECK_SIZE = 2;
 	
 	public AudioCandidatesChooser(AudioInputStream audio)
 	{

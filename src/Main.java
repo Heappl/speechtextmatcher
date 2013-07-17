@@ -82,7 +82,7 @@ public class Main {
     	    sorted.add(phoneme);
     	}
     	
-    	double minTime = 0.5;
+    	double minTime = 0.7;
     	ArrayList<AudioLabel> wrong = new ArrayList<AudioLabel>();
     	int count = 0;
     	for (;;) {

@@ -78,13 +78,21 @@ public class PhonemeSearch {
 		
 		double[] scores = new double[phonemes.length];
 		for (int i = 1; i < phonemes.length; ++i) scores[i] = -Math.pow(2, 1000);
-		scores[0] = calculateBestScore(wordSequence, wordSpectrumSequence, 0, minLength, hmms[0], averageBackgroundPower);
+		scores[0] = calculateScore(
+		        wordSequence[0],
+		        wordSpectrumSequence[0].getSpectrum()[0],
+		        hmms[0],
+		        averageBackgroundPower);
 		int[][] sequences = new int[phonemes.length][phonemes.length];
 		for (int i = 1; i < wordSequence.length - minLength; i++) {
 			double[] nextScores = new double[phonemes.length];
 			int[][] nextSequences = new int[phonemes.length][phonemes.length];
 			for (int p = 0; p < phonemes.length; ++p) {
-				double auxScore = calculateBestScore(wordSequence, wordSpectrumSequence, i, minLength, hmms[p], averageBackgroundPower);
+				double auxScore = calculateScore(
+				        wordSequence[i],
+				        wordSpectrumSequence[i].getSpectrum()[0],
+				        hmms[p],
+				        averageBackgroundPower);
 				double score1 = scores[p] + auxScore;
 				double score2 = (p > 0) ? scores[p - 1] + auxScore : score1 - 0.1;
 				if ((p > 0) && (i - sequences[p - 1][p - 1] < minLength)) score2 = score1 - 0.1;
@@ -116,23 +124,13 @@ public class PhonemeSearch {
 		return ret;
 	}
 	
-	private double calculateBestScore(
-	    FloatData[] wordSequence,
-	    Data[] wordSpectrumSequence,
-	    int i, int minLength,
+	private double calculateScore(
+	    FloatData frame,
+	    double power,
 	    HMM hmm,
 	    double averageBackgroundPower)
 	{
-		HMMState state = hmm.getState(1);
-		double bestScore = Double.MIN_VALUE;
-		for (int j = i; j < i + minLength; ++j) {
-			double auxScore = state.getScore(wordSequence[i]);
-			if ((i < wordSpectrumSequence.length) &&
-			    (wordSpectrumSequence[i].getSpectrum()[0] < averageBackgroundPower))
-			    auxScore = 0; 
-			if ((bestScore == Double.MIN_VALUE) || (bestScore < auxScore))
-				bestScore = auxScore;
-		}
-		return bestScore;
+	    if (power < averageBackgroundPower) return 0;
+		return hmm.getState(1).getScore(frame);
 	}
 }
