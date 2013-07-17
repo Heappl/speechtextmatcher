@@ -5,7 +5,7 @@ import java.util.Iterator;
 
 
 
-public class DataSequence implements Iterable<Data>
+public class DataSequence implements Iterable<Data>, DataContainer<Data>
 {
 	private ArrayList<Data> data = new ArrayList<Data>();
 	

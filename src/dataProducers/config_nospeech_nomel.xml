@@ -8,7 +8,6 @@
             <item>preemphasizer </item>
             <item>windower </item>
             <item>fft </item>
-            <item>floatDataConverter</item>
         </propertylist>
     </component>
     
