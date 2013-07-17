@@ -25,13 +25,20 @@ public class WaveImporter implements Runnable
 	private String configFile = "";
 	private ArrayList<IWaveObserver> observers = new ArrayList<IWaveObserver>();
 	private ArrayList<ISpeechObserver> speechObservers = new ArrayList<ISpeechObserver>();
-	Thread processThread = null;
+	private Thread processThread = null;
+	private long maxToRead = Long.MAX_VALUE;
 	
 	public WaveImporter(String waveFilePath, String configFile)
 	{
 		this.waveFilePath = waveFilePath;
 		this.configFile = configFile;
 	}
+    public WaveImporter(String waveFilePath, String configFile, long maxToRead)
+    {
+        this.waveFilePath = waveFilePath;
+        this.configFile = configFile;
+        this.maxToRead = maxToRead;
+    }
 	
 	public void registerObserver(IWaveObserver observer)
 	{
@@ -66,7 +73,9 @@ public class WaveImporter implements Runnable
 		audioSource.setAudioFile(sourceFile, null);
 		
 		Data data = null;
+		int count = 0;
 		while ((data = frontend.getData()) != null) {
+		    if (count++ > this.maxToRead) break;
 
 			double startTime = 0;
 			double endTime = 0;

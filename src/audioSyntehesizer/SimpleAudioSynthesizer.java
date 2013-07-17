@@ -39,6 +39,7 @@ public class SimpleAudioSynthesizer
 		}
 		for (AudioLabel phonemeLabel : phonemeLabels) {
 			if (phonemeLabel.getEnd() <= phonemeLabel.getStart()) continue;
+			if (phonemeLabel.getEnd() - phonemeLabel.getStart() > 0.5) continue;
 			ArrayList<AudioLabel> labels = new ArrayList<AudioLabel>();
 			if (this.phonemeLabels.containsKey(phonemeLabel.getLabel()))
 				labels = this.phonemeLabels.get(phonemeLabel.getLabel());

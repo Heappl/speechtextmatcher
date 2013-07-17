@@ -97,7 +97,6 @@
             <item>dataBlocker </item>
             <item>speechClassifier </item>
             <item>speechMarker </item>
-            <item>nonSpeechDataFilter </item>
             <item>preemphasizer </item>
             <item>windower </item>
             <item>fft </item>

@@ -329,19 +329,24 @@ public class MiddleToMiddleAudioSynthesizer
 			int neigh = Math.min(currentNeighSize / frameSize, previousNeighSize / frameSize);
 			
 			int maxPass = neigh / 8;
+			int diffSize = Math.max(1, maxPass / 8);
 			for (int i = -neigh; i < neigh; ++i) {
 				int currentStartIndex = i * frameSize + currentMergePhonemeMiddleIndex * frameSize;
 				for (int o = -maxPass; o < maxPass; ++o) {
-    				int previousStartIndex = (i + o) * frameSize + previousMergePhonemeMiddleIndex * frameSize;
+				    int previousStartIndex = (i + o) * frameSize + previousMergePhonemeMiddleIndex * frameSize;
     				double diff = prev.getScore();
-    				for (int j = 0; j < frameSize; ++j) {
-    				    if ((currentStartIndex + j >= currentBytes.length)
-    				         || (previousStartIndex + j >= previousBytes.length)) {
-    				        diff = Double.MAX_VALUE;
-    				        break;
-    				    }
-    					double auxDiff = currentBytes[currentStartIndex + j] - previousBytes[previousStartIndex + j];
-    					diff += (1 + auxDiff) * (1 + auxDiff);
+    				for (int f = -diffSize; f < diffSize; ++f) {
+        				for (int j = 0; j < frameSize; ++j) {
+        				    int currentIndex = currentStartIndex + f * frameSize + j;
+        				    int previousIndex = previousStartIndex + f * frameSize + j;
+        				    if ((currentIndex < 0) || (currentIndex >= currentBytes.length)
+        				        || (previousIndex < 0) || (previousIndex >= previousBytes.length)) {
+        				        diff = Double.MAX_VALUE;
+        				        break;
+        				    }
+        					double auxDiff = currentBytes[currentIndex] - previousBytes[previousIndex];
+        					diff += auxDiff * auxDiff;
+        				}
     				}
     				if (diff < bestScore) {
     					bestScore = diff;

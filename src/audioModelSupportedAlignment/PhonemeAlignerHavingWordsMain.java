@@ -47,15 +47,13 @@ public class PhonemeAlignerHavingWordsMain
 		String outputFile = args[2];
 		
 		AudioLabel[] prepared = new AudacityLabelImporter(new TextImporter(labelsFile)).getLabels();
-		WaveImporter waveImporterForPhonemeRecognition = new WaveImporter(waveFile, "config_nospeech_nomel.xml");
+		WaveImporter waveImporterForPhonemeRecognition = new WaveImporter(
+		        waveFile, "config_nospeech_nomel.xml");
     	PowerExtractor powerExtractor = new PowerExtractor();
     	waveImporterForPhonemeRecognition.registerObserver(powerExtractor);
-//    	waveImporterForPhonemeRecognition.process();
-//    	waveImporterForPhonemeRecognition.done();
+    	waveImporterForPhonemeRecognition.process();
+    	waveImporterForPhonemeRecognition.done();
     	
-//    	WordToPhonemeAligner aligner = new WordToPhonemeAligner(
-//    			prepared, speechExtractor.getAllData(), new GraphemesToPolishPhonemesConverter(),
-//    			new SpectrumDiffCalculator());
     	WordToPhonemeAlignerBasedOnHMM aligner = new WordToPhonemeAlignerBasedOnHMM(
     			audioModelUrl(), prepared, new GraphemesToRussianPhonemesConverter());
 

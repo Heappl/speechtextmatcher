@@ -63,12 +63,10 @@ public class WordToPhonemeAlignerBasedOnHMM {
 			allData.add((FloatData)data);
 		}
 		ArrayList<AudioLabel> ret = new ArrayList<AudioLabel>();
-		int count = 5;
 		for (AudioLabel word : words) {
 			FloatData[] wordSequence = extractWordData(word, allData);
-			common.Data[] wordSpectrumSequence = new common.Data[0];// = extractWordData(word, dataSequence);
+			common.Data[] wordSpectrumSequence = extractWordData(word, dataSequence);
 			ret.addAll(this.phonemeSearch.findPhonemes(word, wordSequence, wordSpectrumSequence));
-//			if (count-- <= 0) break;
 		}
 		
 		return ret;

@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 
 import common.AudioLabel;
 
@@ -15,7 +16,12 @@ public class AudacityLabelsExporter {
 	public AudacityLabelsExporter(String outputFilePath) {
 		this.filePath = outputFilePath;
 	}
-	
+
+    public boolean export(ArrayList<AudioLabel> labels)
+    {
+        return export(labels.toArray(new AudioLabel[0]));
+    }
+    
 	public boolean export(AudioLabel[] labels)
 	{
 		try {
