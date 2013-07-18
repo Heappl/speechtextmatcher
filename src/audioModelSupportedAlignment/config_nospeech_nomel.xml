@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<config>     
+    <component name="frontend" type="edu.cmu.sphinx.frontend.FrontEnd">
+        <propertylist name="pipeline">
+            <item>audioFileDataSource </item>
+            <item>dataBlocker </item>
+            <item>preemphasizer </item>
+            <item>windower </item>
+            <item>fft </item>
+        </propertylist>
+    </component>
+    
+    <component name="melFilterBank" type="edu.cmu.sphinx.frontend.frequencywarp.MelFrequencyFilterBank" />
+    <component name="audioFileDataSource" type="edu.cmu.sphinx.frontend.util.AudioFileDataSource"/>
+    <component name="microphone" type="edu.cmu.sphinx.frontend.util.Microphone">
+        <property name="closeBetweenUtterances" value="false"/>
+    </component>
+    <component name="dataBlocker" type="edu.cmu.sphinx.frontend.DataBlocker"/>
+    <component name="preemphasizer" type="edu.cmu.sphinx.frontend.filter.Preemphasizer"/>
+    <component name="windower" type="edu.cmu.sphinx.frontend.window.RaisedCosineWindower">
+    	<property name="windowSizeInMs" value="17"/>
+    	<property name="windowShiftInMs" value="2"/>
+    </component>
+    <component name="fft" type="edu.cmu.sphinx.frontend.transform.DiscreteFourierTransform"/>
+    <component name="fft2" type="edu.cmu.sphinx.frontend.transform.DiscreteFourierTransform"/>
+    <component name="dct" type="edu.cmu.sphinx.frontend.transform.DiscreteCosineTransform"/>
+    <component name="liveCMN" type="edu.cmu.sphinx.frontend.feature.LiveCMN"/>
+    <component name="featureExtraction" type="edu.cmu.sphinx.frontend.feature.DeltasFeatureExtractor"/>
+    <component name="speechClassifier" type="edu.cmu.sphinx.frontend.endpoint.SpeechClassifier">
+        <property name="threshold" value="30"/>
+    </component>
+    <component name="nonSpeechDataFilter" type="edu.cmu.sphinx.frontend.endpoint.NonSpeechDataFilter"/>
+    <component name="speechMarker" type="edu.cmu.sphinx.frontend.endpoint.SpeechMarker" >
+        <property name="speechTrailer" value="0"/>
+    </component>
+    <component name="floatDataConverter" type="dataTransforms.FloatDataToDoubleConverter"/>
+    <component name="logApplier" type="dataTransforms.DataLogApplier"/>
+    <component name="logApplier2" type="dataTransforms.DataLogApplier"/>
+    <component name="windowTransposer1" type="dataTransforms.WindowTransposer">
+        <property name="window" value="100"/>
+    </component>
+    <component name="windowTransposer2" type="dataTransforms.WindowTransposer">
+        <property name="window" value="257"/>
+    </component>
+</config>

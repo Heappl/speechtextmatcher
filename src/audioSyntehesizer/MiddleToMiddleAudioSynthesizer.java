@@ -66,7 +66,6 @@ public class MiddleToMiddleAudioSynthesizer
 	                ok = false;
 		    }
 		    if (!ok) { wordPhonemeLabels.clear(); continue; }
-		    System.err.println("ok " + wordContaing.getLabel());
             for (AudioLabel wordPhoneme : wordPhonemeLabels) {
     			ArrayList<AudioLabel> labels = new ArrayList<AudioLabel>();
     			if (this.phonemeLabels.containsKey(wordPhoneme.getLabel()))

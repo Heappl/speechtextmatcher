@@ -4,6 +4,8 @@ import commonExceptions.ImplementationError;
 
 public class GaussianMixtureExpectedMaximalization
 {
+    private static final long PRIME = 2543568463L;
+    
     public GaussianMixtureExpectedMaximalization()
     {
     }
@@ -11,102 +13,106 @@ public class GaussianMixtureExpectedMaximalization
     public MultivariateNormalDistribution[] calculate(double[][] data, int numOfModels) throws ImplementationError
     {
         int s = data.length;
-        int[] classification = new int[s];
-        for (int i = 0; i < s; ++i) classification[i] = i % numOfModels;
-        MultivariateNormalDistribution[] models;
+        MultivariateNormalDistribution[] models = new MultivariateNormalDistribution[numOfModels];
+        double[][] prevMeans;
+        {
+            double[][] initialProbs = new double[data.length][models.length];
+            for (int i = 0; i < data.length; ++i)
+                for (int j = 0; j < models.length; ++j)
+                    initialProbs[i][j] = (double)1 / (double)models.length;
+            double[][] initialMeans = new double[numOfModels][];
+            for (int i = 0; i < numOfModels; ++i) {
+                int index = (int)((PRIME * (long)i) % (long)s);
+                initialMeans[i] = data[index];
+            }
+            double[][][] initialCovariances = calculateCovariances(data, initialMeans, initialProbs);
+            for (int i = 0; i < numOfModels; ++i)
+                models[i] = new MultivariateNormalDistribution(initialMeans[i], initialCovariances[i]);
+            prevMeans = initialMeans;
+        }
         
         int count = 1;
         while (true) {
-            System.err.println("iteration " + count++);
-            models = calculateModels(data, classification, numOfModels);
+            System.err.println("EM iteration " + count++);
             
-            for (int i = 0; i < models.length; ++i) {
-                System.err.println("  " + models[i]);
-            }
+            double[][] probs = calculateProbabilities(data, models);
             
-            int[] newClassification = reclassify(data, models, classification);
-            if (!changed(newClassification, classification)) break;
-            classification = newClassification;
+            double[][] newMeans = calculateMeans(data, models, probs);
+            double[][][] newCovariances = calculateCovariances(data, newMeans, probs);
+            for (int i = 0; i < numOfModels; ++i)
+                models[i] = new MultivariateNormalDistribution(newMeans[i], newCovariances[i]);
+            
+            if (!changed(prevMeans, newMeans, 0.000001)) break;
+            prevMeans = newMeans;
         }
         return models;
     }
 
-    private boolean changed(int[] newClassification, int[] classification)
+    private double[][] calculateProbabilities(double[][] data, MultivariateNormalDistribution[] models) throws ImplementationError
     {
-        for (int i = 0; i < classification.length; ++i)
-            if (classification[i] != newClassification[i])
-                return true;
+        double[][] probs = new double[data.length][models.length];
+        double[] sums = new double[models.length];
+        for (int i = 0; i < data.length; ++i) {
+            double sum = 0;
+            for (int j = 0; j < models.length; ++j) {
+                double prob = Math.pow(Math.E, models[j].logLikelihood(data[i]));
+                probs[i][j] = prob;
+                sum += prob;
+            }
+            for (int j = 0; j < models.length; ++j)
+                probs[i][j] /= sum;
+            for (int j = 0; j < models.length; ++j)
+                sums[j] += probs[i][j];
+        }
+        for (int i = 0; i < data.length; ++i) {
+            for (int j = 0; j < models.length; ++j)
+                probs[i][j] /= sums[j];
+        }
+        return probs;
+    }
+
+    private double[][] calculateMeans(
+        double[][] data,
+        MultivariateNormalDistribution[] models,
+        double[][] probs) throws ImplementationError
+    {
+        int d = data[0].length;
+        double[][] means = new double[models.length][d];
+        
+        for (int i = 0; i < data.length; ++i) {
+            for (int j = 0; j < models.length; ++j) {
+                for (int k = 0; k < d; ++k)
+                    means[j][k] += probs[i][j] * data[i][k]; 
+            }
+        }
+        return means;
+    }
+
+    private boolean changed(double[][] prev, double[][] curr, double diff)
+    {
+        for (int i = 0; i < prev.length; ++i) {
+            for (int j = 0; j < prev[i].length; ++j) {
+                if (Math.abs(prev[i][j] - curr[i][j]) > diff)
+                    return true;
+            }
+        }
         return false;
     }
 
-    private int[] reclassify(double[][] data, MultivariateNormalDistribution[] models, int[] classification) throws ImplementationError
-    {
-        int[] ret = new int[classification.length];
-        for (int i = 0; i < data.length; ++i) {
-            int mostProbableModel = 0;
-            double bestModelLikelihood = Double.MIN_VALUE;
-            for (int j = 0; j < models.length; ++j) {
-                double logLikelihood = models[j].logLikelihood(data[i]);
-                if ((bestModelLikelihood == Double.MIN_VALUE) || (logLikelihood > bestModelLikelihood)) {
-                    bestModelLikelihood = logLikelihood;
-                    mostProbableModel = j;
-                }
-            }
-            ret[i] = mostProbableModel;
-        }
-        return ret;
-    }
-
-    private MultivariateNormalDistribution[] calculateModels(double[][] data, int[] classification, int numOfModels)
-    {
-        double[][] means = calculateMeans(data, classification, numOfModels);
-        double[][][] covariances = calculateCovariances(data, means, classification, numOfModels);
-        MultivariateNormalDistribution[] models = new MultivariateNormalDistribution[numOfModels];
-        for (int i = 0; i < numOfModels; ++i)
-            models[i] = new MultivariateNormalDistribution(means[i], covariances[i]);
-        return models;
-    }
-
-    private double[][][] calculateCovariances(double[][] data, double[][] mean, int[] classification, int numOfModels)
+    private double[][][] calculateCovariances(double[][] data, double[][] means, double[][] probs)
     {
         int d = data[0].length;
+        int numOfModels = means.length;
         double[][][] ret = new double[numOfModels][d][d];
-        int[] counts = new int[numOfModels];
-        
-        for (int i = 0; i < data.length; ++i) {
-            int model = classification[i];
-            for (int j = 0; j < d; ++j) {
-                for (int k = 0; k < d; ++k) {
-                    ret[model][j][k] += (data[i][j] - mean[model][j]) * (data[i][k] - mean[model][k]);
-                }
-            }
-            counts[model]++;
-        }
-        for (int i = 0; i < numOfModels; ++i) {
-            for (int j = 0; j < d; ++j) {
-                for (int k = 0; k < d; ++k) {
-                    ret[i][j][k] /= counts[i];
-                }
-            }
-        }
-        return ret;
-    }
-
-    private double[][] calculateMeans(double[][] data, int[] classification, int numOfModels)
-    {
-        int d = data[0].length;
-        double[][] ret = new double[numOfModels][d];
-        int[] counts = new int[numOfModels];
         
         for (int i = 0; i < data.length; ++i) {
             for (int j = 0; j < d; ++j) {
-                ret[classification[i]][j] += data[i][j];
-            }
-            counts[classification[i]]++;
-        }
-        for (int i = 0; i < numOfModels; ++i) {
-            for (int j = 0; j < d; ++j) {
-                ret[i][j] /= counts[i];
+                for (int k = 0; k < d; ++k) {
+                    for (int model = 0; model < numOfModels; ++model) {
+                        ret[model][j][k] +=
+                            probs[i][model] * (data[i][j] - means[model][j]) * (data[i][k] - means[model][k]);
+                    }
+                }
             }
         }
         return ret;

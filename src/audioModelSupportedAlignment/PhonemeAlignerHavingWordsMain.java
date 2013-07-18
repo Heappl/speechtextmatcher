@@ -47,18 +47,28 @@ public class PhonemeAlignerHavingWordsMain
 		String outputFile = args[2];
 		
 		AudioLabel[] prepared = new AudacityLabelImporter(new TextImporter(labelsFile)).getLabels();
-		WaveImporter waveImporterForPhonemeRecognition = new WaveImporter(
-		        waveFile, "config_nospeech_nomel.xml");
-    	PowerExtractor powerExtractor = new PowerExtractor();
-    	waveImporterForPhonemeRecognition.registerObserver(powerExtractor);
-    	waveImporterForPhonemeRecognition.process();
-    	waveImporterForPhonemeRecognition.done();
+
+        AudioInputStream stream = AudioSystem.getAudioInputStream(new File(waveFile));
+        double totalTime = (double)stream.getFrameLength() / (double)stream.getFormat().getFrameRate();
+
+        WaveImporter waveImporterForPowers = new WaveImporter(
+                waveFile, "../audioModelSupportedAlignment/config_nospeech_nomel.xml");
+        WaveImporter waveImporterForAudioData = new WaveImporter(
+                waveFile, "../audioModelSupportedAlignment/phonemeAlignmentConfig.xml");
+        PowerExtractor powerExtractor = new PowerExtractor();
+        
+        waveImporterForPowers.registerObserver(powerExtractor.getPowerObserver());
+        waveImporterForAudioData.registerObserver(powerExtractor.getAudioFeaturesObserver());
+        
+        waveImporterForPowers.process();
+        waveImporterForAudioData.process();
+        waveImporterForAudioData.done();
+        waveImporterForPowers.done();
     	
     	WordToPhonemeAlignerBasedOnHMM aligner = new WordToPhonemeAlignerBasedOnHMM(
     			audioModelUrl(), prepared, new GraphemesToRussianPhonemesConverter());
 
-        AudioInputStream stream = AudioSystem.getAudioInputStream(new File(waveFile));
 		new AudacityLabelsExporter(outputFile).export(
-				aligner.align(stream, prepared, powerExtractor.getPowerData()).toArray(new AudioLabel[0]));
+				aligner.align(powerExtractor.getPowerData(), prepared, totalTime));
 	}
 }

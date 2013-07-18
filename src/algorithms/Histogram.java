@@ -3,8 +3,8 @@ package algorithms;
 
 public class Histogram
 {
-	private double max = Double.MIN_VALUE;
-	private double min = Double.MAX_VALUE;
+	private double max = Double.NEGATIVE_INFINITY;
+	private double min = Double.POSITIVE_INFINITY;
 	private double step = 0;
 	private double average = 0;
 	private double deviation = 0;

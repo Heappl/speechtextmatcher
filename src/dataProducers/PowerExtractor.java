@@ -1,25 +1,57 @@
 package dataProducers;
 import java.util.ArrayList;
 
-import common.Data;
-import common.DataSequence;
-
-
-
-public class PowerExtractor implements IWaveObserver {
+public class PowerExtractor {
 	
-	DataSequence powerData = new DataSequence();
+	ArrayList<double[]> powerData = new ArrayList<double[]>();
+	int powerDataCount = 0;
+	int audioDataCount = 0;
+	int spectrumSize = 0;
 	
-	@Override
-	public void process(double startTime, double endTime, double[] values)
+	public IWaveObserver getPowerObserver()
 	{
-		double power = 0;
-		for (int i = 0; i < values.length; ++i) power += values[i];
-		power /= values.length;
-		powerData.add(new Data(startTime, endTime, new double[]{Math.sqrt(power)}));
+	    return new IWaveObserver() {
+            @Override
+            public void process(double startTime, double endTime, double[] values)
+            {
+                double power = 0;
+                for (int i = 0; i < values.length; ++i) power += values[i];
+                power /= values.length;
+                power = Math.sqrt(power);
+                while (true) {
+                    synchronized (powerData) {
+                        if (spectrumSize == 0) continue;
+                        if (powerDataCount >= audioDataCount) {
+                            powerData.add(new double[spectrumSize]);
+                        }
+                        powerData.get(powerDataCount++)[0] = power;
+                        if (spectrumSize > 0) break;
+                    }
+                }
+            }
+        };
 	}
-
-	public DataSequence getPowerData()
+	
+	public IWaveObserver getAudioFeaturesObserver()
+	{
+        return new IWaveObserver() {
+            @Override
+            public void process(double startTime, double endTime, double[] values)
+            {
+                synchronized (powerData) {
+                    spectrumSize = values.length + 1;
+                    if (audioDataCount >= powerDataCount) {
+                        powerData.add(new double[spectrumSize]);
+                    }
+                    double[] aux = powerData.get(audioDataCount++);
+                    for (int i = 0; i < values.length; ++i)
+                        aux[i + 1] = values[i];
+                }
+            }
+        };
+	}
+	
+	public ArrayList<double[]> getPowerData()
 	{
 		return powerData;
 	}

@@ -9,24 +9,32 @@ import commonExceptions.ImplementationError;
 public class MultivariateNormalDistribution
 {
     private final double[] mean;
+    private final double[][] covariances;
     private final RealMatrix inversedCovariancesMatrix;
     private final double constant_element;
     
     public MultivariateNormalDistribution(double[] mean, double[][] covariances)
     {
-        double d = mean.length;
+        this.covariances = covariances;
         RealMatrix covariancesMatrix = new Array2DRowRealMatrix(covariances);
         LUDecomposition decomposition = new LUDecomposition(covariancesMatrix);
         double covariancesMatrixDeterminant = decomposition.getDeterminant();
-        this.inversedCovariancesMatrix = decomposition.getSolver().getInverse();
+        if (covariancesMatrixDeterminant != 0) {
+            this.inversedCovariancesMatrix = decomposition.getSolver().getInverse();
+        } else {
+            this.inversedCovariancesMatrix = null;
+            System.err.println("singular matrix");
+        }
         this.constant_element = Math.log(Math.pow(Math.PI, mean.length) * covariancesMatrixDeterminant);
         this.mean = mean;
     }
     
     public double[] getMean() { return mean; }
+    public boolean isOk() { return (this.inversedCovariancesMatrix != null); }
 
     public double logLikelihood(double[] point) throws ImplementationError
     {
+        if (this.inversedCovariancesMatrix == null) return Double.NEGATIVE_INFINITY;
         RealMatrix x = new Array2DRowRealMatrix(new double[][]{point});
         RealMatrix mean = new Array2DRowRealMatrix(new double[][]{this.mean});
         RealMatrix x_minus_mean = x.subtract(mean);
@@ -41,9 +49,22 @@ public class MultivariateNormalDistribution
     
     public String toString()
     {
-        String ret = "guassian [";
+        String ret = "{gaussian mean: [";
         for (int i = 0; i < mean.length; ++i)
             ret += mean[i] + ", ";
-        return ret.substring(0, ret.length() - 2) + "]";
+        ret = ret.substring(0, ret.length() - 2) + "] ";
+        
+        if (!isOk()) {
+            ret += "covariances: [";
+            for (int i = 0; i < covariances.length; ++i) {
+                ret += "[";
+                for (int j = 0; j < covariances[i].length; ++j) {
+                    ret += covariances[i][j] + ", ";
+                }
+                ret = ret.substring(0, ret.length() - 2) + "], ";
+            }
+            ret = ret.substring(0, ret.length() - 2) + "]";
+        }
+        return ret + "}";
     }
 }

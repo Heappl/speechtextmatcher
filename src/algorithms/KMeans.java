@@ -29,7 +29,6 @@ public class KMeans {
 			for (int j = 0; j < data[i].length; ++j)
 				means[i][j] = data[(int)((long)i * (long)SEED % (long)data.length)][j];
 		
-		System.err.println(data.length + " " + data[0].length + " " + k);
 		int i = 0;
 		while (classify(data, means))
 		{

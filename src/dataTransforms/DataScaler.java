@@ -4,8 +4,8 @@ public class DataScaler
 {
 	private class MinAndMax
 	{
-		private double min = Double.MAX_VALUE;
-		private double max = Double.MIN_VALUE;
+		private double min = Double.POSITIVE_INFINITY;
+		private double max = Double.NEGATIVE_INFINITY;
 		
 		MinAndMax withNewValue(double value)
 		{
