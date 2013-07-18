@@ -20,6 +20,7 @@ public class PhonemeGuasianTrainer
         
         public PhonemeData(String phoneme, double[][] data)
         {
+            System.err.println(phoneme + " " + data.length);
             this.data = data;
             this.phoneme = phoneme;
         }
@@ -62,7 +63,9 @@ public class PhonemeGuasianTrainer
         
         for (AudioLabel label : phonemeLabels) {
             ArrayList<double[]> phonemeData = dataExtractor.extract(label.getStart(), label.getEnd());
-            dataPerPhoneme.put(label.getLabel(), phonemeData);
+            if (dataPerPhoneme.containsKey(label.getLabel()))
+                dataPerPhoneme.get(label.getLabel()).addAll(phonemeData);
+            else dataPerPhoneme.put(label.getLabel(), phonemeData);
         }
         
         ArrayList<PhonemeData> ret = new ArrayList<PhonemeData>();

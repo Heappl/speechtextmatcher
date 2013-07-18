@@ -147,7 +147,7 @@ public class IterativeTrainingPhonemeAligner
             }
             for (int j = 0; j < scorers.length; ++j) {
                 PhonemeSequenceScorer previous = (j > 0) ? scorers[j - 1] : null;
-                double previousScore = (j > 0) ? previous.getScore() : Double.MAX_VALUE;
+                double previousScore = (j > 0) ? previous.getScore() : Double.NEGATIVE_INFINITY;
                 double currentTime = frameTime * i + word.getStart();
                 newScorers[j].score(audio.get(i), currentTime, previous, previousScore);
             }

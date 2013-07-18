@@ -216,7 +216,7 @@ public class SimpleAudioSynthesizer
 
 	private AudioMergeDiff calcDiff(AudioCandidate ending, AudioCandidate starting)
 	{
-		int neigh = 30;
+		int neigh = 10;
 		
 		double bestScore = Double.MAX_VALUE;
 		int bestEnding = 0;

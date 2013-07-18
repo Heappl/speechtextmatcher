@@ -9,6 +9,7 @@ import javax.sound.sampled.AudioInputStream;
 
 import algorithms.DataByTimesExtractor;
 
+import phonemeAligner.HMMPhonemeSearch;
 import phonemeAligner.PhonemeSearch;
 
 import common.AudioLabel;
@@ -29,7 +30,7 @@ import graphemesToPhonemesConverters.IWordToPhonemesConverter;
 
 
 public class WordToPhonemeAlignerBasedOnHMM {
-	PhonemeSearch phonemeSearch;
+	HMMPhonemeSearch phonemeSearch;
 	FrontEnd frontend;
 	AudioFileDataSource dataSource;
 
@@ -50,7 +51,7 @@ public class WordToPhonemeAlignerBasedOnHMM {
 		UnitManager unitManager = (UnitManager)cm.lookup("unitManager");
 		AcousticModel acousticModel = (AcousticModel)cm.lookup("wsj");
 		acousticModel.allocate();
-		this.phonemeSearch = new PhonemeSearch(converter, unitManager, acousticModel);
+		this.phonemeSearch = new HMMPhonemeSearch(converter, unitManager, acousticModel);
 		this.frontend = (FrontEnd)cm.lookup("frontend");
 	}
 
@@ -63,9 +64,11 @@ public class WordToPhonemeAlignerBasedOnHMM {
 		DataByTimesExtractor<double[]> dataExtractor = new DataByTimesExtractor<double[]>(
                 new GenericListContainer<double[]>(data), totalTime, 0);
 		
+		int count = 100;
 		for (AudioLabel word : words) {
 			ArrayList<double[]> wordData = dataExtractor.extract(word.getStart(), word.getEnd());
 			ret.addAll(this.phonemeSearch.findPhonemes(word, wordData));
+//			if (count-- < 0) break;
 		}
 		
 		return ret;

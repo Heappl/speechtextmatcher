@@ -11,6 +11,7 @@ import edu.cmu.sphinx.linguist.acoustic.Context;
 import edu.cmu.sphinx.linguist.acoustic.HMM;
 import edu.cmu.sphinx.linguist.acoustic.HMMPosition;
 import edu.cmu.sphinx.linguist.acoustic.HMMState;
+import edu.cmu.sphinx.linguist.acoustic.LeftRightContext;
 import edu.cmu.sphinx.linguist.acoustic.Unit;
 import edu.cmu.sphinx.linguist.acoustic.UnitManager;
 import graphemesToPhonemesConverters.IWordToPhonemesConverter;
@@ -50,18 +51,26 @@ public class PhonemeSearch {
         }
         averageBackgroundPower /= auxCount;
 		
-		String[] phonemes = converter.convert(word.getLabel()).get(0).split(" ");
+		String[] phonemes = ("SIL " + converter.convert(word.getLabel()).get(0) + " SIL").split(" ");
 		if ((phonemes.length < 2) || (data.size() < phonemes.length)) {
             return new ArrayList<AudioLabel>();
 		}
 		HMM[] hmms = new HMM[phonemes.length];
-		for (int i = 0; i < phonemes.length; ++i) {
-			HMMPosition position = HMMPosition.INTERNAL;
-			if (i == 0) position = HMMPosition.BEGIN;
-			if (i == phonemes.length - 1) position = HMMPosition.END;
-			Unit unit = unitManager.getUnit(phonemes[i], false, Context.EMPTY_CONTEXT);
-			hmms[i] = acousticModel.lookupNearestHMM(unit, position, false);
-		}
+        for (int i = 0; i < phonemes.length; ++i) {
+            HMMPosition position = HMMPosition.INTERNAL;
+            if (i == 0) position = HMMPosition.BEGIN;
+            if (i == phonemes.length - 1) position = HMMPosition.END;
+            
+            Context context = Context.EMPTY_CONTEXT;
+            boolean isFiller = phonemes[i].equals("SIL");
+            if (!isFiller) {
+                Unit leftContextUnit = unitManager.getUnit(phonemes[i - 1], false, Context.EMPTY_CONTEXT);
+                Unit rightContextUnit = unitManager.getUnit(phonemes[i + 1], false, Context.EMPTY_CONTEXT);
+                context = LeftRightContext.get(new Unit[]{leftContextUnit}, new Unit[]{rightContextUnit});
+            }
+            Unit unit = unitManager.getUnit(phonemes[i], false, context);
+            hmms[i] = acousticModel.lookupNearestHMM(unit, position, false);
+        }
 		
 		
 		int minLength = 10;
@@ -93,6 +102,7 @@ public class PhonemeSearch {
 
 		ArrayList<AudioLabel> ret = new ArrayList<AudioLabel>();
 		for (int i = 0; i < phonemes.length; ++i) {
+		    if (phonemes[i].equals("SIL")) continue;
 //			double start = wordSpectrumSequence[sequences[phonemes.length - 1][i]].getStartTime();
 //			double end = (i + 1 < phonemes.length) ? 
 //					wordSpectrumSequence[sequences[phonemes.length - 1][i + 1]].getStartTime() :

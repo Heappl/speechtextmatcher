@@ -343,8 +343,8 @@ public class MiddleToMiddleAudioSynthesizer
 			double previousMergePhonemeMiddle = previousMergePhonemeTime / 2.0;
 			int previousMergePhonemeMiddleIndex = (int)Math.round(previousMergePhonemeMiddle / previousFrameTime) + previousPhonemeStartIndex;
 			
-			int currentNeighSize = (int)Math.floor(currentMergePhonemeTime / currentFrameTime / 8.0);
-			int previousNeighSize = (int)Math.floor(previousMergePhonemeTime / previousFrameTime / 8.0);
+			int currentNeighSize = (int)Math.floor(currentMergePhonemeTime / currentFrameTime / 16.0);
+			int previousNeighSize = (int)Math.floor(previousMergePhonemeTime / previousFrameTime / 16.0);
 			int neigh = Math.min(currentNeighSize / frameSize, previousNeighSize / frameSize);
 			
 			int maxPass = Math.max(1, neigh / 8);
@@ -454,8 +454,6 @@ public class MiddleToMiddleAudioSynthesizer
         if ((sortedWords.get(index).getStart() <= label.getStart())
             && (sortedWords.get(index).getEnd() >= label.getEnd()))
             return sortedWords.get(index);
-        for (int i = Math.max(0, index - 10); i < Math.min(index + 10, sortedWords.size()); ++i)
-            System.err.println(sortedWords.get(i));
         throw new ImplementationError("word not found " + label + " " + sortedWords.get(index));
 	}
 }
