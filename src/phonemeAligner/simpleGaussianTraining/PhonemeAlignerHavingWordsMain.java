@@ -1,4 +1,4 @@
-package phonemeAligner;
+package phonemeAligner.simpleGaussianTraining;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,6 +10,7 @@ import java.util.TreeSet;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
+
 
 
 import graphemesToPhonemesConverters.GraphemesToPolishPhonemesConverter;
@@ -62,7 +63,7 @@ public class PhonemeAlignerHavingWordsMain
     	        new GraphemesToPolishPhonemesConverter(),
     	        totalTime);
 
-		new AudacityLabelsExporter(outputFile).export(aligner.align(1, 3));
+		new AudacityLabelsExporter(outputFile).export(aligner.align(1));
 		System.err.println("END");
 	}
 }

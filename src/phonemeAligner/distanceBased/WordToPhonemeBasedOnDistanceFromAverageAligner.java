@@ -1,4 +1,4 @@
-package phonemeAligner;
+package phonemeAligner.distanceBased;
 import graphemesToPhonemesConverters.IWordToPhonemesConverter;
 
 import java.util.ArrayList;

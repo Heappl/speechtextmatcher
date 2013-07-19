@@ -1,4 +1,4 @@
-package phonemeAligner;
+package phonemeAligner.audioBased;
 import java.util.ArrayList;
 
 import common.AudioLabel;

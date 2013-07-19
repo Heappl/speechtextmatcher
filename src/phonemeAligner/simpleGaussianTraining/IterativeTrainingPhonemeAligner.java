@@ -1,6 +1,9 @@
-package phonemeAligner;
+package phonemeAligner.simpleGaussianTraining;
 
 import java.util.ArrayList;
+
+import phonemeAligner.IPhonemeScorer;
+
 
 import algorithms.DataByTimesExtractor;
 
@@ -11,6 +14,8 @@ import common.DataSequence;
 import common.GenericDataContainer;
 import common.GenericListContainer;
 import commonExceptions.ImplementationError;
+import dataProducers.AudacityLabelImporter;
+import dataProducers.TextImporter;
 
 public class IterativeTrainingPhonemeAligner
 {
@@ -38,22 +43,22 @@ public class IterativeTrainingPhonemeAligner
                 new GenericListContainer<double[]>(this.data), totalTime, 0);
     }
     
-    public ArrayList<AudioLabel> align(int iterations, int modelsPerPhoneme) throws ImplementationError
+    public ArrayList<AudioLabel> align(int iterations) throws ImplementationError
     {
         ArrayList<AudioLabel> phonemeLabels = new ArrayList<AudioLabel>();
-        for (AudioLabel label : words) {
-            phonemeLabels.addAll(initialSplit(label));
-        }
+        for (AudioLabel word : words)
+            phonemeLabels.add(initialSplit(word).get(0));
         
         for (int i = 0; i < iterations; ++i) {
             System.err.println("align iteration " + i);
-            PhonemeGuasianTrainer trainer = new PhonemeGuasianTrainer();
-            GaussianMixturePhonemeScorer[] phonemeScorers =
-                trainer.trainPhonemes(modelsPerPhoneme, phonemeLabels, data, totalTime);
+            IPhonemeScorer[] phonemeScorers =
+                    new PhonemeSingleGaussianTrainer().trainPhonemes(phonemeLabels, data, totalTime);
             
             phonemeLabels.clear();
             for (AudioLabel word : words) {
-                phonemeLabels.addAll(findPhonemes(word, phonemeScorers));
+                ArrayList<AudioLabel> wordPhonemes = findPhonemes(word, phonemeScorers);
+                if (i < 5) phonemeLabels.add(wordPhonemes.get(0));
+                else phonemeLabels.addAll(wordPhonemes);
             }
             System.err.println("~align iteration " + i);
         }
@@ -64,14 +69,14 @@ public class IterativeTrainingPhonemeAligner
     private class PhonemeSequenceScorer
     {
         String phoneme;
-        GaussianMixturePhonemeScorer dataScorer;
+        IPhonemeScorer dataScorer;
         PhonemeSequenceScorer previous = null;
         double bestScore;
         double bestStartTime;
 
         public PhonemeSequenceScorer(
             String phoneme,
-            GaussianMixturePhonemeScorer gaussianMixturePhonemeScorer,
+            IPhonemeScorer gaussianMixturePhonemeScorer,
             double initialScore,
             double initialTime)
         {
@@ -124,11 +129,11 @@ public class IterativeTrainingPhonemeAligner
     }
 
     private ArrayList<AudioLabel> findPhonemes(
-            AudioLabel word, GaussianMixturePhonemeScorer[] phonemeScorers) throws ImplementationError
+            AudioLabel word, IPhonemeScorer[] phonemeScorers) throws ImplementationError
     {
         if (word.getEnd() <= word.getStart()) return new ArrayList<AudioLabel>();
         
-        String[] phonemes = this.converter.convert(word.getLabel()).get(0).split(" ");
+        String[] phonemes = splitWord(word.getLabel());
         ArrayList<double[]> audio = this.dataExtractor.extract(word.getStart(), word.getEnd());
         
         PhonemeSequenceScorer[] scorers = new PhonemeSequenceScorer[phonemes.length];
@@ -159,13 +164,29 @@ public class IterativeTrainingPhonemeAligner
 
     private ArrayList<AudioLabel> initialSplit(AudioLabel word)
     {
-        String[] phonemes = this.converter.convert(word.getLabel()).get(0).split(" ");
+        String[] phonemes = splitWord(word.getLabel());
         
         double splitTime = (word.getEnd() - word.getStart()) / phonemes.length;
         ArrayList<AudioLabel> split = new ArrayList<AudioLabel>();
         for (int i = 0; i < phonemes.length; ++i) {
-            split.add(new AudioLabel(phonemes[i], i * splitTime, (i + 1) * splitTime));
+            double start = i * splitTime + word.getStart();
+            double end = (i + 1) * splitTime + word.getStart();
+            split.add(new AudioLabel(phonemes[i], start, end));
         }
         return split;
+    }
+    
+    private String[] splitWord(String word)
+    {
+        String[] phonemes = (this.converter.convert(word).get(0)).split(" ");
+//        String[] ret = new String[phonemes.length * 3 + 2];
+//        ret[0] = "sil";
+//        ret[ret.length - 1] = "sil";
+//        for (int i = 0; i < phonemes.length; ++i) {
+//            ret[2 * i + 2] = phonemes[i];
+//            ret[2 * i + 1] = phonemes[i] + "_";
+//            ret[2 * i + 3] = "_" + phonemes[i];
+//        }
+        return phonemes;
     }
 }

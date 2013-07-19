@@ -131,7 +131,6 @@ public class AudioCandidatesChooser
 	
 	private AudioInputStream createAudio(byte[] candidate, int start, int end)
 	{
-	    System.err.println(start + " " + end + " " + (double)(end - start) / this.audioFormat.getFrameRate());
 	    end = Math.min(candidate.length / audioFormat.getFrameSize(), end);
 	    end = Math.max(start, end);
 		byte[] actualBytes = new byte[(end - start) * this.audioFormat.getFrameSize()];
@@ -189,7 +188,6 @@ public class AudioCandidatesChooser
 				}
 			}
 		}
-		System.err.println("best: " + bestScore + " " + bestEnding + " " + bestStart);
 		return new AudioMergeDiff(bestScore, bestEnding, bestStart);
 	}
 }

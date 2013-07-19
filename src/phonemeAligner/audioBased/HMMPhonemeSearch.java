@@ -1,4 +1,4 @@
-package phonemeAligner;
+package phonemeAligner.audioBased;
 
 import java.util.ArrayList;
 
@@ -148,7 +148,7 @@ public class HMMPhonemeSearch
         
         ArrayList<AudioLabel> ret = new ArrayList<AudioLabel>();
         for (int i = 0; i < labels.length; i += 3) {
-            if (labels[i].getLabel().equals("SIL")) continue;
+//            if (labels[i].getLabel().equals("SIL")) continue;
             double startTime = labels[i].getStart();
             double endTime = labels[i + 2].getEnd();
             String label = labels[i].getLabel();

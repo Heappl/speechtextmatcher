@@ -1,7 +1,8 @@
-package phonemeAligner;
+package phonemeAligner.simpleGaussianTraining;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+
 
 import common.AudioLabel;
 import common.GenericListContainer;
@@ -11,7 +12,7 @@ import algorithms.DataByTimesExtractor;
 import algorithms.GaussianMixtureExpectedMaximalization;
 import algorithms.MixtureGaussianModel;
 
-public class PhonemeGuasianTrainer
+public class PhonemeGuasianMixtureTrainer
 {
     private class PhonemeData
     {

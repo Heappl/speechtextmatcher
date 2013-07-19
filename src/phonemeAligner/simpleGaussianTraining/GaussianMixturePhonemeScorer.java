@@ -1,5 +1,6 @@
-package phonemeAligner;
+package phonemeAligner.simpleGaussianTraining;
 
+import phonemeAligner.IPhonemeScorer;
 import commonExceptions.ImplementationError;
 
 import edu.cmu.sphinx.frontend.FloatData;

@@ -16,6 +16,7 @@ public class MultivariateNormalDistribution
     public MultivariateNormalDistribution(double[] mean, double[][] covariances)
     {
         this.covariances = covariances;
+        this.mean = mean;
         RealMatrix covariancesMatrix = new Array2DRowRealMatrix(covariances);
         LUDecomposition decomposition = new LUDecomposition(covariancesMatrix);
         double covariancesMatrixDeterminant = decomposition.getDeterminant();
@@ -26,7 +27,6 @@ public class MultivariateNormalDistribution
             System.err.println("singular matrix");
         }
         this.constant_element = Math.log(Math.pow(Math.PI, mean.length) * covariancesMatrixDeterminant);
-        this.mean = mean;
     }
     
     public double[] getMean() { return mean; }

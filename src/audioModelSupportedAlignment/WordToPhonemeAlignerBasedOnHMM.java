@@ -9,8 +9,8 @@ import javax.sound.sampled.AudioInputStream;
 
 import algorithms.DataByTimesExtractor;
 
-import phonemeAligner.HMMPhonemeSearch;
-import phonemeAligner.PhonemeSearch;
+import phonemeAligner.audioBased.HMMPhonemeSearch;
+import phonemeAligner.audioBased.PhonemeSearch;
 
 import common.AudioLabel;
 import common.DataSequence;

@@ -1,5 +1,6 @@
 package audioSyntehesizer;
 
+import graphemesToPhonemesConverters.GraphemesToPolishPhonemesConverter;
 import graphemesToPhonemesConverters.GraphemesToRussianPhonemesConverter;
 
 import java.io.IOException;
@@ -380,7 +381,7 @@ public class MiddleToMiddleAudioSynthesizer
 	
 	private PhonemeSequenceWordCandidates synthesizeWord(String word) throws ImplementationError
 	{
-		String[] phonemes = new GraphemesToRussianPhonemesConverter().convert(word).get(0).split(" +");
+		String[] phonemes = new GraphemesToPolishPhonemesConverter().convert(word).get(0).split(" +");
 		int minimumSize = 3;
 		ArrayList<ArrayList<PhonemeSequenceCandidate>> wordCandidates = new ArrayList<ArrayList<PhonemeSequenceCandidate>>();
 		int lastSize = minimumSize;
