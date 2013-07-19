@@ -59,7 +59,8 @@ public class HMMPhonemeSearch
         }
     }
     
-    public ArrayList<AudioLabel> findPhonemes(AudioLabel word, ArrayList<double[]> data) throws ImplementationError
+    public ArrayList<AudioLabel> findPhonemes(
+            AudioLabel word, ArrayList<double[]> data, double averageBackgroundPower) throws ImplementationError
     {
         double dataTimeDiff = (word.getEnd() - word.getStart()) / (double)data.size();
 
@@ -120,6 +121,7 @@ public class HMMPhonemeSearch
             
             for (int j = 1; j < states.length; ++j) {
                 double frameScore = states[j].score(data.get(i));
+                if (data.get(i)[0] < averageBackgroundPower) frameScore = 0;
                 double noChangeScore = scores[j] + frameScore;
                 double changeScore = scores[j - 1] + frameScore;
                 if (noChangeScore > changeScore) {

@@ -1,6 +1,7 @@
 package experiments;
 import java.util.ArrayList;
 
+import algorithms.GaussianMixtureExpectedMaximalization;
 import algorithms.KMeans;
 
 import common.AudioLabel;

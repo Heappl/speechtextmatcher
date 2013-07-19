@@ -4,4 +4,5 @@ import java.util.ArrayList;
 
 public interface IWordToPhonemesConverter {
 	ArrayList<String> convert(String word);
+	String[] getAllPhonemes();
 }

@@ -47,7 +47,7 @@ public class IterativeTrainingPhonemeAligner
     {
         ArrayList<AudioLabel> phonemeLabels = new ArrayList<AudioLabel>();
         for (AudioLabel word : words)
-            phonemeLabels.add(initialSplit(word).get(0));
+            phonemeLabels.addAll(initialSplit(word));
         
         for (int i = 0; i < iterations; ++i) {
             System.err.println("align iteration " + i);
@@ -57,8 +57,7 @@ public class IterativeTrainingPhonemeAligner
             phonemeLabels.clear();
             for (AudioLabel word : words) {
                 ArrayList<AudioLabel> wordPhonemes = findPhonemes(word, phonemeScorers);
-                if (i < 5) phonemeLabels.add(wordPhonemes.get(0));
-                else phonemeLabels.addAll(wordPhonemes);
+                phonemeLabels.addAll(wordPhonemes);
             }
             System.err.println("~align iteration " + i);
         }
@@ -138,11 +137,18 @@ public class IterativeTrainingPhonemeAligner
         
         PhonemeSequenceScorer[] scorers = new PhonemeSequenceScorer[phonemes.length];
         for (int i = 0; i < scorers.length; ++i) {
-            scorers[i] = new PhonemeSequenceScorer(
-                    phonemes[i],
-                    phonemeScorers[i],
-                    (i == 0) ? 0 : Double.NEGATIVE_INFINITY,
-                    word.getStart());
+            for (int j = 0; j < phonemeScorers.length; ++j) {
+                if (!phonemeScorers[j].getPhoneme().equals(phonemes[i])) continue; 
+                scorers[i] = new PhonemeSequenceScorer(
+                        phonemes[i],
+                        phonemeScorers[j],
+                        (i == 0) ? 0 : Double.NEGATIVE_INFINITY,
+                        word.getStart());
+                break;
+            }
+            if (scorers[i] == null) {
+                System.err.println("null: " + phonemes[i]);
+            }
         }
         
         for (int i = 0; i < audio.size(); ++i) {

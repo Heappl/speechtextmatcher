@@ -33,7 +33,7 @@ public class GaussianMixtureExpectedMaximalization
         
         int count = 1;
         while (true) {
-            System.err.println("EM iteration " + count++);
+//            System.err.println("EM iteration " + count++);
             
             double[][] probs = calculateProbabilities(data, models);
             

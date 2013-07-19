@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import javax.sound.sampled.AudioInputStream;
 
 import algorithms.DataByTimesExtractor;
+import algorithms.OneDimensionalDataStatistics;
 
 import phonemeAligner.audioBased.HMMPhonemeSearch;
 import phonemeAligner.audioBased.PhonemeSearch;
@@ -60,6 +61,7 @@ public class WordToPhonemeAlignerBasedOnHMM {
 	{
 		ArrayList<AudioLabel> ret = new ArrayList<AudioLabel>();
 		
+		OneDimensionalDataStatistics powerStatistics = new OneDimensionalDataStatistics(createPowerData(data));
 
 		DataByTimesExtractor<double[]> dataExtractor = new DataByTimesExtractor<double[]>(
                 new GenericListContainer<double[]>(data), totalTime, 0);
@@ -67,10 +69,18 @@ public class WordToPhonemeAlignerBasedOnHMM {
 		int count = 100;
 		for (AudioLabel word : words) {
 			ArrayList<double[]> wordData = dataExtractor.extract(word.getStart(), word.getEnd());
-			ret.addAll(this.phonemeSearch.findPhonemes(word, wordData));
-//			if (count-- < 0) break;
+			ret.addAll(this.phonemeSearch.findPhonemes(word, wordData, powerStatistics.getBackgroundMean()));
+			if (count-- < 0) break;
 		}
 		
 		return ret;
 	}
+
+    private double[] createPowerData(ArrayList<double[]> data)
+    {
+        double[] ret = new double[data.size()];
+        for (int i = 0; i < ret.length; ++i)
+            ret[i] = data.get(i)[0];
+        return ret;
+    }
 }

@@ -63,7 +63,7 @@ public class PhonemeAlignerHavingWordsMain
     	        new GraphemesToPolishPhonemesConverter(),
     	        totalTime);
 
-		new AudacityLabelsExporter(outputFile).export(aligner.align(1));
+		new AudacityLabelsExporter(outputFile).export(aligner.align(10));
 		System.err.println("END");
 	}
 }

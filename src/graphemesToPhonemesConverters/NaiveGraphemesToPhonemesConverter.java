@@ -1,6 +1,8 @@
 package graphemesToPhonemesConverters;
 
 import java.util.ArrayList;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 public class NaiveGraphemesToPhonemesConverter implements IWordToPhonemesConverter
 {
@@ -40,4 +42,18 @@ public class NaiveGraphemesToPhonemesConverter implements IWordToPhonemesConvert
 		}
 		return out;
 	}
+
+    @Override
+    public String[] getAllPhonemes()
+    {
+        SortedSet<String> phonemeSet = new TreeSet<String>();
+        for (String[][] graphemeData : this.graphemes) {
+            for (String represations : graphemeData[1]) {
+                String[] phonemes = represations.split(" ");
+                for (String phoneme : phonemes)
+                    phonemeSet.add(phoneme);
+            }
+        }
+        return phonemeSet.toArray(new String[0]);
+    }
 }

@@ -7,6 +7,19 @@ public class PowerExtractor {
 	int powerDataCount = 0;
 	int audioDataCount = 0;
 	int spectrumSize = 0;
+	final double minTime;
+	final double maxTime;
+	
+	public PowerExtractor(double minTime, double maxTime)
+    {
+	    this.maxTime = maxTime;
+	    this.minTime = minTime;
+    }
+    public PowerExtractor()
+    {
+        this.maxTime = Double.POSITIVE_INFINITY;
+        this.minTime = Double.NEGATIVE_INFINITY;
+    }
 	
 	public IWaveObserver getPowerObserver()
 	{
@@ -14,6 +27,8 @@ public class PowerExtractor {
             @Override
             public void process(double startTime, double endTime, double[] values)
             {
+                if (startTime > maxTime) return;
+                if (endTime < minTime) return;
                 double power = 0;
                 for (int i = 0; i < values.length; ++i) power += values[i];
                 power /= values.length;
@@ -38,6 +53,8 @@ public class PowerExtractor {
             @Override
             public void process(double startTime, double endTime, double[] values)
             {
+                if (startTime > maxTime) return;
+                if (endTime < minTime) return;
                 synchronized (powerData) {
                     spectrumSize = values.length + 1;
                     if (audioDataCount >= powerDataCount) {
