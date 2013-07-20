@@ -44,7 +44,7 @@ public class PhonemeSingleGaussianTrainer
         double[][] phonemePoints = new double[phonemeData.size()][];
         for (int i = 0; i < phonemeData.size(); ++i) {
             phonemePoints[i] = phonemeData.get(i);
-        }
+        }System.err.println("training model");
         MultivariateNormalDistribution model = new SingleGaussianTrainer().train(phonemePoints);
         return new SingleGaussianPhonemeScorer(model, phoneme);
     }
