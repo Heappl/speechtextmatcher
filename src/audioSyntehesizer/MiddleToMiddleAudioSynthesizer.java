@@ -62,8 +62,8 @@ public class MiddleToMiddleAudioSynthesizer
 		    boolean ok = true;
 		    for (AudioLabel wordPhoneme : wordPhonemeLabels) {
 	            if ((wordPhoneme.getEnd() <= wordPhoneme.getStart())
-	                || (wordPhoneme.getEnd() - wordPhoneme.getStart() > 0.5)
-	                || (wordPhoneme.getEnd() - wordPhoneme.getStart() < 0.01))
+	                || (wordPhoneme.getEnd() - wordPhoneme.getStart() > 1.0)
+	                || (wordPhoneme.getEnd() - wordPhoneme.getStart() < 0.0001))
 	                ok = false;
 		    }
 		    if (!ok) { wordPhonemeLabels.clear(); continue; }
@@ -82,12 +82,15 @@ public class MiddleToMiddleAudioSynthesizer
 	
 	private class WordCandidates implements AudioCandidate
 	{
-		private ArrayList<AudioLabel> candidates;
+		private ArrayList<AudioLabel> candidates = new ArrayList<AudioLabel>();
 		private HashMap<AudioLabel, byte[]> streams = new HashMap<AudioLabel, byte[]>();
 
 		public WordCandidates(ArrayList<AudioLabel> candidates)
 		{
-			this.candidates = candidates;
+		    for (AudioLabel label : candidates) {
+		        if (label.getEnd() - label.getStart() < 0.1) continue;
+		        this.candidates.add(label);
+		    }
 		}
 
 		@Override
@@ -393,6 +396,9 @@ public class MiddleToMiddleAudioSynthesizer
 			    lastSize = minimumSize - 1;
 			    phonemeSequenceCandidates =
 	                    findPhonemeSequenceCandidates(phonemes, i, lastSize);
+			}
+			if (phonemeSequenceCandidates.isEmpty()) {
+			    System.err.println("empty for " + word + " " + phonemes[i] + " " + phonemes[i + 1]);
 			}
 			wordCandidates.add(phonemeSequenceCandidates);
 		}

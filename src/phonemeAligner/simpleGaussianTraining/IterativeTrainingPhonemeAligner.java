@@ -109,8 +109,8 @@ public class IterativeTrainingPhonemeAligner
             double frameScore = this.dataScorer.score(audio);
             double noChangeScore = this.bestScore + frameScore;
             double changeScore = ((previous != null) ? previous.getScore() : Double.NEGATIVE_INFINITY) + frameScore;
-            if ((previous != null) && (currentFrameTime - previous.bestStartTime < 0.05))
-                changeScore = Double.NEGATIVE_INFINITY;
+//            if ((previous != null) && (currentFrameTime - previous.bestStartTime < 0.05))
+//                changeScore = Double.NEGATIVE_INFINITY;
             
             if (noChangeScore > changeScore) {
                 this.bestScore = noChangeScore;
@@ -172,11 +172,19 @@ public class IterativeTrainingPhonemeAligner
     {
         String[] phonemes = splitWord(word.getLabel());
         
-        double splitTime = (word.getEnd() - word.getStart()) / phonemes.length;
+        double silTime = this.frameTime * 2;
+        double splitTime = (word.getEnd() - word.getStart() - 2 * silTime) / (phonemes.length - 2);
         ArrayList<AudioLabel> split = new ArrayList<AudioLabel>();
         for (int i = 0; i < phonemes.length; ++i) {
-            double start = i * splitTime + word.getStart();
-            double end = (i + 1) * splitTime + word.getStart();
+            double start = (i - 1) * splitTime + word.getStart() + silTime;
+            double end = (i) * splitTime + word.getStart() + silTime;
+            if (i == 0) {
+                start = word.getStart();
+                end = silTime + word.getStart();
+            } else if (i == phonemes.length - 1) {
+                start = word.getEnd() - silTime;
+                end = word.getEnd();
+            }
             split.add(new AudioLabel(phonemes[i], start, end));
         }
         return split;
@@ -184,7 +192,7 @@ public class IterativeTrainingPhonemeAligner
     
     private String[] splitWord(String word)
     {
-        String[] phonemes = (this.converter.convert(word).get(0)).split(" ");
+        String[] phonemes = ("sil " + this.converter.convert(word).get(0) + " sil").split(" ");
 //        String[] ret = new String[phonemes.length * 3 + 2];
 //        ret[0] = "sil";
 //        ret[ret.length - 1] = "sil";
