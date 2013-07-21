@@ -6,7 +6,7 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import common.AudioLabel;
-import commonExceptions.ImplementationError;
+import common.exceptions.ImplementationError;
 import dataProducers.AudacityLabelImporter;
 import dataProducers.PowerExtractor;
 import dataProducers.TextImporter;

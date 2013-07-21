@@ -1,9 +1,9 @@
 import java.util.Random;
 
-import commonExceptions.ImplementationError;
+import common.algorithms.GaussianMixtureExpectedMaximalization;
+import common.algorithms.MultivariateNormalDistribution;
+import common.exceptions.ImplementationError;
 
-import algorithms.GaussianMixtureExpectedMaximalization;
-import algorithms.MultivariateNormalDistribution;
 
 
 public class TestMain

@@ -9,11 +9,11 @@ import javax.sound.sampled.AudioInputStream;
 
 import sphinx.GrammarAligner;
 
-import common.AudioChunkExtractor;
 import common.AudioLabel;
 import common.Speech;
 import common.Speeches;
 import common.Text;
+import common.algorithms.AudioChunkExtractor;
 import edu.cmu.sphinx.decoder.search.Token;
 import edu.cmu.sphinx.result.Result;
 import edu.cmu.sphinx.result.WordResult;

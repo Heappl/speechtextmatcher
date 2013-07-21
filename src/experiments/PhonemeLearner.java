@@ -6,8 +6,8 @@ import java.util.HashMap;
 import common.AudioLabel;
 import common.Data;
 import common.DataSequence;
+import common.algorithms.HungarianAlgorithm;
 
-import algorithms.HungarianAlgorithm;
 
 import diffCalculators.SpectrumDiffCalculator;
 import diffCalculators.SpectrumWeights;

@@ -1,4 +1,4 @@
-package phonemeAligner;
+package common.algorithms;
 
 import java.util.ArrayList;
 

@@ -2,11 +2,11 @@ package experiments;
 
 import java.util.ArrayList;
 
-import algorithms.GaussianMixtureExpectedMaximalization;
-import algorithms.MultivariateNormalDistribution;
 
 import common.AudioLabel;
-import commonExceptions.ImplementationError;
+import common.algorithms.GaussianMixtureExpectedMaximalization;
+import common.algorithms.MultivariateNormalDistribution;
+import common.exceptions.ImplementationError;
 
 public class GaussianPhonemeDestructurer
 {

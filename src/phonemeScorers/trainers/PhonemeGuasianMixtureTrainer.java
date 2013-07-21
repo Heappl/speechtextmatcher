@@ -1,16 +1,18 @@
-package phonemeAligner.simpleGaussianTraining;
+package phonemeScorers.trainers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import phonemeScorers.GaussianMixturePhonemeScorer;
+
 
 import common.AudioLabel;
 import common.GenericListContainer;
-import commonExceptions.ImplementationError;
+import common.algorithms.DataByTimesExtractor;
+import common.algorithms.GaussianMixtureExpectedMaximalization;
+import common.algorithms.MixtureGaussianModel;
+import common.exceptions.ImplementationError;
 
-import algorithms.DataByTimesExtractor;
-import algorithms.GaussianMixtureExpectedMaximalization;
-import algorithms.MixtureGaussianModel;
 
 public class PhonemeGuasianMixtureTrainer
 {

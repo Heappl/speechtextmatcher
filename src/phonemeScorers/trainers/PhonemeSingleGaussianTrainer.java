@@ -1,18 +1,19 @@
-package phonemeAligner.simpleGaussianTraining;
+package phonemeScorers.trainers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import phonemeAligner.IPhonemeScorer;
+import phonemeScorers.IPhonemeScorer;
+import phonemeScorers.SingleGaussianPhonemeScorer;
 
 
-import algorithms.DataByTimesExtractor;
-import algorithms.MultivariateNormalDistribution;
-import algorithms.SingleGaussianTrainer;
 
 import common.AudioLabel;
 import common.GenericListContainer;
-import commonExceptions.ImplementationError;
+import common.algorithms.DataByTimesExtractor;
+import common.algorithms.MultivariateNormalDistribution;
+import common.algorithms.SingleGaussianTrainer;
+import common.exceptions.ImplementationError;
 
 public class PhonemeSingleGaussianTrainer
 {

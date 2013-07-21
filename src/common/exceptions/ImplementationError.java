@@ -1,4 +1,4 @@
-package commonExceptions;
+package common.exceptions;
 
 public class ImplementationError extends Exception {
 

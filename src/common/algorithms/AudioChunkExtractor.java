@@ -1,4 +1,4 @@
-package common;
+package common.algorithms;
 import java.awt.Frame;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

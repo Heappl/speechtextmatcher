@@ -15,6 +15,7 @@ public class NaiveGraphemesToPhonemesConverter implements IWordToPhonemesConvert
 	
 	public ArrayList<String> convert(String word)
 	{
+	    word = word.toLowerCase();
 		if (word.isEmpty()) {
 			ArrayList<String> out = new ArrayList<String>();
 			out.add("");

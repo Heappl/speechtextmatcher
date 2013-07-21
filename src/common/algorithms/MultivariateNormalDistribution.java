@@ -1,13 +1,17 @@
-package algorithms;
+package common.algorithms;
 
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.LUDecomposition;
 import org.apache.commons.math3.linear.RealMatrix;
 
-import commonExceptions.ImplementationError;
+import common.exceptions.DeserializationException;
+import common.exceptions.ImplementationError;
 
 public class MultivariateNormalDistribution
 {
+    private final static String covLabel = "covariances:";
+    private final static String meanLabel = "mean:";
+    
     private final double[] mean;
     private final double[][] covariances;
     private final RealMatrix inversedCovariancesMatrix;
@@ -66,5 +70,53 @@ public class MultivariateNormalDistribution
             ret = ret.substring(0, ret.length() - 2) + "]";
         }
         return ret + "}";
+    }
+
+    public String serialize()
+    {
+        return "{" + meanLabel + serializeVector(this.mean) + ","
+                + covLabel + serializeMatrix(this.covariances) + "}";
+    }
+    private String serializeMatrix(double[][] matrix)
+    {
+        String ret = "[";
+        for (double[] val : matrix) {
+            ret += serializeVector(val) + ",";
+        }
+        return ret.substring(0, ret.length() - 1) + "]";
+    }
+    private String serializeVector(double[] vector)
+    {
+        String ret = "[";
+        for (double val : vector) {
+            ret += val + ",";
+        }
+        return ret.substring(0, ret.length() - 1) + "]";
+    }
+    public static MultivariateNormalDistribution deserialize(String modelData) throws DeserializationException
+    {
+        int covIndex = modelData.indexOf(covLabel);
+        int meanIndex = modelData.indexOf(meanLabel);
+        if ((covIndex < 0) || (meanIndex < 0)) throw new DeserializationException("no mean or covariances");
+        
+        String meanData = modelData.substring(meanIndex + meanLabel.length(), covIndex - 1);
+        String covData = modelData.substring(covIndex + covLabel.length(), modelData.length() - 1);
+        return new MultivariateNormalDistribution(deserializeVector(meanData), deserializeMatrix(covData));
+    }
+    private static double[] deserializeVector(String data)
+    {
+        String[] valuesData = data.substring(1, data.length() - 1).split(",");
+        double[] ret = new double[valuesData.length];
+        for (int i = 0; i < valuesData.length; ++i)
+            ret[i] = Double.valueOf(valuesData[i]);
+        return ret;
+    }
+    private static double[][] deserializeMatrix(String data)
+    {
+        String[] rowsData = data.substring(1, data.length() - 1).split("][");
+        double[][] ret = new double[rowsData.length][];
+        for (int i = 0; i < ret.length; ++i)
+            ret[i] = deserializeVector(rowsData[i]);
+        return ret;
     }
 }

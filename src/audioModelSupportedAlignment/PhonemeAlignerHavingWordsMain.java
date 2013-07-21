@@ -18,7 +18,7 @@ import graphemesToPhonemesConverters.GraphemesToRussianPhonemesConverter;
 import speechDetection.OnlineSpeechesExtractor;
 
 import common.AudioLabel;
-import commonExceptions.ImplementationError;
+import common.exceptions.ImplementationError;
 
 import dataExporters.AudacityLabelsExporter;
 import dataProducers.AudacityLabelImporter;

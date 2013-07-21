@@ -7,8 +7,6 @@ import java.util.ArrayList;
 
 import javax.sound.sampled.AudioInputStream;
 
-import algorithms.DataByTimesExtractor;
-import algorithms.OneDimensionalDataStatistics;
 
 import phonemeAligner.audioBased.HMMPhonemeSearch;
 import phonemeAligner.audioBased.PhonemeSearch;
@@ -16,7 +14,9 @@ import phonemeAligner.audioBased.PhonemeSearch;
 import common.AudioLabel;
 import common.DataSequence;
 import common.GenericListContainer;
-import commonExceptions.ImplementationError;
+import common.algorithms.DataByTimesExtractor;
+import common.algorithms.OneDimensionalDataStatistics;
+import common.exceptions.ImplementationError;
 import edu.cmu.sphinx.frontend.Data;
 import edu.cmu.sphinx.frontend.DoubleData;
 import edu.cmu.sphinx.frontend.FloatData;

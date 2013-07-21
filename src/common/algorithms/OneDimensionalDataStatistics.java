@@ -1,4 +1,4 @@
-package algorithms;
+package common.algorithms;
 
 import java.util.ArrayList;
 

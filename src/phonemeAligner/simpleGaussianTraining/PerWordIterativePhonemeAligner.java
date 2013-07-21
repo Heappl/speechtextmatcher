@@ -5,11 +5,11 @@ import graphemesToPhonemesConverters.IWordToPhonemesConverter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import algorithms.DataByTimesExtractor;
 
 import common.AudioLabel;
 import common.GenericListContainer;
-import commonExceptions.ImplementationError;
+import common.algorithms.DataByTimesExtractor;
+import common.exceptions.ImplementationError;
 
 public class PerWordIterativePhonemeAligner
 {

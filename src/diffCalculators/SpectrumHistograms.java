@@ -2,9 +2,9 @@ package diffCalculators;
 
 import java.util.ArrayList;
 
-import algorithms.Histogram;
 
 import common.DataSequence;
+import common.algorithms.Histogram;
 
 
 public class SpectrumHistograms

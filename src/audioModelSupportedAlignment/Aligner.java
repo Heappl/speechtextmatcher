@@ -7,8 +7,8 @@ import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 
-import common.AudioChunkExtractor;
 import common.AudioLabel;
+import common.algorithms.AudioChunkExtractor;
 import sphinx.GrammarAligner;
 import edu.cmu.sphinx.result.Result;
 import edu.cmu.sphinx.result.WordResult;

@@ -1,6 +1,6 @@
-package algorithms;
+package common.algorithms;
 
-import commonExceptions.ImplementationError;
+import common.exceptions.ImplementationError;
 
 public class GaussianMixtureExpectedMaximalization
 {

@@ -8,8 +8,8 @@ import java.util.Collections;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 
-import common.AudioChunkExtractor;
 import common.AudioLabel;
+import common.algorithms.AudioChunkExtractor;
 import dataExporters.AudacityLabelsExporter;
 
 public class AudioCandidatesChooser

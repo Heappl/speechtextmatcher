@@ -6,7 +6,7 @@ import java.util.HashMap;
 
 import common.AudioLabel;
 import common.DataSequence;
-import commonExceptions.ImplementationError;
+import common.exceptions.ImplementationError;
 import diffCalculators.ISpectrumDiffCalculator;
 
 

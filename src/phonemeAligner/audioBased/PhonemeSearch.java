@@ -3,7 +3,7 @@ import java.util.ArrayList;
 
 import common.AudioLabel;
 import common.Data;
-import commonExceptions.ImplementationError;
+import common.exceptions.ImplementationError;
 
 import edu.cmu.sphinx.frontend.FloatData;
 import edu.cmu.sphinx.linguist.acoustic.AcousticModel;

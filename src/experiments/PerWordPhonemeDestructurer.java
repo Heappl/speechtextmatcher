@@ -5,16 +5,16 @@ import graphemesToPhonemesConverters.GraphemesToRussianPhonemesConverter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import phonemeAligner.ThresholdDataFilter;
 
-import algorithms.DataByTimesExtractor;
-import algorithms.GaussianMixtureExpectedMaximalization;
-import algorithms.MultivariateNormalDistribution;
-import algorithms.OneDimensionalDataStatistics;
 
 import common.AudioLabel;
 import common.GenericListContainer;
-import commonExceptions.ImplementationError;
+import common.algorithms.DataByTimesExtractor;
+import common.algorithms.GaussianMixtureExpectedMaximalization;
+import common.algorithms.MultivariateNormalDistribution;
+import common.algorithms.OneDimensionalDataStatistics;
+import common.algorithms.ThresholdDataFilter;
+import common.exceptions.ImplementationError;
 
 public class PerWordPhonemeDestructurer
 {

@@ -10,9 +10,9 @@ import javax.sound.sampled.AudioInputStream;
 
 import sphinx.GrammarAligner;
 
-import common.AudioChunkExtractor;
 import common.AudioLabel;
 import common.Text;
+import common.algorithms.AudioChunkExtractor;
 import dataExporters.LinesExporter;
 import edu.cmu.sphinx.decoder.search.Token;
 import edu.cmu.sphinx.result.Result;

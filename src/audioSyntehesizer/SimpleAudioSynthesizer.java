@@ -13,9 +13,9 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 
 
-import common.AudioChunkExtractor;
 import common.AudioLabel;
 import common.Text;
+import common.algorithms.AudioChunkExtractor;
 
 
 public class SimpleAudioSynthesizer

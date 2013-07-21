@@ -9,8 +9,11 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
+import phonemeScorers.io.PhonemeScorerExporter;
+import phonemeScorers.trainers.IterativePhonemeScorerTraining;
+
 import common.AudioLabel;
-import commonExceptions.ImplementationError;
+import common.exceptions.ImplementationError;
 
 import dataExporters.AudacityLabelsExporter;
 import dataProducers.AudacityLabelImporter;
@@ -18,7 +21,7 @@ import dataProducers.PowerExtractor;
 import dataProducers.TextImporter;
 import dataProducers.WaveImporter;
 
-public class LargeChunkPhonemeAlignment
+public class MainLargeChunkPhonemeAlignment
 {
     public static void main(String[] args) throws UnsupportedAudioFileException, IOException, ImplementationError
     {
@@ -45,15 +48,15 @@ public class LargeChunkPhonemeAlignment
         waveImporterForAudioData.done();
         waveImporterForPowers.done();
 
-        IterativeTrainingForLargerChunksPhonemeAligner aligner =
-            new IterativeTrainingForLargerChunksPhonemeAligner(
+        IterativePhonemeScorerTraining aligner =
+            new IterativePhonemeScorerTraining(
+                5.0,
                 prepared,
                 powerExtractor.getPowerData(),
                 new GraphemesToPolishPhonemesConverter(),
                 totalTime);
 
-        new AudacityLabelsExporter(outputFile).export(aligner.align(15));
+        new PhonemeScorerExporter(outputFile).export(aligner.train(15));
         System.err.println("END");
     }
-
 }

@@ -1,4 +1,4 @@
-package algorithms;
+package common.algorithms;
 
 public class KMeans {
 	private double[][] means;

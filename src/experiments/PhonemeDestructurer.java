@@ -1,13 +1,13 @@
 package experiments;
 import java.util.ArrayList;
 
-import algorithms.GaussianMixtureExpectedMaximalization;
-import algorithms.KMeans;
 
 import common.AudioLabel;
 import common.Data;
 import common.Speeches;
 import common.Text;
+import common.algorithms.GaussianMixtureExpectedMaximalization;
+import common.algorithms.KMeans;
 
 
 

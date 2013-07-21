@@ -14,7 +14,7 @@ import javax.sound.sampled.AudioInputStream;
 
 import common.AudioLabel;
 import common.Text;
-import commonExceptions.ImplementationError;
+import common.exceptions.ImplementationError;
 
 public class MiddleToMiddleAudioSynthesizer
 {
@@ -52,6 +52,7 @@ public class MiddleToMiddleAudioSynthesizer
 		AudioLabel previousWord = null;
 		ArrayList<AudioLabel> wordPhonemeLabels = new ArrayList<AudioLabel>();
 		for (AudioLabel phonemeLabel : phonemeLabels) {
+		    if (phonemeLabel.getLabel().equals("sil")) continue;
 		    AudioLabel wordContaing = findWordContaining(phonemeLabel);
 		    if (wordContaing == previousWord) {
 		        wordPhonemeLabels.add(phonemeLabel);
@@ -458,8 +459,8 @@ public class MiddleToMiddleAudioSynthesizer
 	{
         int index = Collections.binarySearch(sortedWords, label, timeComparator);
         if (index < 0) index = -index - 2;
-        if ((sortedWords.get(index).getStart() <= label.getStart())
-            && (sortedWords.get(index).getEnd() >= label.getEnd()))
+        if ((sortedWords.get(index).getStart() <= label.getStart() + 0.1)
+            && (sortedWords.get(index).getEnd() >= label.getEnd() - 0.1))
             return sortedWords.get(index);
         throw new ImplementationError("word not found " + label + " " + sortedWords.get(index));
 	}

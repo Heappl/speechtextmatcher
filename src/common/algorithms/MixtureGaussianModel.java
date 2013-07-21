@@ -1,6 +1,7 @@
-package algorithms;
+package common.algorithms;
 
-import commonExceptions.ImplementationError;
+import common.exceptions.DeserializationException;
+import common.exceptions.ImplementationError;
 
 public class MixtureGaussianModel
 {
@@ -34,5 +35,23 @@ public class MixtureGaussianModel
             ret += mixture + ", ";
         }
         return ret.substring(0, ret.length() - 2) + "}";
+    }
+
+    public String serialize()
+    {
+        String ret = "{";
+        for (MultivariateNormalDistribution mixture : mixtures) {
+            ret += mixture.serialize() + ",";
+        }
+        return ret.substring(0, ret.length() - 1) + "}";
+    }
+
+    public static MixtureGaussianModel deserialize(String modelData) throws DeserializationException
+    {
+        String[] mixturesData = modelData.substring(1, modelData.length() - 1).split(",");
+        MultivariateNormalDistribution[] mixtures = new MultivariateNormalDistribution[mixturesData.length];
+        for (int i = 0; i < mixturesData.length; ++i)
+            mixtures[i] = MultivariateNormalDistribution.deserialize(mixturesData[i]);
+        return new MixtureGaussianModel(mixtures);
     }
 }

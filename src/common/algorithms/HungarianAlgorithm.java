@@ -1,4 +1,4 @@
-package algorithms;
+package common.algorithms;
 import java.util.Arrays;
 
 /* Copyright (c) 2012 Kevin L. Stern

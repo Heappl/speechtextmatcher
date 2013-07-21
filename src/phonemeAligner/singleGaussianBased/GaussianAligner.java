@@ -1,21 +1,19 @@
-package phonemeAligner.simpleGaussianTraining;
+package phonemeAligner.singleGaussianBased;
 
 import graphemesToPhonemesConverters.IWordToPhonemesConverter;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 
-import phonemeAligner.IPhonemeScorer;
-import algorithms.DataByTimesExtractor;
+import phonemeScorers.IPhonemeScorer;
 
 import common.AudioLabel;
 import common.GenericListContainer;
-import commonExceptions.ImplementationError;
+import common.algorithms.DataByTimesExtractor;
+import common.exceptions.ImplementationError;
 
-public class IterativeTrainingForLargerChunksPhonemeAligner
+public class GaussianAligner
 {
     private AudioLabel[] chunks;
     ArrayList<double[]> data;
@@ -24,7 +22,8 @@ public class IterativeTrainingForLargerChunksPhonemeAligner
     double frameTime;
     DataByTimesExtractor<double[]> dataExtractor;
 
-    public IterativeTrainingForLargerChunksPhonemeAligner(
+    public GaussianAligner(
+            double maxTimeOfChunk,
             AudioLabel[] chunks,
             ArrayList<double[]> allData,
             IWordToPhonemesConverter converter,
@@ -41,39 +40,29 @@ public class IterativeTrainingForLargerChunksPhonemeAligner
                 return 0;
             }
         });
-        this.chunks = new AudioLabel[chunks.length / 2];
+        ArrayList<AudioLabel> auxChunks = new ArrayList<AudioLabel>();
         for (int i = 0; i < this.chunks.length; ++i) {
+            if (chunks[i].getEnd() - chunks[i].getStart() > maxTimeOfChunk)
+                break;
             this.chunks[i] = chunks[i];
-            System.err.println(chunks[i].getEnd() - chunks[i].getStart());
         }
+        System.err.println("took " + auxChunks.size() + " chunks out of " + chunks.length);
         
+        this.chunks = auxChunks.toArray(new AudioLabel[0]);
         this.converter = converter;
         this.totalTime = totalTime;
         this.frameTime = totalTime / allData.size();
-        
         this.data = allData;
-
         this.dataExtractor = new DataByTimesExtractor<double[]>(
                 new GenericListContainer<double[]>(this.data), totalTime, 0);
     }
     
-    public ArrayList<AudioLabel> align(int iterations) throws ImplementationError
+    public ArrayList<AudioLabel> align(IPhonemeScorer[] phonemeScorers) throws ImplementationError
     {
         ArrayList<AudioLabel> phonemeLabels = new ArrayList<AudioLabel>();
-        for (AudioLabel word : chunks)
-            phonemeLabels.addAll(initialSplit(word));
-        
-        for (int i = 0; i < iterations; ++i) {
-            System.err.println("align iteration " + i);
-            IPhonemeScorer[] phonemeScorers =
-                    new PhonemeSingleGaussianTrainer().trainPhonemes(phonemeLabels, data, totalTime);
-            
-            phonemeLabels.clear();
-            for (AudioLabel word : chunks) {
-                ArrayList<AudioLabel> wordPhonemes = findPhonemes(word, phonemeScorers);
-                phonemeLabels.addAll(wordPhonemes);
-            }
-            System.err.println("~align iteration " + i);
+        for (AudioLabel word : chunks) {
+            ArrayList<AudioLabel> wordPhonemes = findPhonemes(word, phonemeScorers);
+            phonemeLabels.addAll(wordPhonemes);
         }
         
         return phonemeLabels;
@@ -180,21 +169,7 @@ public class IterativeTrainingForLargerChunksPhonemeAligner
         return scorers[scorers.length - 1].getBestAlignment(chunk.getEnd());
     }
 
-    private ArrayList<AudioLabel> initialSplit(AudioLabel chunk)
-    {
-        String[] phonemes = splitChunk(chunk.getLabel());
-        
-        double splitTime = (chunk.getEnd() - chunk.getStart()) / phonemes.length;
-        ArrayList<AudioLabel> split = new ArrayList<AudioLabel>();
-        for (int i = 0; i < phonemes.length; ++i) {
-            double start = (i) * splitTime + chunk.getStart();
-            double end = (i + 1) * splitTime + chunk.getStart();
-            split.add(new AudioLabel(phonemes[i], start, end));
-        }
-        return split;
-    }
-    
-    private String[] splitChunk(String chunk)
+    public String[] splitChunk(String chunk)
     {
         String[] words = chunk.split("[. ]+");
         ArrayList<String> phonemes = new ArrayList<String>();
@@ -211,5 +186,4 @@ public class IterativeTrainingForLargerChunksPhonemeAligner
     {
         return this.converter.convert(word).get(0).split(" ");
     }
-
 }

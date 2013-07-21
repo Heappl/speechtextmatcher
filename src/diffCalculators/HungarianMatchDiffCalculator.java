@@ -1,7 +1,7 @@
 package diffCalculators;
 import common.Data;
+import common.algorithms.HungarianAlgorithm;
 
-import algorithms.HungarianAlgorithm;
 
 
 public class HungarianMatchDiffCalculator implements ISequenceDiffCalculator
