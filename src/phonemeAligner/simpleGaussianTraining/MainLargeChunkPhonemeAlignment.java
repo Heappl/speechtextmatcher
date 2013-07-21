@@ -56,7 +56,7 @@ public class MainLargeChunkPhonemeAlignment
                 new GraphemesToPolishPhonemesConverter(),
                 totalTime);
 
-        new PhonemeScorerExporter(outputFile).export(aligner.train(15));
+        new PhonemeScorerExporter(outputFile).export(aligner.train(20));
         System.err.println("END");
     }
 }

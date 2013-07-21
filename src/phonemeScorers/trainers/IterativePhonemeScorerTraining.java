@@ -44,10 +44,10 @@ public class IterativePhonemeScorerTraining
             }
         });
         ArrayList<AudioLabel> auxChunks = new ArrayList<AudioLabel>();
-        for (int i = 0; i < this.chunks.length; ++i) {
+        for (int i = 0; i < chunks.length; ++i) {
             if (chunks[i].getEnd() - chunks[i].getStart() > maxTimeOfChunk)
                 break;
-            this.chunks[i] = chunks[i];
+            auxChunks.add(chunks[i]);
         }
         System.err.println("took " + auxChunks.size() + " chunks out of " + chunks.length);
         
