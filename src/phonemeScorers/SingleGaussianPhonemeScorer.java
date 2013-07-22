@@ -8,8 +8,12 @@ import common.exceptions.ImplementationError;
 public class SingleGaussianPhonemeScorer implements IPhonemeScorer
 {
 
-    private MultivariateNormalDistribution model;
-    private String phoneme;
+    private MultivariateNormalDistribution model = null;
+    private String phoneme = "";
+    
+    public SingleGaussianPhonemeScorer()
+    {
+    }
     
     public SingleGaussianPhonemeScorer(MultivariateNormalDistribution gaussianModel, String phoneme)
     {

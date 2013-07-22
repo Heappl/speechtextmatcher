@@ -24,7 +24,7 @@ public class PhonemeScorerImporter
     
     private IPhonemeScorer createScorer(String line) throws ClassNotFoundException, InstantiationException, IllegalAccessException, DeserializationException
     {
-        String className = line.split("{")[0];
+        String className = line.split("\\{")[0];
         Class scorerClass = Class.forName(className);
         return ((IPhonemeScorer)scorerClass.newInstance()).deserialize(line);
     }

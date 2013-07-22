@@ -50,7 +50,7 @@ public class MainLargeChunkPhonemeAlignment
 
         IterativePhonemeScorerTraining aligner =
             new IterativePhonemeScorerTraining(
-                5.0,
+                Double.POSITIVE_INFINITY,
                 prepared,
                 powerExtractor.getPowerData(),
                 new GraphemesToPolishPhonemesConverter(),

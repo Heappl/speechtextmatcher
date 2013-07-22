@@ -113,10 +113,10 @@ public class MultivariateNormalDistribution
     }
     private static double[][] deserializeMatrix(String data)
     {
-        String[] rowsData = data.substring(1, data.length() - 1).split("][");
+        String[] rowsData = data.substring(2, data.length() - 2).split("\\],\\[");
         double[][] ret = new double[rowsData.length][];
         for (int i = 0; i < ret.length; ++i)
-            ret[i] = deserializeVector(rowsData[i]);
+            ret[i] = deserializeVector("[" + rowsData[i] + "]");
         return ret;
     }
 }

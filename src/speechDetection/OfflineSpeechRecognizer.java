@@ -16,12 +16,19 @@ public class OfflineSpeechRecognizer implements IWaveObserver {
 	private int spectrumSize = 0;
 	private int speechGravity;
 	private int nonSpeechGravity;
+	private boolean storeData = true;
 	
 	public OfflineSpeechRecognizer(int speechGravity, int nonSpeechGravity)
 	{
 		this.speechGravity = speechGravity;
 		this.nonSpeechGravity = nonSpeechGravity;
 	}
+    public OfflineSpeechRecognizer(int speechGravity, int nonSpeechGravity, boolean storeData)
+    {
+        this.speechGravity = speechGravity;
+        this.nonSpeechGravity = nonSpeechGravity;
+        this.storeData = storeData;
+    }
 	
 	@Override
 	public void process(double startTime, double endTime, double[] values)

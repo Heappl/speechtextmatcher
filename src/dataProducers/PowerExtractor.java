@@ -7,6 +7,7 @@ public class PowerExtractor {
 	int powerDataCount = 0;
 	int audioDataCount = 0;
 	int spectrumSize = 0;
+	double lastTime = 0;
 	final double minTime;
 	final double maxTime;
 	
@@ -27,6 +28,9 @@ public class PowerExtractor {
             @Override
             public void process(double startTime, double endTime, double[] values)
             {
+                synchronized (powerData) {
+                    lastTime = Math.max(lastTime, endTime);
+                }
                 if (startTime > maxTime) return;
                 if (endTime < minTime) return;
                 double power = 0;
@@ -53,6 +57,9 @@ public class PowerExtractor {
             @Override
             public void process(double startTime, double endTime, double[] values)
             {
+                synchronized (powerData) {
+                    lastTime = Math.max(lastTime, endTime);
+                }
                 if (startTime > maxTime) return;
                 if (endTime < minTime) return;
                 synchronized (powerData) {
@@ -72,4 +79,9 @@ public class PowerExtractor {
 	{
 		return powerData;
 	}
+	
+    public double getTotalTime()
+    {
+        return this.lastTime;
+    }
 }

@@ -8,9 +8,12 @@ import edu.cmu.sphinx.frontend.FloatData;
 
 public class GaussianMixturePhonemeScorer implements IPhonemeScorer
 {
-    private MixtureGaussianModel gaussianMixtureModel;
-    private String phoneme;
-    
+    private MixtureGaussianModel gaussianMixtureModel = null;
+    private String phoneme = "";
+
+    public GaussianMixturePhonemeScorer()
+    {
+    }
     public GaussianMixturePhonemeScorer(MixtureGaussianModel gaussianMixtureModel, String phoneme)
     {
         this.gaussianMixtureModel = gaussianMixtureModel;

@@ -9,7 +9,7 @@ import dataProducers.TextImporter;
 import dataProducers.WaveImporter;
 
 
-public class TextToSpeechByLengthMatcherMain
+public class MainTextToSpeechByLengthMatcher
 {
 	public static void main(String[] args)
 	{
