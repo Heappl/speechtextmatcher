@@ -4,8 +4,8 @@ import java.util.ArrayList;
 
 
 import common.AudioLabel;
-import common.algorithms.GaussianMixtureExpectedMaximalization;
-import common.algorithms.MultivariateNormalDistribution;
+import common.algorithms.gaussian.GaussianMixtureExpectedMaximalization;
+import common.algorithms.gaussian.MultivariateNormalDistribution;
 import common.exceptions.ImplementationError;
 
 public class GaussianPhonemeDestructurer

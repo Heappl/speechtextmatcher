@@ -11,8 +11,8 @@ import phonemeScorers.SingleGaussianPhonemeScorer;
 import common.AudioLabel;
 import common.GenericListContainer;
 import common.algorithms.DataByTimesExtractor;
-import common.algorithms.MultivariateNormalDistribution;
-import common.algorithms.SingleGaussianTrainer;
+import common.algorithms.gaussian.MultivariateNormalDistribution;
+import common.algorithms.gaussian.SingleGaussianTrainer;
 import common.exceptions.ImplementationError;
 
 public class PhonemeSingleGaussianTrainer

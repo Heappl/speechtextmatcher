@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 
 import common.DataSequence;
-import common.algorithms.Histogram;
+import common.statistics.Histogram;
 
 
 public class SpectrumHistograms

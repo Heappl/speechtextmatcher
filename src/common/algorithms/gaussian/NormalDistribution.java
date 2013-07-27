@@ -1,4 +1,4 @@
-package common.algorithms;
+package common.algorithms.gaussian;
 
 public class NormalDistribution
 {

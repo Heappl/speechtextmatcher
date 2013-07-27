@@ -1,4 +1,4 @@
-package common.algorithms;
+package common.algorithms.gaussian;
 
 import common.exceptions.ImplementationError;
 

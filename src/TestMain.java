@@ -1,7 +1,7 @@
 import java.util.Random;
 
-import common.algorithms.GaussianMixtureExpectedMaximalization;
-import common.algorithms.MultivariateNormalDistribution;
+import common.algorithms.gaussian.GaussianMixtureExpectedMaximalization;
+import common.algorithms.gaussian.MultivariateNormalDistribution;
 import common.exceptions.ImplementationError;
 
 

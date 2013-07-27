@@ -1,7 +1,7 @@
 package phonemeScorers;
 
 
-import common.algorithms.MultivariateNormalDistribution;
+import common.algorithms.gaussian.MultivariateNormalDistribution;
 import common.exceptions.DeserializationException;
 import common.exceptions.ImplementationError;
 

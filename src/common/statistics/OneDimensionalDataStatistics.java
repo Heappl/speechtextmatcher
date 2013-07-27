@@ -1,6 +1,9 @@
-package common.algorithms;
+package common.statistics;
 
 import java.util.ArrayList;
+
+import common.algorithms.gaussian.MultivariateNormalDistribution;
+
 
 public class OneDimensionalDataStatistics
 {

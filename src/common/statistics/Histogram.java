@@ -1,4 +1,6 @@
-package common.algorithms;
+package common.statistics;
+
+import common.algorithms.gaussian.NormalDistribution;
 
 
 public class Histogram

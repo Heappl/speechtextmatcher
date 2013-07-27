@@ -1,6 +1,6 @@
 package phonemeScorers;
 
-import common.algorithms.MixtureGaussianModel;
+import common.algorithms.gaussian.MixtureGaussianModel;
 import common.exceptions.DeserializationException;
 import common.exceptions.ImplementationError;
 

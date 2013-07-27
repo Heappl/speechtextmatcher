@@ -6,8 +6,8 @@ import common.AudioLabel;
 import common.Data;
 import common.Speeches;
 import common.Text;
-import common.algorithms.GaussianMixtureExpectedMaximalization;
 import common.algorithms.KMeans;
+import common.algorithms.gaussian.GaussianMixtureExpectedMaximalization;
 
 
 

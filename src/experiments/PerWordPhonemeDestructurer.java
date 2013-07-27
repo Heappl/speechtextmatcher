@@ -10,11 +10,11 @@ import java.util.HashMap;
 import common.AudioLabel;
 import common.GenericListContainer;
 import common.algorithms.DataByTimesExtractor;
-import common.algorithms.GaussianMixtureExpectedMaximalization;
-import common.algorithms.MultivariateNormalDistribution;
-import common.algorithms.OneDimensionalDataStatistics;
 import common.algorithms.ThresholdDataFilter;
+import common.algorithms.gaussian.GaussianMixtureExpectedMaximalization;
+import common.algorithms.gaussian.MultivariateNormalDistribution;
 import common.exceptions.ImplementationError;
+import common.statistics.OneDimensionalDataStatistics;
 
 public class PerWordPhonemeDestructurer
 {

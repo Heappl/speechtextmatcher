@@ -9,8 +9,8 @@ import phonemeScorers.GaussianMixturePhonemeScorer;
 import common.AudioLabel;
 import common.GenericListContainer;
 import common.algorithms.DataByTimesExtractor;
-import common.algorithms.GaussianMixtureExpectedMaximalization;
-import common.algorithms.MixtureGaussianModel;
+import common.algorithms.gaussian.GaussianMixtureExpectedMaximalization;
+import common.algorithms.gaussian.MixtureGaussianModel;
 import common.exceptions.ImplementationError;
 
 
