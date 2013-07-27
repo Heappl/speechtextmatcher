@@ -23,6 +23,7 @@ import common.exceptions.ImplementationError;
 
 import dataExporters.AudacityLabelsExporter;
 import dataProducers.AudacityLabelImporter;
+import dataProducers.AudioDataExtractor;
 import dataProducers.PowerExtractor;
 import dataProducers.TextImporter;
 import dataProducers.WaveImporter;
@@ -37,10 +38,6 @@ public class MainPhonemeAlignerHavingWords
 		String waveFile = args[0];
 		String labelsFile = args[1];
 		String outputFile = args[2];
-		
-		AudioInputStream stream = AudioSystem.getAudioInputStream(new File(waveFile));
-		double totalTime = (double)stream.getFrameLength() / (double)stream.getFormat().getFrameRate();
-		System.err.println("total time: " + totalTime);
 		
 		AudioLabel[] prepared = new AudacityLabelImporter(new TextImporter(labelsFile)).getLabels();
 		WaveImporter waveImporterForPowers = new WaveImporter(
@@ -61,7 +58,7 @@ public class MainPhonemeAlignerHavingWords
     	        prepared,
     	        powerExtractor.getPowerData(),
     	        new GraphemesToPolishPhonemesConverter(),
-    	        totalTime);
+    	        powerExtractor.getTotalTime());
 
 		new AudacityLabelsExporter(outputFile).export(aligner.align(15));
 		System.err.println("END");

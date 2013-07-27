@@ -22,6 +22,9 @@ public class GaussianBasedAligner
     private GaussianPhonemeAligner aligner;
     private DataByTimesExtractor<double[]> dataExtractor;
     private IWordToPhonemesConverter converter;
+    private GuassianSearch searcher;
+
+    IPhonemeScorer[] scorers;
     
     public GaussianBasedAligner(
         IPhonemeScorer[] scorers,
@@ -29,7 +32,9 @@ public class GaussianBasedAligner
         ArrayList<double[]> allData,
         double totalTime)
     {
+        this.scorers = scorers;
         this.aligner = new GaussianPhonemeAligner(scorers);
+        this.searcher = new GuassianSearch(scorers, converter, allData, totalTime);
         this.converter = converter;
         this.dataExtractor = new DataByTimesExtractor<double[]>(
                 new GenericListContainer<double[]>(allData), totalTime, 0);
@@ -46,11 +51,14 @@ public class GaussianBasedAligner
             System.err.println("processing " + speech.getStartTime() + " " + speech.getTime());
             ArrayList<AudioLabel> partial =
                     alignSpeech(speech, words, soFar, text.getEstimatedTimePerCharacter());
-            ret.addAll(partial);
+            String sentences = "";
+            for (AudioLabel label : partial)
+                sentences += label.getLabel() + " ";
+            ret.add(new AudioLabel(sentences, speech.getStartTime(), speech.getEndTime()));
             soFar += partial.size();
-            if (count-- == 0) break;
+//            if (count-- == 0) break;
+//            break;
         }
-        
         return ret;
     }
 
@@ -58,11 +66,37 @@ public class GaussianBasedAligner
             Speech speech, String[] words, int start, double timePerChar) throws ImplementationError
     {
         int estimatedNumOfWords = estimateNumOfWords(words, start, timePerChar, speech.getTime());
-        int neigh = estimatedNumOfWords;//Math.max(1, (int)Math.ceil(Math.sqrt(estimatedNumOfWords)));
-        System.err.println("estimated number of words: " + estimatedNumOfWords);
+        int neigh = Math.max(1, (int)Math.ceil(Math.sqrt(estimatedNumOfWords)));
         
         ArrayList<double[]> speechData =
                 this.dataExtractor.extract(speech.getStartTime(), speech.getEndTime());
+//        
+//        double time = speech.getEndTime() - speech.getStartTime();
+//        double frameTime = time / speechData.size();
+//        int it = 0;
+//        for (double[] frame : speechData) {
+//            double bestScore = Double.NEGATIVE_INFINITY;
+//            int bestIndex = 0;
+//            for (int i = 0; i < this.scorers.length; ++i) {
+//                double score = this.scorers[i].score(frame);
+//                if ((this.scorers[i].getPhoneme().equals("s"))
+//                    || (this.scorers[i].getPhoneme().equals("t")) 
+//                    || (this.scorers[i].getPhoneme().equals("e")) 
+//                    || (this.scorers[i].getPhoneme().equals("sil")))
+//                {
+//                    if (score > bestScore) {
+//                        bestScore = score;
+//                        bestIndex = i;
+//                    }
+//                }
+//            }
+//            System.err.println((it++ * frameTime + speech.getStartTime()) + " " + this.scorers[bestIndex].getPhoneme());
+//        }
+//        
+//        ArrayList<AudioLabel> ret = new ArrayList<AudioLabel>();
+////        ret.add(this.searcher.search(words[0], speech.getStartTime(), speech.getEndTime()));
+////        ret.add(this.searcher.search(words[1], speech.getStartTime(), speech.getEndTime()));
+//        return ret;
         
         Alignment bestAlignment = new Alignment(new ArrayList<AudioLabel>(), Double.NEGATIVE_INFINITY);
         for (int i = Math.max(1, estimatedNumOfWords - neigh);
@@ -71,7 +105,6 @@ public class GaussianBasedAligner
             String[] phonemes = convertToPhonemes(words, start, start + i);
             Alignment alignment =
                     this.aligner.align(phonemes, speechData, speech.getStartTime(), speech.getEndTime());
-            System.err.println(i + " score: " + alignment.getScore() + " " + alignment.getLabels().size());
             if (alignment.getScore() > bestAlignment.getScore())
                 bestAlignment = alignment;
         }
@@ -82,7 +115,6 @@ public class GaussianBasedAligner
     {
         ArrayList<AudioLabel> ret = new ArrayList<AudioLabel>();
         phonemes = filterAllSils(phonemes);
-        System.err.println("phonemes labels " + phonemes.size());
         for (int i = start; i < words.length; ++i) {
             if (phonemes.isEmpty()) break;
             ArrayList<AudioLabel> wordLabels = getWordPhonemesOnly(words[i], phonemes);
@@ -93,7 +125,6 @@ public class GaussianBasedAligner
                     ));
             phonemes = new ArrayList<AudioLabel>(phonemes.subList(wordLabels.size(), phonemes.size()));
         }
-        System.err.println("word labels " + ret.size());
         return ret;
     }
 
@@ -129,11 +160,12 @@ public class GaussianBasedAligner
         ArrayList<String> ret = new ArrayList<String>();
         for (int i = start; i < end; ++i) {
             String word = words[i].replaceAll("'", "");
-            String[] phonemes = ("sil " + this.converter.convert(word).get(0) + " sil").split(" ");
+            String[] phonemes = ("sil " + this.converter.convert(word).get(0)).split(" ");
             for (String phoneme : phonemes)
                 ret.add(phoneme);
         }
-        return ret.toArray(new String[0]);
+        ret.add("sil");
+        return ret.subList(1, ret.size()).toArray(new String[0]);
     }
 
     private int estimateNumOfWords(String[] words, int start, double timePerChar, double time)

@@ -30,7 +30,7 @@ public class MultivariateNormalDistribution
             this.inversedCovariancesMatrix = null;
             System.err.println("singular matrix");
         }
-        this.constant_element = Math.log(Math.pow(Math.PI, mean.length) * covariancesMatrixDeterminant);
+        this.constant_element = Math.log(Math.pow(2 * Math.PI, mean.length)) + Math.log(covariancesMatrixDeterminant);
     }
     
     public double[] getMean() { return mean; }
@@ -43,10 +43,12 @@ public class MultivariateNormalDistribution
         RealMatrix mean = new Array2DRowRealMatrix(new double[][]{this.mean});
         RealMatrix x_minus_mean = x.subtract(mean);
         
-        RealMatrix matrixPart = x_minus_mean.multiply(inversedCovariancesMatrix.multiply(x_minus_mean.transpose()));
+        RealMatrix matrixPart = x_minus_mean.multiply(inversedCovariancesMatrix).multiply(x_minus_mean.transpose());
         if ((matrixPart.getColumnDimension() != 1) || (matrixPart.getRowDimension() != 1))
             throw new ImplementationError("result is not a single value");
         
+        if (matrixPart.getEntry(0, 0) < 0)
+            System.err.println("ERROR: " + matrixPart);
         double ret = this.constant_element + matrixPart.getEntry(0, 0);
         return -ret / 2.0;
     }

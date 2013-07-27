@@ -11,6 +11,7 @@ import common.exceptions.DeserializationException;
 import common.exceptions.ImplementationError;
 
 import dataExporters.AudacityLabelsExporter;
+import dataProducers.AudioDataExtractor;
 import dataProducers.PowerExtractor;
 import dataProducers.TextImporter;
 import dataProducers.WaveImporter;
@@ -40,15 +41,16 @@ public class MainTextToSpeechByGaussianMatcher
             System.err.println("searching for speech parts");
             speeches = speechRecognizer.findSpeechParts();
         }
-        PowerExtractor powerExtractor = new PowerExtractor();
+        PowerExtractor extractor = new PowerExtractor();
         {
             System.err.println("importing audio features data");
-            WaveImporter waveImporterForOfflineSpeechRecognition =
-                    new WaveImporter(waveFile, "../textAligners/config_nospeech_nomel_17_2.xml");
             WaveImporter waveImporterForAudioFeatures =
                     new WaveImporter(waveFile, "../textAligners/config_all_frontend.xml");
-            waveImporterForAudioFeatures.registerObserver(powerExtractor.getAudioFeaturesObserver());
-            waveImporterForOfflineSpeechRecognition.registerObserver(powerExtractor.getPowerObserver());
+            WaveImporter waveImporterForOfflineSpeechRecognition =
+                    new WaveImporter(waveFile, "../textAligners/config_nospeech_nomel_17_2.xml");
+            
+            waveImporterForAudioFeatures.registerObserver(extractor.getAudioFeaturesObserver());
+            waveImporterForOfflineSpeechRecognition.registerObserver(extractor.getPowerObserver());
         
             waveImporterForAudioFeatures.process();
             waveImporterForOfflineSpeechRecognition.process();
@@ -63,8 +65,8 @@ public class MainTextToSpeechByGaussianMatcher
         GaussianBasedAligner aligner = new GaussianBasedAligner(
                 scorers,
                 new GraphemesToPolishPhonemesConverter(),
-                powerExtractor.getPowerData(),
-                powerExtractor.getTotalTime());
+                extractor.getPowerData(),
+                extractor.getTotalTime());
         new AudacityLabelsExporter(labelsOutputPath).export(aligner.align(text, speeches));
         System.err.println("END");
     }

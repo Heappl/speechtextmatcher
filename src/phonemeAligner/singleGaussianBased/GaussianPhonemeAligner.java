@@ -55,7 +55,7 @@ public class GaussianPhonemeAligner
         
         return new Alignment(
                 scorers[scorers.length - 1].getBestAlignment(endTime),
-                scorers[scorers.length - 1].getScore() - phonemes.length * 100);
+                scorers[scorers.length - 1].getScore() - phonemes.length * 80);
     }
     
     private class PhonemeSequenceScorer

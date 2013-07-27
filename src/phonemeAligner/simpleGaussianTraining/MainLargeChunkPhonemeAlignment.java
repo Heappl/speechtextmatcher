@@ -11,12 +11,14 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 
 import phonemeScorers.io.PhonemeScorerExporter;
 import phonemeScorers.trainers.IterativePhonemeScorerTraining;
+import speechDetection.OnlineSpeechesExtractor;
 
 import common.AudioLabel;
 import common.exceptions.ImplementationError;
 
 import dataExporters.AudacityLabelsExporter;
 import dataProducers.AudacityLabelImporter;
+import dataProducers.AudioDataExtractor;
 import dataProducers.PowerExtractor;
 import dataProducers.TextImporter;
 import dataProducers.WaveImporter;
@@ -28,35 +30,34 @@ public class MainLargeChunkPhonemeAlignment
         String waveFile = args[0];
         String labelsFile = args[1];
         String outputFile = args[2];
-        
-        AudioInputStream stream = AudioSystem.getAudioInputStream(new File(waveFile));
-        double totalTime = (double)stream.getFrameLength() / (double)stream.getFormat().getFrameRate();
-        System.err.println("total time: " + totalTime);
+        String outputPhonemeLabelsFile = args[3];
         
         AudioLabel[] prepared = new AudacityLabelImporter(new TextImporter(labelsFile)).getLabels();
-        WaveImporter waveImporterForPowers = new WaveImporter(
-                waveFile, "../phonemeAligner/config_nospeech_nomel.xml");
         WaveImporter waveImporterForAudioData = new WaveImporter(
                 waveFile, "../phonemeAligner/phonemeAlignmentConfig.xml");
-        PowerExtractor powerExtractor = new PowerExtractor();
+        WaveImporter waveImporterForPowerData = new WaveImporter(
+                waveFile, "../phonemeAligner/config_nospeech_nomel.xml");
+        PowerExtractor dataExtractor = new PowerExtractor();
         
-        waveImporterForPowers.registerObserver(powerExtractor.getPowerObserver());
-        waveImporterForAudioData.registerObserver(powerExtractor.getAudioFeaturesObserver());
+        waveImporterForAudioData.registerObserver(dataExtractor.getAudioFeaturesObserver());
+        waveImporterForPowerData.registerObserver(dataExtractor.getPowerObserver());
         
-        waveImporterForPowers.process();
         waveImporterForAudioData.process();
+        waveImporterForPowerData.process();
+        waveImporterForPowerData.done();
         waveImporterForAudioData.done();
-        waveImporterForPowers.done();
 
         IterativePhonemeScorerTraining aligner =
             new IterativePhonemeScorerTraining(
-                Double.POSITIVE_INFINITY,
+                //Double.POSITIVE_INFINITY,
+                3,
                 prepared,
-                powerExtractor.getPowerData(),
+                dataExtractor.getPowerData(),
                 new GraphemesToPolishPhonemesConverter(),
-                totalTime);
+                dataExtractor.getTotalTime());
 
-        new PhonemeScorerExporter(outputFile).export(aligner.train(20));
+        new PhonemeScorerExporter(outputFile).export(aligner.train(15));
+        new AudacityLabelsExporter(outputPhonemeLabelsFile).export(aligner.getLastResults());
         System.err.println("END");
     }
 }
