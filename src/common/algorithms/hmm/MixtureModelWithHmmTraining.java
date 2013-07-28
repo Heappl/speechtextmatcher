@@ -5,20 +5,20 @@ import common.statistics.OnlineMultivariateDataStatistics;
 
 public class MixtureModelWithHmmTraining
 {
-    HiddenMarkovModel trainModels(
+    public HiddenMarkovModel trainModel(
         double[][][] setOfDataSequences,
-        HMMGraph[] setOfStateGraphs)
+        HMMPathGraph[] setOfPathGraphs)
     {
-        HMMWithLogLikelihood hmm = createInitialHMM(setOfDataSequences, setOfStateGraphs);
+        HMMWithLogLikelihood hmm = createInitialHMM(setOfDataSequences, setOfPathGraphs);
         
         double previousLogLikelihood = hmm.logLikelihood;
         while (true) {
-            hmm = trainNextHMM(setOfDataSequences, setOfStateGraphs, hmm.model);
+            hmm = trainNextHMM(setOfDataSequences, setOfPathGraphs, hmm.model);
             if (Math.abs(hmm.logLikelihood - previousLogLikelihood) < 0.001) break;
         }
         return hmm.model;
     }
-    
+
     private class HMMWithLogLikelihood
     {
         double logLikelihood;
@@ -33,34 +33,51 @@ public class MixtureModelWithHmmTraining
     
     HMMWithLogLikelihood trainNextHMM(
         double[][][] setOfDataSequences,
-        HMMGraph[] setOfStateGraphs,
+        HMMPathGraph[] setOfPathGraphs,
         HiddenMarkovModel previousModel)
     {
         
-        int states = 0; //TODO
+        int states = previousModel.getNumOfNodes();
+        int maxNumOfExitArcs = previousModel.getMaxNumOfExitArcs();
         OnlineMultivariateDataStatistics[] statistics =
                 new OnlineMultivariateDataStatistics[states];
+        double[][] transitionLikelihoods = new double[states][maxNumOfExitArcs];
+        double[] statesLikelihoods = new double[states];
         
-        for (double[][] sequence : setOfDataSequences) {
-            double[][] statesProbs =
-                    previousModel.calculateStatesProbabilitesGivenSequenceOfObservations(sequence);
-            for (int i = 0; i < sequence.length; ++i) {
-                for (int j = 0; j < statistics.length; ++j) {
-                    statistics[j].addPoint(sequence[i], statesProbs[i][j]);
+        for (int i = 0; i < setOfDataSequences.length; ++i) {
+            HMMNodesProbabilities[] nodesProbs =
+                previousModel.calculateStatesProbabilites(setOfDataSequences[i], setOfPathGraphs[i]);
+            for (int it = 0; it < nodesProbs.length; ++it) {
+                HMMNodesProbabilities probs = nodesProbs[it];
+                for (int j = 0; j < states; ++j) {
+                    double stateProb = probs.getStateProbability(j);
+                    for (int k = 0; k < maxNumOfExitArcs; ++k) {
+                        transitionLikelihoods[j][k] =
+                            logAdd(transitionLikelihoods[j][k], probs.getArcProbability(j, k));
+                    }
+                    statesLikelihoods[j] = logAdd(statesLikelihoods[j], stateProb);
+                    statistics[j].addPoint(setOfDataSequences[i][it], stateProb);
                 }
             }
         }
         
         MultivariateNormalDistribution[] stateDistributions = new MultivariateNormalDistribution[states];
-        for (int i = 0; i < states; ++i)
+        for (int i = 0; i < states; ++i) {
             stateDistributions[i] = statistics[i].getDistribution();
-        double[][] transitionProbabilities = null; //TODO
-        
-        return createNextHMM(setOfStateGraphs, stateDistributions, transitionProbabilities);
+            for (int j = 0; j < maxNumOfExitArcs; ++j)
+                transitionLikelihoods[i][j] -= statesLikelihoods[i];
+        }
+        return createNextHMM(setOfPathGraphs, stateDistributions, transitionLikelihoods);
+    }
+
+    private double logAdd(double d, double arcProbability)
+    {
+        // TODO Auto-generated method stub
+        return 0;
     }
 
     private HMMWithLogLikelihood createNextHMM(
-        HMMGraph[] setOfStateGraphs,
+        HMMPathGraph[] setOfStateGraphs,
         MultivariateNormalDistribution[] stateDistributions,
         double[][] transitionProbabilities)
     {
@@ -68,9 +85,16 @@ public class MixtureModelWithHmmTraining
         return null;
     }
 
-    private HMMWithLogLikelihood createInitialHMM(double[][][] setOfSequences, HMMGraph[] setOfStateGraphs)
+    private HMMWithLogLikelihood createInitialHMM(double[][][] setOfSequences, HMMPathGraph[] setOfPathGraphs)
+    {
+        HMMNode[] nodes = createInitialNodes(setOfPathGraphs);
+        // TODO Auto-generated method stub
+        return new HMMWithLogLikelihood(null, 0);
+    }
+    
+    private HMMNode[] createInitialNodes(HMMPathGraph[] setOfPathGraphs)
     {
         // TODO Auto-generated method stub
-        return null;
+        return new HMMNode[0];
     }
 }

@@ -12,8 +12,8 @@ import common.AudioLabel;
 import common.GenericListContainer;
 import common.algorithms.DataByTimesExtractor;
 import common.algorithms.gaussian.MultivariateNormalDistribution;
-import common.algorithms.gaussian.SingleGaussianTrainer;
 import common.exceptions.ImplementationError;
+import common.statistics.MultivariateDataStatistics;
 
 public class PhonemeSingleGaussianTrainer
 {
@@ -45,7 +45,8 @@ public class PhonemeSingleGaussianTrainer
         double[][] phonemePoints = new double[phonemeData.size()][];
         for (int i = 0; i < phonemeData.size(); ++i)
             phonemePoints[i] = phonemeData.get(i);
-        MultivariateNormalDistribution model = new SingleGaussianTrainer().train(phonemePoints);
+        MultivariateNormalDistribution model =
+                new MultivariateDataStatistics(phonemePoints).getDistribution();
         return new SingleGaussianPhonemeScorer(model, phoneme);
     }
 

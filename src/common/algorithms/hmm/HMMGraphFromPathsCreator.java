@@ -1,6 +1,6 @@
 package common.algorithms.hmm;
 
-public class HMMStateTransitions
+public class HMMGraphFromPathsCreator
 {
     
 }
