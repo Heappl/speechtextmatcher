@@ -3,40 +3,34 @@ package phonemeAligner.hmmBased;
 import java.util.ArrayList;
 
 import common.AudioLabel;
-import common.algorithms.hmm.HMMPathGraph;
-import common.algorithms.hmm.HMMResultSequence;
-import common.algorithms.hmm.HMMState;
-import common.algorithms.hmm.HiddenMarkovModel;
 
 public class PhonemeHMMBasedAligner
 {
-    private HiddenMarkovModel model;
-    private HMMGraphFromPhonemeSequenceCreator hmmGraphCreator = new HMMGraphFromPhonemeSequenceCreator();
+    private PhonemeHMM model;
     
-    public PhonemeHMMBasedAligner(HiddenMarkovModel model)
+    public PhonemeHMMBasedAligner(PhonemeHMM model)
     {
         this.model = model;
     }
     
-    public ArrayList<AudioLabel> align(String[][] phonemeSequence, double[][] audioData, double totalTime)
+    public ArrayList<AudioLabel> align(String text, double[][] audioData, double totalTime)
     {
-        HMMPathGraph sequenceGraph = this.hmmGraphCreator.create(phonemeSequence);
-        HMMResultSequence result = this.model.calculateMostProbableSequence(audioData, sequenceGraph);
+        String[] result = this.model.calculateMostProbableSequence(audioData, text);
         
         double stepTime = (double)audioData.length / totalTime;
         
         ArrayList<AudioLabel> ret = new ArrayList<AudioLabel>();
         int start = 0;
         int count = 0;
-        HMMState prev = null;
-        for (HMMState state : result) {
-            if (prev != state) {
+        String prev = null;
+        for (String phoneme : result) {
+            if (prev != phoneme) {
                 if (prev != null) {
                     double startTime = start * stepTime;
                     double endTime = count * stepTime;
-                    ret.add(new AudioLabel(prev.getName(), startTime, endTime));
+                    ret.add(new AudioLabel(prev, startTime, endTime));
                 }
-                prev = state;
+                prev = phoneme;
                 start = count;
             }
             ++count;

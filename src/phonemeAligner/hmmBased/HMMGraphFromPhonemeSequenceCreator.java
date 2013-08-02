@@ -1,39 +1,33 @@
 package phonemeAligner.hmmBased;
 
-import common.algorithms.hmm.HMMPathGraph;
-import common.algorithms.hmm.HMMPathNode;
-import common.algorithms.hmm.HmmPathArc;
+import java.util.ArrayList;
+
+import graphemesToPhonemesConverters.TextToPhonemeSequenceConverter;
+import common.algorithms.hmm2.Node;
 
 public class HMMGraphFromPhonemeSequenceCreator
 {
-    public HMMPathGraph create(String[][] phonemeSequences)
+    private final MapOfPhonemeStates phonemeStates = new MapOfPhonemeStates();
+    private final TextToPhonemeSequenceConverter converter;
+    
+    public HMMGraphFromPhonemeSequenceCreator(TextToPhonemeSequenceConverter converter)
     {
-        HMMPathNode initial = new HMMPathNode("sil");
-        initial.add(new HmmPathArc(initial, 0));
-        HMMPathNode last = initial;
-        for (String[] wordSeq : phonemeSequences) {
-            if (wordSeq.length == 0) continue;
-            {
-                HMMPathNode firstFromWord = new HMMPathNode(wordSeq[0]);
-                last.add(new HmmPathArc(firstFromWord, 1));
-                firstFromWord.add(new HmmPathArc(firstFromWord, 0));
-                last = firstFromWord;
-            }
-            for (int i = 1; i < wordSeq.length; ++i) {
-                HMMPathNode next = new HMMPathNode(wordSeq[i]);
-                HMMPathNode inWordSil = new HMMPathNode("_sil_");
-                last.add(new HmmPathArc(last, 0));
-                last.add(new HmmPathArc(inWordSil, 1));
-                last.add(new HmmPathArc(next, 2));
-                inWordSil.add(new HmmPathArc(inWordSil, 0));
-                inWordSil.add(new HmmPathArc(next, 1));
-                
-                last = next;
-            }
-            last.add(new HmmPathArc(new HMMPathNode("sil"), 1));
-            last.add(new HmmPathArc(last, 0));
+        this.converter = converter;
+    }
+    
+    public Node create(String text)
+    {
+        String[][] phonemeSequence = this.converter.convert(text);
+        
+        ArrayList<String> phonemes = new ArrayList<String>();
+        for (String[] word : phonemeSequence)
+            for (String phoneme : word)
+                phonemes.add(phoneme);
+        
+        Node next = null;
+        for (int i = phonemes.size() - 1; i >= 0; --i) {
+            next = this.phonemeStates.createNode(next, phonemes.get(i));
         }
-        last.add(new HmmPathArc(null, 1));
-        return new HMMPathGraph(initial);
+        return next;
     }
 }

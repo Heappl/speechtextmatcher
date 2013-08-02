@@ -8,16 +8,15 @@ import java.util.ArrayList;
 import common.AudioLabel;
 import common.GenericListContainer;
 import common.algorithms.DataByTimesExtractor;
-import common.algorithms.hmm.HMMPathGraph;
-import common.algorithms.hmm.HiddenMarkovModel;
-import common.algorithms.hmm.MixtureModelWithHmmTraining;
+import common.algorithms.hmm2.Node;
+import common.algorithms.hmm2.Trainer;
 
 public class PhonemeSequencesHMMTrainer
 {
     private DataByTimesExtractor<double[]> extractor;
-    private HMMGraphFromPhonemeSequenceCreator hmmGraphCreator = new HMMGraphFromPhonemeSequenceCreator();
-    private TextToPhonemeSequenceConverter phonemeSeqCreator =
-            new TextToPhonemeSequenceConverter(new GraphemesToPolishPhonemesConverter());
+    private HMMGraphFromPhonemeSequenceCreator hmmGraphCreator
+        = new HMMGraphFromPhonemeSequenceCreator(
+                new TextToPhonemeSequenceConverter(new GraphemesToPolishPhonemesConverter()));
     
     public PhonemeSequencesHMMTrainer(ArrayList<double[]> audioData, double totalTime)
     {
@@ -25,20 +24,19 @@ public class PhonemeSequencesHMMTrainer
                 new GenericListContainer<double[]>(audioData), totalTime, 0);
     }
     
-    HiddenMarkovModel trainModel(ArrayList<AudioLabel> chunks)
+    PhonemeHMM trainModel(ArrayList<AudioLabel> chunks)
     {
         double[][][] trainingData = new double[chunks.size()][][];
-        HMMPathGraph[] chunkGraphs = new HMMPathGraph[chunks.size()];
+        Node[] chunkGraphs = new Node[chunks.size()];
         
         int count = 0;
         for (AudioLabel chunk : chunks) {
             ArrayList<double[]> extracted = this.extractor.extract(chunk.getStart(), chunk.getEnd());
             trainingData[count] = extracted.toArray(new double[0][0]);
-            chunkGraphs[count] = this.hmmGraphCreator.create(this.phonemeSeqCreator.convert(chunk.getLabel()));
+            chunkGraphs[count] = this.hmmGraphCreator.create(chunk.getLabel());
             ++count;
         }
-        
-        MixtureModelWithHmmTraining hmmTrainer = new MixtureModelWithHmmTraining();
-        return hmmTrainer.trainModel(trainingData, chunkGraphs);
+        new Trainer().trainModel(trainingData, chunkGraphs);
+        return new PhonemeHMM(this.hmmGraphCreator);
     }
 }
