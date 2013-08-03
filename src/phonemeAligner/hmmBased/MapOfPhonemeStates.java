@@ -30,8 +30,8 @@ public class MapOfPhonemeStates
     {
         StateElements phonemeStateElements = getOrCreate(phoneme);
         Node ret = new Node(phoneme, phonemeStateElements.state);
-        ret.addArc(new Arc(phonemeStateElements.loopExit, ret));
-        ret.addArc(new Arc(phonemeStateElements.nextExit, next));
+        ret.addArc(new Arc(phonemeStateElements.loopExit, ret, ret));
+        ret.addArc(new Arc(phonemeStateElements.nextExit, next, ret));
         return ret;
     }
 

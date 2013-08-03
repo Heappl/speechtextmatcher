@@ -63,7 +63,7 @@ public class GaussianMixtureExpectedMaximalization
         }
         for (int i = 0; i < data.length; ++i) {
             for (int j = 0; j < models.length; ++j)
-                probs[i][j] /= sums[j];
+                probs[i][j] /= sums[j]; //?
         }
         return probs;
     }

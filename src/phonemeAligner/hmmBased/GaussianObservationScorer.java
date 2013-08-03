@@ -9,7 +9,10 @@ public class GaussianObservationScorer
 {
     
     private boolean startedTraining = false;
+    private boolean startedSecondPhase = false;
     private double[] mean;
+    private double totalProbability = 0;
+    private float totalLogLikelihood = 0;
     private double[][] covariances;
     private MultivariateNormalDistribution distribution = null;
     
@@ -20,12 +23,14 @@ public class GaussianObservationScorer
         double probability = LogMath.logToLinear(normalizedLogLikelihood);
         for (int i = 0; i < mean.length; ++i)
             this.mean[i] = observation[i] * probability;
+        this.totalProbability += probability;
     }
 
     @Override
     public void addObservationAgain(double[] observation, float normalizedLogLikelihood)
     {
-        double probability = LogMath.logToLinear(normalizedLogLikelihood);
+        if (!startedSecondPhase) initiateSecondPhase();
+        double probability = LogMath.logToLinear(normalizedLogLikelihood - this.totalLogLikelihood);
         for (int i = 0; i < this.mean.length; ++i) {
             for (int j = 0; j < this.mean.length; ++j) {
                 this.covariances[i][j] +=
@@ -34,11 +39,20 @@ public class GaussianObservationScorer
         }
     }
 
+    private void initiateSecondPhase()
+    {
+        for (int i = 0; i < this.mean.length; ++i)
+            this.mean[i] /= this.totalProbability;
+        this.totalLogLikelihood = LogMath.linearToLog(this.totalProbability);
+        this.startedSecondPhase = true;
+    }
+
     @Override
     public void finishTraining()
     {
         this.distribution = new MultivariateNormalDistribution(this.mean, this.covariances);
         this.startedTraining = false;
+        this.startedSecondPhase = false;
         this.mean = null;
         this.covariances = null;
     }
@@ -48,6 +62,7 @@ public class GaussianObservationScorer
         this.mean = new double[numOfDimensions];
         this.covariances = new double[numOfDimensions][numOfDimensions];
         this.startedTraining = true;
+        this.totalProbability = 0;
     }
 
     @Override

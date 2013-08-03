@@ -24,6 +24,14 @@ public class NodeLogLikelihoods implements Iterable<ArcLogLikelihood>
         this.observation = observation;
     }
     
+    public NodeLogLikelihoods(NodeLogLikelihoods nodeLikelihoods, float updatedLikelihood)
+    {
+        this.node = nodeLikelihoods.node;
+        this.logLikelihood = updatedLikelihood;
+        this.arcLikelihoods = nodeLikelihoods.arcLikelihoods;
+        this.observation = nodeLikelihoods.observation;
+    }
+
     public Node getNode()
     {
         return this.node;
