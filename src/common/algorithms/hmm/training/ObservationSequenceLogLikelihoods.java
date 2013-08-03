@@ -1,7 +1,8 @@
-package common.algorithms.hmm;
+package common.algorithms.hmm.training;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+
 
 public class ObservationSequenceLogLikelihoods implements Iterable<NodeLogLikelihoods>
 {

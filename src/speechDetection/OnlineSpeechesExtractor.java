@@ -1,6 +1,4 @@
 package speechDetection;
-import java.util.ArrayList;
-
 import common.Data;
 import common.DataSequence;
 import common.Speech;

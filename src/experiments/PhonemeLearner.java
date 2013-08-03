@@ -1,6 +1,5 @@
 package experiments;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 
 import common.AudioLabel;

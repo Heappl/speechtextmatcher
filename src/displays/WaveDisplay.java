@@ -4,8 +4,6 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
-import java.awt.image.ImageObserver;
-
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -13,9 +11,11 @@ import javax.swing.border.BevelBorder;
 
 import dataProducers.IWaveObserver;
 
-class WaveFormPanel extends JPanel {
-	
-	int width;
+class WaveFormPanel extends JPanel
+{
+    private static final long serialVersionUID = 917868852262856884L;
+    
+    int width;
 	int height;
 	double barScale = Double.MAX_VALUE;
 	Image image = null;
@@ -63,8 +63,11 @@ class WaveFormPanel extends JPanel {
 	}
 }
 
-public class WaveDisplay extends JFrame implements IWaveObserver {
-	int width = 1600;
+public class WaveDisplay extends JFrame implements IWaveObserver
+{
+    private static final long serialVersionUID = 1677937904401158074L;
+    
+    int width = 1600;
 	int height = 600;
 	WaveFormPanel wavePanel;
 	long[] currData = null;

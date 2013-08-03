@@ -1,31 +1,19 @@
 package audioModelSupportedAlignment;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-
-import javax.sound.sampled.AudioInputStream;
-
-
 import phonemeAligner.audioBased.HMMPhonemeSearch;
-import phonemeAligner.audioBased.PhonemeSearch;
-
 import common.AudioLabel;
-import common.DataSequence;
 import common.GenericListContainer;
 import common.algorithms.DataByTimesExtractor;
 import common.exceptions.ImplementationError;
 import common.statistics.OneDimensionalDataStatistics;
-import edu.cmu.sphinx.frontend.Data;
-import edu.cmu.sphinx.frontend.DoubleData;
-import edu.cmu.sphinx.frontend.FloatData;
 import edu.cmu.sphinx.frontend.FrontEnd;
 import edu.cmu.sphinx.frontend.util.AudioFileDataSource;
 import edu.cmu.sphinx.linguist.acoustic.AcousticModel;
 import edu.cmu.sphinx.linguist.acoustic.UnitManager;
 import edu.cmu.sphinx.util.props.ConfigurationManager;
-import edu.cmu.sphinx.util.props.ConfigurationManagerUtils;
 import edu.cmu.sphinx.util.props.PropertyException;
 import graphemesToPhonemesConverters.IWordToPhonemesConverter;
 

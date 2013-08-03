@@ -1,9 +1,6 @@
 package textAligners;
 
 import java.util.ArrayList;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
 import common.AudioLabel;
 import common.Speech;
 import common.Speeches;

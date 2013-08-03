@@ -4,8 +4,6 @@ import common.algorithms.gaussian.MixtureGaussianModel;
 import common.exceptions.DeserializationException;
 import common.exceptions.ImplementationError;
 
-import edu.cmu.sphinx.frontend.FloatData;
-
 public class GaussianMixturePhonemeScorer implements IPhonemeScorer
 {
     private MixtureGaussianModel gaussianMixtureModel = null;

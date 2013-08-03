@@ -4,28 +4,17 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Comparator;
-import java.util.TreeSet;
-
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
-
-
-import graphemesToPhonemesConverters.GraphemesToPolishPhonemesConverter;
 import graphemesToPhonemesConverters.GraphemesToRussianPhonemesConverter;
-
-import speechDetection.OnlineSpeechesExtractor;
-
 import common.AudioLabel;
 import common.exceptions.ImplementationError;
-
 import dataExporters.AudacityLabelsExporter;
 import dataProducers.AudacityLabelImporter;
 import dataProducers.PowerExtractor;
 import dataProducers.TextImporter;
 import dataProducers.WaveImporter;
-import diffCalculators.SpectrumDiffCalculator;
 import edu.cmu.sphinx.util.props.PropertyException;
 
 

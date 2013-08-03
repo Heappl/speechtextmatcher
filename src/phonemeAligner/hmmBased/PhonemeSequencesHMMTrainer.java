@@ -9,7 +9,7 @@ import common.AudioLabel;
 import common.GenericListContainer;
 import common.algorithms.DataByTimesExtractor;
 import common.algorithms.hmm.Node;
-import common.algorithms.hmm.Trainer;
+import common.algorithms.hmm.training.Trainer;
 
 public class PhonemeSequencesHMMTrainer
 {

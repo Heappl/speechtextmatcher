@@ -3,18 +3,10 @@ import java.util.Comparator;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import speechDetection.OfflineSpeechRecognizer;
-import speechDetection.OnlineSpeechesExtractor;
-
 import common.AudioLabel;
-import common.DataSequence;
-import common.Speech;
-import common.Speeches;
-import common.Text;
 import dataExporters.AudacityLabelsExporter;
 import dataProducers.AudacityLabelImporter;
 import dataProducers.TextImporter;
-import dataProducers.WaveImporter;
 
 public class Main {
 	
@@ -64,7 +56,7 @@ public class Main {
 //    	}
 //    	AudioLabel[] labels = aux.toArray(new AudioLabel[0]);
 //    	
-    	AudioLabel[] words = new AudacityLabelImporter(new TextImporter(args[2])).getLabels();
+//    	AudioLabel[] words = new AudacityLabelImporter(new TextImporter(args[2])).getLabels();
     	AudioLabel[] phonemes = new AudacityLabelImporter(new TextImporter(args[3])).getLabels();
     	
     	SortedSet<AudioLabel> sorted = new TreeSet<AudioLabel>(new Comparator<AudioLabel>() {

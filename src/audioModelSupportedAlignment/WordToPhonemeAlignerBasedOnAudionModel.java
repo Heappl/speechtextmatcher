@@ -1,15 +1,10 @@
 package audioModelSupportedAlignment;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
-
 import javax.sound.sampled.AudioInputStream;
-
-
 import sphinx.GrammarAligner;
-
 import common.AudioLabel;
 import common.Text;
 import common.algorithms.AudioChunkExtractor;
@@ -181,13 +176,6 @@ public class WordToPhonemeAlignerBasedOnAudionModel
 		Result result = aligner.align(stream, textToAlign.substring(1));
 		if ((result == null) || (calculateScore(result) == 0)) return new ArrayList<WordResult>();
 		return result.getWords();
-	}
-
-	private String join(String[] strings, String delimiter)
-	{
-		String ret = "";
-		for (String str : strings) ret += delimiter + str;
-		return ret.substring(delimiter.length());
 	}
 
 	private double calculateScore(Result result)

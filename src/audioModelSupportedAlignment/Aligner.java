@@ -1,11 +1,7 @@
 package audioModelSupportedAlignment;
-import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
-
-import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
 
 import common.AudioLabel;
 import common.algorithms.AudioChunkExtractor;
@@ -48,7 +44,6 @@ public class Aligner {
        
         text = text.toLowerCase();
         double chunkStart = 0;
-        int count = 0;
         double prevChunkStart = -1;
         while (!text.isEmpty()) {
         	double endTime = Math.min(chunkStart + chunkTime, totalTime + 5.0);
@@ -104,7 +99,6 @@ public class Aligner {
         	}
         	prevChunkStart = chunkStart;
         	chunkStart += chunkMove;
-        	++count;
         	if (prevChunkStart == chunkStart) break;
         }
         return results;

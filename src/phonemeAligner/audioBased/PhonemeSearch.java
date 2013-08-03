@@ -2,7 +2,6 @@ package phonemeAligner.audioBased;
 import java.util.ArrayList;
 
 import common.AudioLabel;
-import common.Data;
 import common.exceptions.ImplementationError;
 
 import edu.cmu.sphinx.frontend.FloatData;
@@ -10,7 +9,6 @@ import edu.cmu.sphinx.linguist.acoustic.AcousticModel;
 import edu.cmu.sphinx.linguist.acoustic.Context;
 import edu.cmu.sphinx.linguist.acoustic.HMM;
 import edu.cmu.sphinx.linguist.acoustic.HMMPosition;
-import edu.cmu.sphinx.linguist.acoustic.HMMState;
 import edu.cmu.sphinx.linguist.acoustic.LeftRightContext;
 import edu.cmu.sphinx.linguist.acoustic.Unit;
 import edu.cmu.sphinx.linguist.acoustic.UnitManager;

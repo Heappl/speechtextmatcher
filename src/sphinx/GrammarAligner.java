@@ -13,16 +13,11 @@ package sphinx;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-
 import javax.sound.sampled.AudioInputStream;
-
-import edu.cmu.sphinx.decoder.search.Token;
 import edu.cmu.sphinx.frontend.util.AudioFileDataSource;
 import edu.cmu.sphinx.linguist.language.grammar.AlignerGrammar;
 import edu.cmu.sphinx.recognizer.Recognizer;
 import edu.cmu.sphinx.result.Result;
-import edu.cmu.sphinx.result.WordResult;
 import edu.cmu.sphinx.util.props.ConfigurationManager;
 import edu.cmu.sphinx.util.props.ConfigurationManagerUtils;
 import edu.cmu.sphinx.util.props.PropertyException;
@@ -47,17 +42,8 @@ public class GrammarAligner implements IAligner {
 		recognizer.allocate();
 	}
 	
-	private void log(String text) {
-		if (text.length() <= 40)
-			System.err.println("aligning " + text);
-		else
-			System.err.println("aligning " + text.substring(0, 20) +
-							   " [...] " + text.substring(text.length() - 20));
-	}
-
 	@Override
 	public Result align(AudioInputStream stream, String text) {
-//		log(text);
 		dataSource.setInputStream(stream, "input");
 		grammar.setText(text);
 		Result result =  recognizer.recognize();

@@ -2,18 +2,12 @@ package phonemeScorers.trainers;
 
 import graphemesToPhonemesConverters.IWordToPhonemesConverter;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
-
 import phonemeAligner.singleGaussianBased.GaussianAligner;
 import phonemeScorers.IPhonemeScorer;
-
 import common.AudioLabel;
-import common.GenericListContainer;
-import common.algorithms.DataByTimesExtractor;
 import common.exceptions.ImplementationError;
 
 public class IterativePhonemeScorerTraining

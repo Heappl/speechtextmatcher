@@ -77,13 +77,9 @@ public class SimpleAudioSynthesizer
 	};
 	private class AudioCandidate
 	{
-		int index1;
-		int index2;
 		byte[] bytes;
 		
 		public AudioCandidate(AudioInputStream streamCopy, AudioElement element) throws IOException {
-			this.index1 = element.index1;
-			this.index2 = element.index2;
 			this.bytes = new byte[(int)(streamCopy.getFrameLength() * audioFormat.getFrameSize())];
 			streamCopy.read(bytes, 0, bytes.length);
 		}

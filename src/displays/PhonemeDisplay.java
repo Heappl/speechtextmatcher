@@ -3,24 +3,15 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.awt.image.ImageObserver;
-import java.util.ArrayList;
-
-import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.border.BevelBorder;
-
 import common.DataSequence;
-
 import dataTransforms.DataScaler;
 
 class NextNotifier  implements ActionListener
@@ -40,7 +31,9 @@ class NextNotifier  implements ActionListener
 }
 
 public class PhonemeDisplay extends JFrame {
-	int width = 600;
+    private static final long serialVersionUID = -3617138699151138007L;
+    
+    int width = 600;
 	int height = 300;
 	JLabel imageLabelUp = null;
 	JLabel imageLabelDown = null;

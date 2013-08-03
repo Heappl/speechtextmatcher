@@ -1,4 +1,6 @@
-package common.algorithms.hmm;
+package common.algorithms.hmm.training;
+
+import common.algorithms.hmm.State;
 
 public class SingleStateTrainer
 {
@@ -7,7 +9,6 @@ public class SingleStateTrainer
     public SingleStateTrainer(State state)
     {
         this.state = state;
-        this.state.getTrainableScorer().startTraining();
     }
 
     public State getState()
@@ -20,8 +21,13 @@ public class SingleStateTrainer
         this.state.getTrainableScorer().finishTraining();
     }
 
-    public void addObservation(double[] observation, double logLikelihood)
+    public void addObservation(double[] observation, float logLikelihood)
     {
         this.state.getTrainableScorer().addObservation(observation, logLikelihood);
+    }
+
+    public void addObservationAgain(double[] observation, float logLikelihood)
+    {
+        this.state.getTrainableScorer().addObservationAgain(observation, logLikelihood);
     }
 }

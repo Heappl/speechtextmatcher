@@ -1,15 +1,11 @@
 package experiments;
 import java.util.ArrayList;
 
-
 import common.AudioLabel;
 import common.Data;
 import common.Speeches;
 import common.Text;
 import common.algorithms.KMeans;
-import common.algorithms.gaussian.GaussianMixtureExpectedMaximalization;
-
-
 
 public class PhonemeDestructurer {
 	

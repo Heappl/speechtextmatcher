@@ -4,15 +4,12 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.image.PixelGrabber;
 
-import common.Complex;
-
 import dataTransforms.DataScaler;
 
 import edu.cmu.sphinx.frontend.BaseDataProcessor;
 import edu.cmu.sphinx.frontend.Data;
 import edu.cmu.sphinx.frontend.DataProcessingException;
 import edu.cmu.sphinx.frontend.DoubleData;
-import edu.cmu.sphinx.frontend.databranch.DataBufferProcessor;
 import edu.cmu.sphinx.frontend.transform.DiscreteFourierTransform;
 
 
@@ -85,28 +82,28 @@ public class ImageDFT
 		return ret;
 	}
 
-	private double calculatePoint(int k, int l)
-	{
-		Complex ret = new Complex(0, 0);
-		for (int i = 0; i < N; ++i) {
-			for (int j = 0; j < N; ++j) {
-				ret = ret.add(getPower(k, l, i, j, N).exp().multiply(data[i * N + j]));
-			}
-		}
-		return ret.magnitude();
-	}
+//	private double calculatePoint(int k, int l)
+//	{
+//		Complex ret = new Complex(0, 0);
+//		for (int i = 0; i < N; ++i) {
+//			for (int j = 0; j < N; ++j) {
+//				ret = ret.add(getPower(k, l, i, j, N).exp().multiply(data[i * N + j]));
+//			}
+//		}
+//		return ret.magnitude();
+//	}
 	
-	private Complex getPower(int k, int l, int i, int j, int N)
-	{
-		Complex ck = new Complex(k);
-		Complex cl = new Complex(l);
-		Complex ci = new Complex(i);
-		Complex cj = new Complex(j);
-		Complex ii = new Complex(0, -1);
-		Complex ckci = ck.multiply(ci);
-		Complex clcj = cl.multiply(cj);
-		Complex ckci_plus_clcj_divided_by_N = ckci.add(clcj).divide(N);
-		Complex minus_i2pi = ii.multiply(2 * Math.PI);
-		return ckci_plus_clcj_divided_by_N.multiply(minus_i2pi);
-	}
+//	private Complex getPower(int k, int l, int i, int j, int N)
+//	{
+//		Complex ck = new Complex(k);
+//		Complex cl = new Complex(l);
+//		Complex ci = new Complex(i);
+//		Complex cj = new Complex(j);
+//		Complex ii = new Complex(0, -1);
+//		Complex ckci = ck.multiply(ci);
+//		Complex clcj = cl.multiply(cj);
+//		Complex ckci_plus_clcj_divided_by_N = ckci.add(clcj).divide(N);
+//		Complex minus_i2pi = ii.multiply(2 * Math.PI);
+//		return ckci_plus_clcj_divided_by_N.multiply(minus_i2pi);
+//	}
 }

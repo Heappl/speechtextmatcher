@@ -1,10 +1,13 @@
-package common.algorithms.hmm;
+package common.algorithms.hmm.training;
+
+import common.algorithms.hmm.LogMath;
+import common.algorithms.hmm.StateExit;
 
 public class TransitionTrainer
 {
     private StateExit exit;
-    private double totalExitLikelihood = 0;
-    private double totalStateLikelihood = 0;
+    private float totalExitLikelihood = 0;
+    private float totalStateLikelihood = 0;
 
     public TransitionTrainer(StateExit exit)
     {
@@ -14,11 +17,11 @@ public class TransitionTrainer
     {
         return this.exit;
     }
-    public void addObservation(double[] observation, double likelihood)
+    public void addObservation(double[] observation, float likelihood)
     {
         this.totalExitLikelihood = LogMath.logAdd(this.totalExitLikelihood, likelihood);
     }
-    public void addStateObservation(double[] observation, double likelihood)
+    public void addStateObservation(double[] observation, float likelihood)
     {
         this.totalStateLikelihood = LogMath.logAdd(this.totalStateLikelihood, likelihood);
     }

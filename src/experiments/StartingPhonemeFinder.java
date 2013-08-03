@@ -1,10 +1,5 @@
 package experiments;
 import java.util.ArrayList;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
 import common.AudioLabel;
 import common.Data;
 import common.DataSequence;
@@ -13,13 +8,7 @@ import common.Speech;
 import common.Text;
 import diffCalculators.HungarianMatchDiffCalculator;
 import diffCalculators.ISequenceDiffCalculator;
-import diffCalculators.SpectrumDiffCalculator;
 import diffCalculators.SpectrumMahalanobisDiffCalculator;
-import diffCalculators.SpectrumWeights;
-
-
-import edu.cmu.sphinx.tools.audio.AudioData;
-
 
 public class StartingPhonemeFinder {
 	DataSequence allData;

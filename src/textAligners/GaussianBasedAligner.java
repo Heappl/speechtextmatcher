@@ -3,8 +3,6 @@ package textAligners;
 import graphemesToPhonemesConverters.IWordToPhonemesConverter;
 
 import java.util.ArrayList;
-import java.util.Collection;
-
 import common.Alignment;
 import common.AudioLabel;
 import common.GenericListContainer;
@@ -22,7 +20,6 @@ public class GaussianBasedAligner
     private GaussianPhonemeAligner aligner;
     private DataByTimesExtractor<double[]> dataExtractor;
     private IWordToPhonemesConverter converter;
-    private GuassianSearch searcher;
 
     IPhonemeScorer[] scorers;
     
@@ -34,7 +31,6 @@ public class GaussianBasedAligner
     {
         this.scorers = scorers;
         this.aligner = new GaussianPhonemeAligner(scorers);
-        this.searcher = new GuassianSearch(scorers, converter, allData, totalTime);
         this.converter = converter;
         this.dataExtractor = new DataByTimesExtractor<double[]>(
                 new GenericListContainer<double[]>(allData), totalTime, 0);
@@ -46,7 +42,6 @@ public class GaussianBasedAligner
         
         ArrayList<AudioLabel> ret = new ArrayList<AudioLabel>();
         int soFar = 0;
-        int count = 3;
         for (Speech speech : speeches) {
             System.err.println("processing " + speech.getStartTime() + " " + speech.getTime());
             ArrayList<AudioLabel> partial =
@@ -56,8 +51,6 @@ public class GaussianBasedAligner
                 sentences += label.getLabel() + " ";
             ret.add(new AudioLabel(sentences, speech.getStartTime(), speech.getEndTime()));
             soFar += partial.size();
-//            if (count-- == 0) break;
-//            break;
         }
         return ret;
     }

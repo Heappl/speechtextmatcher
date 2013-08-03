@@ -3,8 +3,6 @@ package phonemeScorers.io;
 import java.util.ArrayList;
 
 import phonemeScorers.IPhonemeScorer;
-
-import common.AudioLabel;
 import common.ITextProducer;
 import common.exceptions.DeserializationException;
 
@@ -25,7 +23,7 @@ public class PhonemeScorerImporter
     private IPhonemeScorer createScorer(String line) throws ClassNotFoundException, InstantiationException, IllegalAccessException, DeserializationException
     {
         String className = line.split("\\{")[0];
-        Class scorerClass = Class.forName(className);
+        Class<?> scorerClass = Class.forName(className);
         return ((IPhonemeScorer)scorerClass.newInstance()).deserialize(line);
     }
 

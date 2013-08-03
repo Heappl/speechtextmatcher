@@ -1,33 +1,20 @@
 package audioModelSupportedAlignment;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
-
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
-
-
 import common.AudioLabel;
 import common.Speeches;
 import common.Text;
 import dataExporters.AudacityLabelsExporter;
 import dataProducers.TextImporter;
 import dataProducers.WaveImporter;
-
-
-import edu.cmu.sphinx.result.WordResult;
 import graphemesToPhonemesConverters.DictionaryGenerator;
 import graphemesToPhonemesConverters.GraphemesToRussianPhonemesConverter;
 import speechDetection.OfflineSpeechRecognizer;
-import speechDetection.OnlineSpeechesExtractor;
-import sphinx.GrammarAligner;
-
-
 
 public class UsingEnglishAudioModelMain
 {

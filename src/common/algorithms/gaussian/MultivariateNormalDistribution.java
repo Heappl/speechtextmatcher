@@ -3,9 +3,7 @@ package common.algorithms.gaussian;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.LUDecomposition;
 import org.apache.commons.math3.linear.RealMatrix;
-
 import common.exceptions.DeserializationException;
-import common.exceptions.ImplementationError;
 
 public class MultivariateNormalDistribution
 {
@@ -36,7 +34,7 @@ public class MultivariateNormalDistribution
     public double[] getMean() { return mean; }
     public boolean isOk() { return (this.inversedCovariancesMatrix != null); }
 
-    public double logLikelihood(double[] point) throws ImplementationError
+    public double logLikelihood(double[] point)
     {
         if (this.inversedCovariancesMatrix == null) return Double.NEGATIVE_INFINITY;
         RealMatrix x = new Array2DRowRealMatrix(new double[][]{point});
@@ -44,8 +42,7 @@ public class MultivariateNormalDistribution
         RealMatrix x_minus_mean = x.subtract(mean);
         
         RealMatrix matrixPart = x_minus_mean.multiply(inversedCovariancesMatrix).multiply(x_minus_mean.transpose());
-        if ((matrixPart.getColumnDimension() != 1) || (matrixPart.getRowDimension() != 1))
-            throw new ImplementationError("result is not a single value");
+        assert((matrixPart.getColumnDimension() != 1) || (matrixPart.getRowDimension() != 1));
         
         if (matrixPart.getEntry(0, 0) < 0)
             System.err.println("ERROR: " + matrixPart);

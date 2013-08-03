@@ -2,10 +2,15 @@ package common.algorithms.hmm;
 
 public class StateExit
 {
-    private double logLikelihood;
+    private float logLikelihood;
 
-    public void updateLikelihood(double newLogLikelihood)
+    public void updateLikelihood(float newLogLikelihood)
     {
         this.logLikelihood = newLogLikelihood;
+    }
+
+    public float getLogLikelihood()
+    {
+        return this.logLikelihood;
     }
 }

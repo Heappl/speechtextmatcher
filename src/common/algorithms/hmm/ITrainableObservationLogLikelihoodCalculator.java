@@ -2,7 +2,8 @@ package common.algorithms.hmm;
 
 public interface ITrainableObservationLogLikelihoodCalculator
 {
-    public void addObservation(double[] observation, double logLikelihood);
+    public void addObservation(double[] observation, float normalizedLogLikelihood);
     public void finishTraining();
-    public void startTraining();
+    public void addObservationAgain(double[] observation, float normalizedLogLikelihood);
+    public float observationLogLikelihood(double[] observation);
 }

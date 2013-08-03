@@ -1,8 +1,5 @@
 package diffCalculators;
 
-import java.util.ArrayList;
-
-
 import common.DataSequence;
 import common.statistics.Histogram;
 

@@ -9,8 +9,6 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
-import phonemeAligner.simpleGaussianTraining.IterativeTrainingPhonemeAligner;
-
 import common.AudioLabel;
 import common.exceptions.ImplementationError;
 

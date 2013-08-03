@@ -37,13 +37,10 @@ public class HMMPhonemeSearch
     {
         HMMState scorer;
         String phoneme;
-        double exitProb;
-        
         public State(String phoneme, HMMState scorer, double exitProb)
         {
             this.phoneme = phoneme;
             this.scorer = scorer;
-            this.exitProb = exitProb;
         }
         
         public double score(double[] data)

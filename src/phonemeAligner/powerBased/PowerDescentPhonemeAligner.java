@@ -3,7 +3,6 @@ package phonemeAligner.powerBased;
 import graphemesToPhonemesConverters.IWordToPhonemesConverter;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 
@@ -11,7 +10,6 @@ import common.AudioLabel;
 
 public class PowerDescentPhonemeAligner
 {
-    private AudioLabel[] words;
     private ArrayList<TimedData> allData = new ArrayList<TimedData>();
     private IWordToPhonemesConverter converter;
     private String[] usedPhonemes;
@@ -22,7 +20,6 @@ public class PowerDescentPhonemeAligner
         IWordToPhonemesConverter converter,
         double totalTime)
     {
-        this.words = words;
         this.converter = converter;
         double frameTime = totalTime / allData.size();
         

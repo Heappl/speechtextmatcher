@@ -4,14 +4,11 @@ import graphemesToPhonemesConverters.GraphemesToPolishPhonemesConverter;
 import phonemeScorers.IPhonemeScorer;
 import phonemeScorers.io.PhonemeScorerImporter;
 import speechDetection.OfflineSpeechRecognizer;
-
 import common.Speeches;
 import common.Text;
 import common.exceptions.DeserializationException;
 import common.exceptions.ImplementationError;
-
 import dataExporters.AudacityLabelsExporter;
-import dataProducers.AudioDataExtractor;
 import dataProducers.PowerExtractor;
 import dataProducers.TextImporter;
 import dataProducers.WaveImporter;

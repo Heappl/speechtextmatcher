@@ -1,8 +1,12 @@
-package common.algorithms.hmm;
+package common.algorithms.hmm.training;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
+import common.algorithms.hmm.Node;
+import common.algorithms.hmm.State;
+import common.algorithms.hmm.StateExit;
 
 public class StatesTrainer
 {
@@ -53,5 +57,18 @@ public class StatesTrainer
         for (SingleStateTrainer trainer : this.stateTrainers.values())
             trainer.finish();
         return this.totalLikelihood;
+    }
+
+    public void retrainStateTrainersSecondPhase(double[][] observationSequence, Node possibleModel)
+    {
+        NodeLogLikelihoodsCalculator likelihoodsCalculator = new NodeLogLikelihoodsCalculator();
+        ObservationSequenceLogLikelihoods sequenceLikelihoods =
+            likelihoodsCalculator.calculate(observationSequence, possibleModel);
+        
+        for (NodeLogLikelihoods likelihood : sequenceLikelihoods) {
+            State nodeState = likelihood.getNode().getState();
+            double[] observation = likelihood.getObservation();
+            this.stateTrainers.get(nodeState).addObservationAgain(observation, likelihood.getLogLikelihood());
+        }
     }
 }

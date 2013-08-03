@@ -2,23 +2,17 @@ package phonemeAligner.simpleGaussianTraining;
 
 import graphemesToPhonemesConverters.GraphemesToPolishPhonemesConverter;
 
-import java.io.File;
 import java.io.IOException;
-
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
 import phonemeScorers.io.PhonemeScorerExporter;
 import phonemeScorers.trainers.IterativePhonemeScorerTraining;
-import speechDetection.OnlineSpeechesExtractor;
 
 import common.AudioLabel;
 import common.exceptions.ImplementationError;
 
 import dataExporters.AudacityLabelsExporter;
 import dataProducers.AudacityLabelImporter;
-import dataProducers.AudioDataExtractor;
 import dataProducers.PowerExtractor;
 import dataProducers.TextImporter;
 import dataProducers.WaveImporter;

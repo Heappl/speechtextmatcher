@@ -2,20 +2,13 @@ package dataProducers;
 
 import java.io.File;
 import java.util.ArrayList;
-
-
 import edu.cmu.sphinx.frontend.Data;
-import edu.cmu.sphinx.frontend.DataBlocker;
-import edu.cmu.sphinx.frontend.DataProcessor;
 import edu.cmu.sphinx.frontend.DoubleData;
 import edu.cmu.sphinx.frontend.FloatData;
 import edu.cmu.sphinx.frontend.FrontEnd;
 import edu.cmu.sphinx.frontend.endpoint.SpeechEndSignal;
 import edu.cmu.sphinx.frontend.endpoint.SpeechStartSignal;
-import edu.cmu.sphinx.frontend.filter.Preemphasizer;
-import edu.cmu.sphinx.frontend.transform.DiscreteFourierTransform;
 import edu.cmu.sphinx.frontend.util.AudioFileDataSource;
-import edu.cmu.sphinx.frontend.window.RaisedCosineWindower;
 import edu.cmu.sphinx.util.props.ConfigurationManager;
 
 

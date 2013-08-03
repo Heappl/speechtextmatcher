@@ -10,7 +10,6 @@ import java.util.HashMap;
 import common.AudioLabel;
 import common.GenericListContainer;
 import common.algorithms.DataByTimesExtractor;
-import common.algorithms.ThresholdDataFilter;
 import common.algorithms.gaussian.GaussianMixtureExpectedMaximalization;
 import common.algorithms.gaussian.MultivariateNormalDistribution;
 import common.exceptions.ImplementationError;
@@ -19,16 +18,13 @@ import common.statistics.OneDimensionalDataStatistics;
 public class PerWordPhonemeDestructurer
 {
     private HashMap<String, ArrayList<AudioLabel>> wordLabels = new HashMap<String, ArrayList<AudioLabel>>();
-    private final double frameTime;
     private DataByTimesExtractor<double[]> extractor;
-    private ThresholdDataFilter filter;
     
     public PerWordPhonemeDestructurer(
         AudioLabel[] words,
         ArrayList<double[]> allData,
         double totalTime)
     {
-        this.frameTime = totalTime / allData.size();
         for (AudioLabel word : words) {
             String key = word.getLabel();
             ArrayList<AudioLabel> labelList =
@@ -47,7 +43,6 @@ public class PerWordPhonemeDestructurer
         double[] threshold = new double[dimension];
         threshold[0] = powerStats.getBackgroundMean();
         for (int i = 1; i < threshold.length; ++i) threshold[i] = Double.NEGATIVE_INFINITY;
-        this.filter = new ThresholdDataFilter(threshold, 100.0);
     }
     
     public void process() throws ImplementationError

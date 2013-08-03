@@ -4,18 +4,12 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
-
-
 import common.AudioLabel;
 import common.exceptions.ImplementationError;
-
-import dataExporters.AudacityLabelsExporter;
 import dataProducers.AudacityLabelImporter;
 import dataProducers.TextImporter;
 

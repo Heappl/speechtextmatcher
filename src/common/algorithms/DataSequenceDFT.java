@@ -1,8 +1,6 @@
 package common.algorithms;
 import java.awt.Color;
-import java.awt.Image;
 import java.awt.image.BufferedImage;
-import java.awt.image.PixelGrabber;
 import java.util.ArrayList;
 
 import common.DataSequence;
@@ -13,7 +11,6 @@ import edu.cmu.sphinx.frontend.BaseDataProcessor;
 import edu.cmu.sphinx.frontend.Data;
 import edu.cmu.sphinx.frontend.DataProcessingException;
 import edu.cmu.sphinx.frontend.DoubleData;
-import edu.cmu.sphinx.frontend.databranch.DataBufferProcessor;
 import edu.cmu.sphinx.frontend.transform.DiscreteFourierTransform;
 
 

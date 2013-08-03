@@ -13,7 +13,6 @@ import common.Text;
 import diffCalculators.HungarianMatchDiffCalculator;
 import diffCalculators.ISequenceDiffCalculator;
 import diffCalculators.SpectrumDiffCalculator;
-import diffCalculators.SpectrumWeights;
 
 
 public class CommonWordPhonemesFinder {

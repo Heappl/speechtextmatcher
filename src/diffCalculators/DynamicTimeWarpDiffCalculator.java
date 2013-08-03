@@ -1,6 +1,4 @@
 package diffCalculators;
-import java.util.ArrayList;
-import java.util.List;
 
 import common.Data;
 import common.DataSequence;
@@ -24,20 +22,15 @@ public class DynamicTimeWarpDiffCalculator implements ISequenceDiffCalculator
 		if ((first.length == 0) || (second.length == 0)) return Double.MAX_VALUE;
 		if (first.length < second.length) return diff(second, first);
 		
-		double[] zero = new double[first[0].getSpectrum().length];
 		double[] partial = new double[first.length];
 		for (int i = 0; i < first.length; ++i)
 			partial[i] = ((i > 0) ? partial[i - 1] : 0) + calculateDiff(first[i], second[0]);
 		
 		double ret = Double.MAX_VALUE;
-		int bestIndex = 0;
-		boolean up = false;
 		for (int i = 0; i < second.length; ++i)
 		{
 			if (partial[partial.length - 1] < ret) {
 				ret = partial[partial.length - 1];
-				bestIndex = i;
-				up = true;
 			}
 			double[] next = new double[partial.length];
 			for (int j = 0; j < first.length; ++j) {
@@ -49,15 +42,11 @@ public class DynamicTimeWarpDiffCalculator implements ISequenceDiffCalculator
 			partial = next;
 		}
 
-//		ret = Double.MAX_VALUE;
 		for (int  i = 0; i < partial.length; ++i) {
 			if (partial[i] < ret) {
 				ret = partial[i];
-				bestIndex = i;
-				up = false;
 			}
 		}
-//		System.err.println(bestIndex + " " + ret + " " + up);
 		return ret;
 	}
 	

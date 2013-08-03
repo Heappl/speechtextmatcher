@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import common.algorithms.gaussian.MixtureGaussianModel;
 import common.algorithms.hmm.Arc;
-import common.algorithms.hmm.ITrainableObservationLogLikelihoodCalculator;
 import common.algorithms.hmm.Node;
 import common.algorithms.hmm.State;
 import common.algorithms.hmm.StateExit;
@@ -31,7 +29,7 @@ public class MapOfPhonemeStates
     public Node createNode(Node next, String phoneme)
     {
         StateElements phonemeStateElements = getOrCreate(phoneme);
-        Node ret = new Node(phonemeStateElements.state);
+        Node ret = new Node(phoneme, phonemeStateElements.state);
         ret.addArc(new Arc(phonemeStateElements.loopExit, ret));
         ret.addArc(new Arc(phonemeStateElements.nextExit, next));
         return ret;

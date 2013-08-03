@@ -1,11 +1,13 @@
-package common.algorithms.hmm;
+package common.algorithms.hmm.training;
+
+import common.algorithms.hmm.Arc;
 
 public class ArcLogLikelihood
 {
     private final Arc arc;
-    private final double logLikelihood;
+    private final float logLikelihood;
     
-    public ArcLogLikelihood(Arc arc, double logLikelihood)
+    public ArcLogLikelihood(Arc arc, float logLikelihood)
     {
         this.arc = arc;
         this.logLikelihood = logLikelihood;
@@ -16,7 +18,7 @@ public class ArcLogLikelihood
         return this.arc;
     }
 
-    public double getLogLikelihood()
+    public float getLogLikelihood()
     {
         return this.logLikelihood;
     }

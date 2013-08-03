@@ -6,7 +6,6 @@ import common.exceptions.ImplementationError;
 public class MixtureGaussianModel
 {
     private MultivariateNormalDistribution[] mixtures;
-    private final static double maxLog = Math.log(Double.MAX_VALUE);
     
     public MixtureGaussianModel(MultivariateNormalDistribution[] mixtures)
     {

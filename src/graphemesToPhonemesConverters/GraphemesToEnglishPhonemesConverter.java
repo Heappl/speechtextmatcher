@@ -1,7 +1,5 @@
 package graphemesToPhonemesConverters;
 
-import java.util.ArrayList;
-
 public class GraphemesToEnglishPhonemesConverter extends NaiveGraphemesToPhonemesConverter
 {
 	private final static String[][][] englishGraphemes = new String[][][]{

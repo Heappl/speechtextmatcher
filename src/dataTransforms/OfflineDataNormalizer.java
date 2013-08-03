@@ -1,6 +1,4 @@
 package dataTransforms;
-import java.util.ArrayList;
-
 import common.Data;
 import common.DataSequence;
 

@@ -1,19 +1,21 @@
-package common.algorithms.hmm;
+package common.algorithms.hmm.training;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import common.algorithms.hmm.Node;
+
 public class NodeLogLikelihoods implements Iterable<ArcLogLikelihood>
 {
     private final Node node;
-    private final double logLikelihood;
+    private final float logLikelihood;
     private final double[] observation;
     private final ArrayList<ArcLogLikelihood> arcLikelihoods;
     
     public NodeLogLikelihoods(
         Node node,
         double[] observation,
-        double logLikelihood,
+        float logLikelihood,
         ArrayList<ArcLogLikelihood> arcLikelihoods)
     {
         this.node = node;
@@ -38,7 +40,7 @@ public class NodeLogLikelihoods implements Iterable<ArcLogLikelihood>
         return this.observation;
     }
 
-    public double getLogLikelihood()
+    public float getLogLikelihood()
     {
         return this.logLikelihood;
     }

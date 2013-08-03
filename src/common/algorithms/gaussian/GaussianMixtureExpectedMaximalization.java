@@ -31,10 +31,7 @@ public class GaussianMixtureExpectedMaximalization
             prevMeans = initialMeans;
         }
         
-        int count = 1;
         while (true) {
-//            System.err.println("EM iteration " + count++);
-            
             double[][] probs = calculateProbabilities(data, models);
             
             double[][] newMeans = calculateMeans(data, models, probs);

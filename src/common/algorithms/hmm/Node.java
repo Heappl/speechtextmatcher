@@ -7,16 +7,19 @@ public class Node implements Iterable<Arc>
 {
     private final State state;
     private final ArrayList<Arc> arcs;
+    private final String name;
 
-    public Node(State state)
+    public Node(String name, State state)
     {
         this.state = state;
         this.arcs = new ArrayList<Arc>();
+        this.name = name;
     }
-    public Node(State state, ArrayList<Arc> arcs)
+    public Node(String name, State state, ArrayList<Arc> arcs)
     {
         this.state = state;
         this.arcs = arcs;
+        this.name = name;
     }
     public void addArc(Arc arc)
     {
@@ -32,5 +35,9 @@ public class Node implements Iterable<Arc>
     public State getState()
     {
         return this.state;
+    }
+    public String getName()
+    {
+        return this.name;
     }
 }

@@ -1,9 +1,14 @@
-package common.algorithms.hmm;
+package common.algorithms.hmm.training;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+
+import common.algorithms.hmm.Arc;
+import common.algorithms.hmm.Node;
+import common.algorithms.hmm.State;
+import common.algorithms.hmm.StateExit;
 
 public class Trainer
 {
@@ -91,6 +96,10 @@ public class Trainer
     {
         for (int i = 0; i < setOfDataSequences.length; ++i) {
             statesTrainer.retrainStateTrainersWithObservationSequenceForPossibleModel(
+                    setOfDataSequences[i], subgraphs[i]);
+        }
+        for (int i = 0; i < setOfDataSequences.length; ++i) {
+            statesTrainer.retrainStateTrainersSecondPhase(
                     setOfDataSequences[i], subgraphs[i]);
         }
         return statesTrainer.retrainingFinished();

@@ -33,7 +33,6 @@ public class IncrementalAligner
 	public void align()
 	{
 		calculateAverageSeq();
-		double[] diffs = new double[sequences.size()];
 		
 		while (true) {
 			

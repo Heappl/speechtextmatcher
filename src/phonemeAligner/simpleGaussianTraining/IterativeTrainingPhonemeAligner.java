@@ -1,24 +1,10 @@
 package phonemeAligner.simpleGaussianTraining;
 
 import java.util.ArrayList;
-
-import phonemeAligner.singleGaussianBased.GaussianAligner;
-import phonemeScorers.IPhonemeScorer;
 import phonemeScorers.trainers.IterativePhonemeScorerTraining;
-import phonemeScorers.trainers.PhonemeSingleGaussianTrainer;
-
-
-
 import graphemesToPhonemesConverters.IWordToPhonemesConverter;
-
 import common.AudioLabel;
-import common.DataSequence;
-import common.GenericDataContainer;
-import common.GenericListContainer;
-import common.algorithms.DataByTimesExtractor;
 import common.exceptions.ImplementationError;
-import dataProducers.AudacityLabelImporter;
-import dataProducers.TextImporter;
 
 public class IterativeTrainingPhonemeAligner
 {
