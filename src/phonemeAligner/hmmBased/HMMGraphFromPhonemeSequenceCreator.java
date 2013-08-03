@@ -3,7 +3,7 @@ package phonemeAligner.hmmBased;
 import java.util.ArrayList;
 
 import graphemesToPhonemesConverters.TextToPhonemeSequenceConverter;
-import common.algorithms.hmm2.Node;
+import common.algorithms.hmm.Node;
 
 public class HMMGraphFromPhonemeSequenceCreator
 {

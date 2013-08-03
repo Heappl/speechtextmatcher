@@ -1,6 +1,6 @@
 package phonemeAligner.hmmBased;
 
-import common.algorithms.hmm2.Node;
+import common.algorithms.hmm.Node;
 
 public class ChunkGraph
 {

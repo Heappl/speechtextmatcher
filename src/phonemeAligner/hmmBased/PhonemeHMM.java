@@ -1,6 +1,6 @@
 package phonemeAligner.hmmBased;
 
-import common.algorithms.hmm2.BestSequenceFinder;
+import common.algorithms.hmm.BestSequenceFinder;
 
 public class PhonemeHMM
 {

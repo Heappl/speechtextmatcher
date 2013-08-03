@@ -5,11 +5,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import common.algorithms.gaussian.MixtureGaussianModel;
-import common.algorithms.hmm2.Arc;
-import common.algorithms.hmm2.ITrainableObservationLogLikelihoodCalculator;
-import common.algorithms.hmm2.Node;
-import common.algorithms.hmm2.State;
-import common.algorithms.hmm2.StateExit;
+import common.algorithms.hmm.Arc;
+import common.algorithms.hmm.ITrainableObservationLogLikelihoodCalculator;
+import common.algorithms.hmm.Node;
+import common.algorithms.hmm.State;
+import common.algorithms.hmm.StateExit;
 
 public class MapOfPhonemeStates
 {

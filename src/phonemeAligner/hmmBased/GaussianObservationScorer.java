@@ -1,6 +1,6 @@
 package phonemeAligner.hmmBased;
 
-import common.algorithms.hmm2.ITrainableObservationLogLikelihoodCalculator;
+import common.algorithms.hmm.ITrainableObservationLogLikelihoodCalculator;
 
 public class GaussianObservationScorer
     implements ITrainableObservationLogLikelihoodCalculator

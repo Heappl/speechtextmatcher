@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import common.AudioLabel;
 import common.GenericListContainer;
 import common.algorithms.DataByTimesExtractor;
-import common.algorithms.hmm2.Node;
-import common.algorithms.hmm2.Trainer;
+import common.algorithms.hmm.Node;
+import common.algorithms.hmm.Trainer;
 
 public class PhonemeSequencesHMMTrainer
 {

@@ -1,4 +1,4 @@
-package common.algorithms.hmm2;
+package common.algorithms.hmm;
 
 public class StateExit
 {
