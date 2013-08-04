@@ -17,11 +17,11 @@ public class TransitionTrainer
     {
         return this.exit;
     }
-    public void addObservation(double[] observation, float likelihood)
+    public void addObservation(float likelihood)
     {
         this.totalExitLikelihood = LogMath.logAdd(this.totalExitLikelihood, likelihood);
     }
-    public void addStateObservation(double[] observation, float likelihood)
+    public void addStateObservation(float likelihood)
     {
         this.totalStateLikelihood = LogMath.logAdd(this.totalStateLikelihood, likelihood);
     }

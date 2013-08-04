@@ -40,4 +40,9 @@ public class Node implements Iterable<Arc>
     {
         return this.name;
     }
+    
+    public String toString()
+    {
+        return "node[" + getName() + "]";
+    }
 }

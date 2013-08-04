@@ -12,7 +12,7 @@
             <item>fft </item>
             <item>melFilterBank</item>
             <item>dct </item>
-            <item>liveCMN</item>
+            <item>cmn</item>
             <item>featureExtraction</item>
         </propertylist>
     </component>
@@ -28,7 +28,7 @@
     </component>
     <component name="fft" type="edu.cmu.sphinx.frontend.transform.DiscreteFourierTransform"/>
     <component name="dct" type="edu.cmu.sphinx.frontend.transform.DiscreteCosineTransform"/>
-    <component name="liveCMN" type="edu.cmu.sphinx.frontend.feature.LiveCMN">
+    <component name="cmn" type="edu.cmu.sphinx.frontend.feature.BatchCMN"/>
     	<property name="cmnWindow" value="25"/>
     	<property name="shiftWindow" value="5"/>
     </component>

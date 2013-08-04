@@ -10,7 +10,7 @@
             <item>fft </item>
             <item>melFilterBank </item>
             <item>dct </item>
-            <item>liveCMN </item>
+            <item>cmn </item>
             <item>featureExtraction</item>
         </propertylist>
     </component>
@@ -26,6 +26,6 @@
     <component name="fft" type="edu.cmu.sphinx.frontend.transform.DiscreteFourierTransform" />
     <component name="melFilterBank" type="edu.cmu.sphinx.frontend.frequencywarp.MelFrequencyFilterBank" />
     <component name="dct" type="edu.cmu.sphinx.frontend.transform.DiscreteCosineTransform"/>
-    <component name="liveCMN" type="edu.cmu.sphinx.frontend.feature.LiveCMN" />
+    <component name="cmn" type="edu.cmu.sphinx.frontend.feature.BatchCMN" />
     <component name="featureExtraction" type="edu.cmu.sphinx.frontend.feature.DeltasFeatureExtractor"/>
 </config>

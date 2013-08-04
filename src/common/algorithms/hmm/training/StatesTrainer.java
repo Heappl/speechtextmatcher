@@ -41,9 +41,9 @@ public class StatesTrainer
             for (ArcLogLikelihood arcLikelihood : likelihood) {
                 StateExit arcStateExit = arcLikelihood.getArc().getExit();
                 this.transitionTrainers.get(arcStateExit)
-                    .addObservation(observation, arcLikelihood.getLogLikelihood());
+                    .addObservation(arcLikelihood.getLogLikelihood());
                 this.transitionTrainers.get(arcStateExit)
-                    .addStateObservation(observation, likelihood.getLogLikelihood());
+                    .addStateObservation(likelihood.getLogLikelihood());
             }
         }
         this.totalLikelihood += sequenceLikelihoods.getLogLikelihood();

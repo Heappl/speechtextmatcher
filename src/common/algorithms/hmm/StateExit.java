@@ -2,7 +2,7 @@ package common.algorithms.hmm;
 
 public class StateExit
 {
-    private float logLikelihood;
+    private float logLikelihood = 0;
 
     public void updateLikelihood(float newLogLikelihood)
     {

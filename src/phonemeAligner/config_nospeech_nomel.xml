@@ -25,7 +25,7 @@
     <component name="fft" type="edu.cmu.sphinx.frontend.transform.DiscreteFourierTransform"/>
     <component name="fft2" type="edu.cmu.sphinx.frontend.transform.DiscreteFourierTransform"/>
     <component name="dct" type="edu.cmu.sphinx.frontend.transform.DiscreteCosineTransform"/>
-    <component name="liveCMN" type="edu.cmu.sphinx.frontend.feature.LiveCMN"/>
+    <component name="cmn" type="edu.cmu.sphinx.frontend.feature.BatchCMN"/>
     <component name="featureExtraction" type="edu.cmu.sphinx.frontend.feature.DeltasFeatureExtractor"/>
     <component name="speechClassifier" type="edu.cmu.sphinx.frontend.endpoint.SpeechClassifier">
         <property name="threshold" value="30"/>
