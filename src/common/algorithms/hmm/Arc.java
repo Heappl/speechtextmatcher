@@ -26,4 +26,9 @@ public class Arc
     {
         return stateExit;
     }
+    
+    public boolean isExitState()
+    {
+        return (this.toNode == null);
+    }
 }

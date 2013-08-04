@@ -81,6 +81,7 @@ public class Trainer
             Node current = next.remove(next.size() - 1);
             for (Arc arc : current) {
                 if (visited.contains(arc.getLeadingToNode())) continue;
+                if (arc.isExitState()) continue;
                 visited.add(arc.getLeadingToNode());
                 next.add(arc.getLeadingToNode());
                 ret.add(arc.getLeadingToNode().getState());

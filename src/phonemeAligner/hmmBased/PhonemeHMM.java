@@ -1,5 +1,7 @@
 package phonemeAligner.hmmBased;
 
+import java.util.ArrayList;
+
 import common.algorithms.hmm.BestSequenceFinder;
 
 public class PhonemeHMM
@@ -10,7 +12,7 @@ public class PhonemeHMM
     {
         this.hmmGraphCreator = hmmGraphCreator;
     }
-    public String[] calculateMostProbableSequence(double[][] audioData, String text)
+    public String[] calculateMostProbableSequence(ArrayList<double[]> audioData, String text)
     {
         return new BestSequenceFinder().findBestSequence(audioData, this.hmmGraphCreator.create(text));
     }

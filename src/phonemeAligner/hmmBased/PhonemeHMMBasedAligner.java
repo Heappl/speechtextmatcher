@@ -3,21 +3,38 @@ package phonemeAligner.hmmBased;
 import java.util.ArrayList;
 
 import common.AudioLabel;
+import common.GenericListContainer;
+import common.algorithms.DataByTimesExtractor;
 
 public class PhonemeHMMBasedAligner
 {
     private PhonemeHMM model;
+    private DataByTimesExtractor<double[]> dataExtractor;
     
-    public PhonemeHMMBasedAligner(PhonemeHMM model)
+    public PhonemeHMMBasedAligner(PhonemeHMM model, ArrayList<double[]> data, double totalTime)
     {
         this.model = model;
+        this.dataExtractor = new DataByTimesExtractor<double[]>(
+                new GenericListContainer<double[]>(data), totalTime, 0);
+    }
+
+    public ArrayList<AudioLabel> align(AudioLabel[] chunks)
+    {
+        System.err.println("aligning");
+        ArrayList<AudioLabel> ret = new ArrayList<AudioLabel>();
+        for (AudioLabel chunk : chunks) {
+            ret.addAll(align(chunk.getLabel(),
+                    this.dataExtractor.extract(chunk.getStart(), chunk.getEnd()),
+                    chunk.getEnd() - chunk.getStart()));
+        }
+        return ret;
     }
     
-    public ArrayList<AudioLabel> align(String text, double[][] audioData, double totalTime)
+    public ArrayList<AudioLabel> align(String text, ArrayList<double[]> audioData, double totalTime)
     {
         String[] result = this.model.calculateMostProbableSequence(audioData, text);
         
-        double stepTime = (double)audioData.length / totalTime;
+        double stepTime = (double)audioData.size() / totalTime;
         
         ArrayList<AudioLabel> ret = new ArrayList<AudioLabel>();
         int start = 0;

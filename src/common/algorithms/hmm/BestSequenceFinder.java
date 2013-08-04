@@ -43,7 +43,7 @@ public class BestSequenceFinder
         }
     }
     
-    public String[] findBestSequence(double[][] observations, Node model)
+    public String[] findBestSequence(ArrayList<double[]> observations, Node model)
     {
         Map<Node, NodeScore> bestNodeScores = new HashMap<Node, NodeScore>();
         bestNodeScores.put(model, new NodeScore(0, model, null));

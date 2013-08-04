@@ -24,10 +24,11 @@ public class PhonemeSequencesHMMTrainer
                 new GenericListContainer<double[]>(audioData), totalTime, 0);
     }
     
-    PhonemeHMM trainModel(ArrayList<AudioLabel> chunks)
+    PhonemeHMM trainModel(AudioLabel[] chunks)
     {
-        double[][][] trainingData = new double[chunks.size()][][];
-        Node[] chunkGraphs = new Node[chunks.size()];
+        System.err.println("training hmm");
+        double[][][] trainingData = new double[chunks.length][][];
+        Node[] chunkGraphs = new Node[chunks.length];
         
         int count = 0;
         for (AudioLabel chunk : chunks) {

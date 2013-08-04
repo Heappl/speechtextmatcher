@@ -85,6 +85,7 @@ public class NodeLogLikelihoodsCalculator
                     ArrayList<NodeScorerArc> arcScorers = new ArrayList<NodeScorerArc>();
                     for (Arc arc : allNodes[j]) {
                         Node exitNode = arcCreator.getExitNode(arc);
+                        if (exitNode == null) continue;
                         arcScorers.add(
                             new NodeScorerArc(previousScorers[indexes.get(exitNode)], arc));
                     }
@@ -104,6 +105,7 @@ public class NodeLogLikelihoodsCalculator
             Node current = next.remove(next.size() - 1);
             for (Arc arc : current) {
                 if (ret.contains(arc.getLeadingToNode())) continue;
+                if (arc.isExitState()) continue;
                 next.add(arc.getLeadingToNode());
                 ret.add(arc.getLeadingToNode());
             }

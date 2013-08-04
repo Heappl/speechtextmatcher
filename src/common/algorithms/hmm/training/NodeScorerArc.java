@@ -14,7 +14,8 @@ public class NodeScorerArc
     }
     public float getScore()
     {
-        return this.arc.getExit().getLogLikelihood() + this.from.getScore();
+        return this.arc.getExit().getLogLikelihood() +
+                ((this.from == null) ? 0 : this.from.getScore());
     }
     public Arc getArc()
     {
