@@ -26,4 +26,13 @@ public class ObservationSequenceLogLikelihoods implements Iterable<NodeLogLikeli
     {
         return this.logLikelihood;
     }
+    
+    public String toString()
+    {
+        String ret = this.logLikelihood + " {";
+        for (NodeLogLikelihoods nodeLL : this.nodesLogLikelihoods) {
+            ret += nodeLL + ",";
+        }
+        return ret.substring(0, ret.length() - 1) + "}";
+    }
 }

@@ -52,4 +52,9 @@ public class NodeLogLikelihoods implements Iterable<ArcLogLikelihood>
     {
         return this.logLikelihood;
     }
+    
+    public String toString()
+    {
+        return "[" + this.node.getName() + " " + this.logLikelihood + "}";
+    }
 }

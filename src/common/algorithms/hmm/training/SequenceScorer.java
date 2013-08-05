@@ -28,7 +28,6 @@ public class SequenceScorer
                             (i + 1 < sequence.size()) ? sequence.get(i + 1) : null));
             }
         }
-        System.err.println(bestScore);
         return new ObservationSequenceLogLikelihoods(bestScore, nodesLogLikelihoods);
     }
 

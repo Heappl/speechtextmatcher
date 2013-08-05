@@ -37,6 +37,7 @@ public class Trainer
             if (Math.abs(likelihoodSoFar - likelihood) <= this.endingDifference) break;
             likelihoodSoFar = likelihood;
             iteration++;
+            break;
         }
     }
     

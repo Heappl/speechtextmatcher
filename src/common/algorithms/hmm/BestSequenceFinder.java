@@ -33,13 +33,21 @@ public class BestSequenceFinder
 
         public ArrayList<NodeScore> createNext(double[] observation)
         {
+            if (this.node == endingNode) return new ArrayList<NodeScore>();
             ArrayList<NodeScore> ret = new ArrayList<NodeScore>();
             float observationScore = this.node.getState().observationLogLikelihood(observation);
             for (Arc arc : this.node) {
                 float score = this.score + observationScore + arc.getExit().getLogLikelihood();
-                ret.add(new NodeScore(score, arc.getLeadingToNode(), this));
+                Node nextNode = arc.getLeadingToNode();
+                if (nextNode == null) nextNode = endingNode;
+                ret.add(new NodeScore(score, nextNode, this));
             }
             return ret;
+        }
+        
+        public String toString()
+        {
+            return "{" + this.node.getName() + " " + this.score + "}";
         }
     }
     

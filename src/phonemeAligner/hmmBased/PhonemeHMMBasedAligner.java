@@ -22,19 +22,18 @@ public class PhonemeHMMBasedAligner
     {
         System.err.println("aligning");
         ArrayList<AudioLabel> ret = new ArrayList<AudioLabel>();
-        for (AudioLabel chunk : chunks) {
-            ret.addAll(align(chunk.getLabel(),
-                    this.dataExtractor.extract(chunk.getStart(), chunk.getEnd()),
-                    chunk.getEnd() - chunk.getStart()));
-        }
+        for (AudioLabel chunk : chunks)
+            ret.addAll(align(chunk, this.dataExtractor.extract(chunk.getStart(), chunk.getEnd())));
         return ret;
     }
     
-    public ArrayList<AudioLabel> align(String text, ArrayList<double[]> audioData, double totalTime)
+    public ArrayList<AudioLabel> align(AudioLabel chunk, ArrayList<double[]> audioData)
     {
+        String text = chunk.getLabel();
+        double totalTime = chunk.getEnd() - chunk.getStart();
         String[] result = this.model.calculateMostProbableSequence(audioData, text);
         
-        double stepTime = (double)audioData.size() / totalTime;
+        double stepTime = totalTime / (double)audioData.size();
         
         ArrayList<AudioLabel> ret = new ArrayList<AudioLabel>();
         int start = 0;
@@ -43,8 +42,8 @@ public class PhonemeHMMBasedAligner
         for (String phoneme : result) {
             if (prev != phoneme) {
                 if (prev != null) {
-                    double startTime = start * stepTime;
-                    double endTime = count * stepTime;
+                    double startTime = start * stepTime + chunk.getStart();
+                    double endTime = count * stepTime + chunk.getStart();
                     ret.add(new AudioLabel(prev, startTime, endTime));
                 }
                 prev = phoneme;

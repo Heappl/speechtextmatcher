@@ -11,13 +11,13 @@ public class LogMath
     }
     public static double logToLinear(float logValue)
     {
-        if (logValue < minLogValue) return Double.NEGATIVE_INFINITY;
-        else if (logValue > maxLogValue) return Double.POSITIVE_INFINITY;
+        if (logValue < minLogValue) return -Double.MAX_VALUE;
+        else if (logValue > maxLogValue) return Double.MAX_VALUE;
         return Math.exp(logValue);
     }
     public static float linearToLog(double value)
     {
-        if (value <= 0) return Float.NEGATIVE_INFINITY;
+        if (value <= 0) return -Float.MAX_VALUE;
         return (float)Math.min(Float.MAX_VALUE, Math.max(-Float.MAX_VALUE, Math.log(value)));
     }
 }

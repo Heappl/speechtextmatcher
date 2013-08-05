@@ -67,6 +67,7 @@ public class StatesTrainer
         
         for (NodeLogLikelihoods likelihood : sequenceLikelihoods) {
             State nodeState = likelihood.getNode().getState();
+//            System.err.println(likelihood.getNode() + " " + likelihood.getLogLikelihood());
             double[] observation = likelihood.getObservation();
             this.stateTrainers.get(nodeState).addObservationAgain(observation, likelihood.getLogLikelihood());
         }

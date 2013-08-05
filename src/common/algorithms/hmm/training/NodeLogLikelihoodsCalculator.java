@@ -64,6 +64,26 @@ public class NodeLogLikelihoodsCalculator
         ObservationSequenceLogLikelihoods forwardLikelihoods =
                 new SequenceScorer().scoreForSequence(
                         sequence, createScorers(possibleModel, sequence.size(), backwardArcCreator));
+        
+        int count = 0;
+        int totalCount = 0;
+        for (NodeLogLikelihoods nodeLogLikelihoods : backwardLikelihoods) {
+            if (Math.abs(nodeLogLikelihoods.getLogLikelihood()) != Float.MAX_VALUE) ++count;
+            else totalCount++;
+        }
+        if (totalCount > 0)
+            System.err.println("backward " + count + " " + totalCount);
+        
+        count = 0;
+        totalCount = 0;
+        for (NodeLogLikelihoods nodeLogLikelihoods : forwardLikelihoods) {
+            if (Math.abs(nodeLogLikelihoods.getLogLikelihood()) != Float.MAX_VALUE) ++count;
+            totalCount++;
+        }
+
+        if (totalCount > 0)
+            System.err.println("forward " + count + " " + totalCount);
+        
         return normalize(mergeLikelihoods(backwardLikelihoods, forwardLikelihoods));
     }
 
