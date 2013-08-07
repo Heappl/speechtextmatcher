@@ -21,6 +21,11 @@ public class State implements Iterable<StateExit>
     {
         return this.exits.iterator();
     }
+    
+    public int numOfExits()
+    {
+        return this.exits.size();
+    }
 
     public ITrainableObservationLogLikelihoodCalculator getTrainableScorer()
     {
@@ -29,7 +34,7 @@ public class State implements Iterable<StateExit>
 
     public float observationLogLikelihood(double[] observation)
     {
-        return this.trainableScorer.observationLogLikelihood(observation);
+        return Math.min(0, this.trainableScorer.observationLogLikelihood(observation));
     }
 }
 

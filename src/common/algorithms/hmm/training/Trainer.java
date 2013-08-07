@@ -10,6 +10,7 @@ import common.algorithms.hmm.LogMath;
 import common.algorithms.hmm.Node;
 import common.algorithms.hmm.State;
 import common.algorithms.hmm.StateExit;
+import common.exceptions.ImplementationError;
 
 public class Trainer
 {
@@ -23,7 +24,7 @@ public class Trainer
         this.endingDifference = trainToDifference;
     }
     
-    public void trainModel(double[][][] setOfDataSequences, Node[] subgraphs)
+    public void trainModel(double[][][] setOfDataSequences, Node[] subgraphs) throws ImplementationError
     {
         double likelihoodSoFar = Double.NEGATIVE_INFINITY;
         
@@ -37,31 +38,30 @@ public class Trainer
             if (Math.abs(likelihoodSoFar - likelihood) <= this.endingDifference) break;
             likelihoodSoFar = likelihood;
             iteration++;
-            break;
         }
     }
     
     private StatesTrainer createStatesTrainer(Node[] subgraphs, double[][][] setOfDataSequences)
     {
         Set<State> allStates = new HashSet<State>();
-        Set<StateExit> allTransitions = new HashSet<StateExit>();
         
         for (Node subgraph : subgraphs) {
             allStates.addAll(getAllStates(subgraph));
-            allTransitions.addAll(getAllTransitions(allStates));
         }
-        System.err.println("states: " + allStates.size() + " transitions: " + allTransitions.size());
         
         ArrayList<SingleStateTrainer> stateTrainers = new ArrayList<SingleStateTrainer>();
         for (State state : allStates) {
             stateTrainers.add(new SingleStateTrainer(state));
         }
         ArrayList<TransitionTrainer> transitionTrainers = new ArrayList<TransitionTrainer>();
-        for (StateExit exit : allTransitions) {
-            exit.updateLikelihood(LogMath.linearToLog((double)1 / (double)allTransitions.size()));
-            transitionTrainers.add(new TransitionTrainer(exit));
-        }
         initiateStates(subgraphs, stateTrainers, setOfDataSequences);
+        
+        for (State state : allStates) {
+            for (StateExit exit : state) {
+                exit.updateLikelihood(LogMath.linearToLog(1.0 / (double)state.numOfExits()));
+                transitionTrainers.add(new TransitionTrainer(exit));
+            }
+        }
         return new StatesTrainer(stateTrainers, transitionTrainers);
     }
     
@@ -94,14 +94,7 @@ public class Trainer
             stateTrainer.finish();
         }
     }
-    private Collection<StateExit> getAllTransitions(Set<State> allStates)
-    {
-        Collection<StateExit> ret = new HashSet<StateExit>();
-        for (State state : allStates)
-            for (StateExit exit : state)
-                ret.add(exit);
-        return ret;
-    }
+    
     private Set<State> getAllStates(Node subgraph)
     {
         ArrayList<Node> next = new ArrayList<Node>();
@@ -120,6 +113,7 @@ public class Trainer
                 next.add(arc.getLeadingToNode());
                 ret.add(arc.getLeadingToNode().getState());
             }
+            break;
         }
         return ret;
     }
@@ -127,7 +121,7 @@ public class Trainer
     private double retrainToBetterModelUsingPreviouslyTrained(
         double[][][] setOfDataSequences,
         Node[] subgraphs,
-        StatesTrainer statesTrainer)
+        StatesTrainer statesTrainer) throws ImplementationError
     {
         System.err.println("first phase");
         for (int i = 0; i < setOfDataSequences.length; ++i) {

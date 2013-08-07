@@ -1,6 +1,7 @@
 package common.algorithms.hmm.training;
 
 import common.algorithms.hmm.Arc;
+import common.exceptions.ImplementationError;
 
 public class NodeScorerArc
 {
@@ -12,10 +13,17 @@ public class NodeScorerArc
         this.from = from;
         this.arc = arc;
     }
-    public float getScore()
+    public float getScore() throws ImplementationError
     {
-        return this.arc.getExit().getLogLikelihood() +
-                ((this.from == null) ? 0 : this.from.getScore());
+        float arcScore = this.arc.getExit().getLogLikelihood();
+        if (arcScore > 0)
+            throw new ImplementationError("arc score is greater than 0: " + arcScore);
+        float fromScore = ((this.from == null) ? 0 : this.from.getScore());
+        if (fromScore > 0)
+            throw new ImplementationError("from node score is greater than 0: " + fromScore);
+        if (arcScore + fromScore > 0)
+            throw new ImplementationError("arc total score is greater than 0: " + (arcScore + fromScore));
+        return arcScore + fromScore;
     }
     public Arc getArc()
     {

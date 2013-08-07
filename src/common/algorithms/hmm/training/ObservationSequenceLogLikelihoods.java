@@ -6,10 +6,10 @@ import java.util.Iterator;
 
 public class ObservationSequenceLogLikelihoods implements Iterable<NodeLogLikelihoods>
 {
-    private final double logLikelihood;
+    private final float logLikelihood;
     private final ArrayList<NodeLogLikelihoods> nodesLogLikelihoods;
     
-    public ObservationSequenceLogLikelihoods(double logLikelihood,
+    public ObservationSequenceLogLikelihoods(float logLikelihood,
                                              ArrayList<NodeLogLikelihoods> nodesLogLikelihoods)
     {
         this.logLikelihood = logLikelihood;
@@ -22,7 +22,7 @@ public class ObservationSequenceLogLikelihoods implements Iterable<NodeLogLikeli
         return this.nodesLogLikelihoods.iterator();
     }
 
-    public double getLogLikelihood()
+    public float getLogLikelihood()
     {
         return this.logLikelihood;
     }

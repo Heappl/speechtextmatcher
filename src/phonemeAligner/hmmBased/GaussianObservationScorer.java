@@ -29,6 +29,7 @@ public class GaussianObservationScorer
     @Override
     public void addObservationAgain(double[] observation, float normalizedLogLikelihood)
     {
+        if (normalizedLogLikelihood == Float.NEGATIVE_INFINITY) return;
         if (!startedSecondPhase) initiateSecondPhase();
         double probability = LogMath.logToLinear(normalizedLogLikelihood - this.totalLogLikelihood);
         for (int i = 0; i < this.mean.length; ++i) {

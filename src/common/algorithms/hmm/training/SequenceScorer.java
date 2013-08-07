@@ -2,11 +2,14 @@ package common.algorithms.hmm.training;
 
 import java.util.ArrayList;
 
+import common.algorithms.hmm.LogMath;
+import common.exceptions.ImplementationError;
+
 public class SequenceScorer
 {
     public ObservationSequenceLogLikelihoods scoreForSequence(
         ArrayList<double[]> sequence,
-        NodeScorer[][] scorers)
+        NodeScorer[][] scorers) throws ImplementationError
     {
         for (int i = 0; i < sequence.size(); ++i)
             for (int j = 0; j < scorers[i].length; ++j)
@@ -19,7 +22,7 @@ public class SequenceScorer
         }
         
         ArrayList<NodeLogLikelihoods> nodesLogLikelihoods = new ArrayList<NodeLogLikelihoods>();
-        for (int i = sequence.size() - 1; i >= 0; --i) {
+        for (int i = 0; i < sequence.size(); ++i) {
             for (int j = 0; j < scorers[i].length; ++j) {
                 nodesLogLikelihoods.add(
                     createNodeLogLikelihoods(
@@ -32,14 +35,29 @@ public class SequenceScorer
     }
 
     private NodeLogLikelihoods createNodeLogLikelihoods(
-        NodeScorer nodeScorer, double[] observation, double[] nextObservation)
+        NodeScorer nodeScorer, double[] observation, double[] nextObservation) throws ImplementationError
     {
+        if (nodeScorer.getScore() > 0)
+            throw new ImplementationError("node likelihood is greater than 0: " + nodeScorer.getScore());
+        
         ArrayList<ArcLogLikelihood> arcLikelihoods = new ArrayList<ArcLogLikelihood>();
         
+        float aux = Float.NEGATIVE_INFINITY;
         for (NodeScorerArc arc : nodeScorer) {
             arcLikelihoods.add(new ArcLogLikelihood(arc.getArc(), arc.getScore(), nextObservation));
+            aux = LogMath.logAdd(aux, arc.getScore());
         }
+        if ((aux != Float.NEGATIVE_INFINITY) && (aux < nodeScorer.getScore()))
+            throw new ImplementationError(
+                    "sum of probabilities of incoming arcs is less" +
+                            " than probability of reaching node with observing node in it (" +
+                            aux + " < " + nodeScorer.getScore() + ")");
+        
         return new NodeLogLikelihoods(
-                nodeScorer.getNode(), observation, nodeScorer.getScore(), arcLikelihoods);
+                nodeScorer.getNode(),
+                observation,
+                nodeScorer.getScore(),
+                nodeScorer.getScoreWithoutObservation(),
+                arcLikelihoods);
     }
 }

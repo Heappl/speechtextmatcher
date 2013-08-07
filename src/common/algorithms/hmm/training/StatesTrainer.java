@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import common.algorithms.hmm.LogMath;
 import common.algorithms.hmm.Node;
 import common.algorithms.hmm.State;
 import common.algorithms.hmm.StateExit;
+import common.exceptions.ImplementationError;
 
 public class StatesTrainer
 {
@@ -28,7 +30,7 @@ public class StatesTrainer
     }
 
     public void retrainStateTrainersWithObservationSequenceForPossibleModel(
-        double[][] observationSequence, Node possibleModel)
+        double[][] observationSequence, Node possibleModel) throws ImplementationError
     {
         NodeLogLikelihoodsCalculator likelihoodsCalculator = new NodeLogLikelihoodsCalculator();
         ObservationSequenceLogLikelihoods sequenceLikelihoods =
@@ -40,6 +42,8 @@ public class StatesTrainer
             this.stateTrainers.get(nodeState).addObservation(observation, likelihood.getLogLikelihood());
             for (ArcLogLikelihood arcLikelihood : likelihood) {
                 StateExit arcStateExit = arcLikelihood.getArc().getExit();
+                if (arcStateExit == null) throw new ImplementationError("null arc state exit");
+                if (!this.transitionTrainers.containsKey(arcStateExit)) continue;
                 this.transitionTrainers.get(arcStateExit)
                     .addObservation(arcLikelihood.getLogLikelihood());
                 this.transitionTrainers.get(arcStateExit)
@@ -59,7 +63,7 @@ public class StatesTrainer
         return this.totalLikelihood;
     }
 
-    public void retrainStateTrainersSecondPhase(double[][] observationSequence, Node possibleModel)
+    public void retrainStateTrainersSecondPhase(double[][] observationSequence, Node possibleModel) throws ImplementationError
     {
         NodeLogLikelihoodsCalculator likelihoodsCalculator = new NodeLogLikelihoodsCalculator();
         ObservationSequenceLogLikelihoods sequenceLikelihoods =
@@ -67,7 +71,6 @@ public class StatesTrainer
         
         for (NodeLogLikelihoods likelihood : sequenceLikelihoods) {
             State nodeState = likelihood.getNode().getState();
-//            System.err.println(likelihood.getNode() + " " + likelihood.getLogLikelihood());
             double[] observation = likelihood.getObservation();
             this.stateTrainers.get(nodeState).addObservationAgain(observation, likelihood.getLogLikelihood());
         }

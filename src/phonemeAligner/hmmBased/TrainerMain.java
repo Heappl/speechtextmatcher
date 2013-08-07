@@ -5,6 +5,7 @@ import phonemeScorers.io.PhonemeScorerExporter;
 import phonemeScorers.trainers.IterativePhonemeScorerTraining;
 
 import common.AudioLabel;
+import common.exceptions.ImplementationError;
 
 import dataExporters.AudacityLabelsExporter;
 import dataProducers.AudacityLabelImporter;
@@ -15,7 +16,7 @@ import dataProducers.WaveImporter;
 public class TrainerMain
 {
 
-    public static void main(String[] args)
+    public static void main(String[] args) throws ImplementationError
     {
         String waveFile = args[0];
         String labelsFile = args[1];

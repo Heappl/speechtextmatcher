@@ -10,6 +10,7 @@ import common.GenericListContainer;
 import common.algorithms.DataByTimesExtractor;
 import common.algorithms.hmm.Node;
 import common.algorithms.hmm.training.Trainer;
+import common.exceptions.ImplementationError;
 
 public class PhonemeSequencesHMMTrainer
 {
@@ -24,7 +25,7 @@ public class PhonemeSequencesHMMTrainer
                 new GenericListContainer<double[]>(audioData), totalTime, 0);
     }
     
-    PhonemeHMM trainModel(AudioLabel[] chunks)
+    PhonemeHMM trainModel(AudioLabel[] chunks) throws ImplementationError
     {
         System.err.println("training hmm");
         double[][][] trainingData = new double[chunks.length][][];

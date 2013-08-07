@@ -6,8 +6,8 @@ import common.algorithms.hmm.StateExit;
 public class TransitionTrainer
 {
     private StateExit exit;
-    private float totalExitLikelihood = 0;
-    private float totalStateLikelihood = 0;
+    private float totalExitLikelihood = Float.NEGATIVE_INFINITY;
+    private float totalStateLikelihood = Float.POSITIVE_INFINITY;
 
     public TransitionTrainer(StateExit exit)
     {
@@ -19,11 +19,19 @@ public class TransitionTrainer
     }
     public void addObservation(float likelihood)
     {
-        this.totalExitLikelihood = LogMath.logAdd(this.totalExitLikelihood, likelihood);
+        if (likelihood == Float.NEGATIVE_INFINITY) return;
+        if (this.totalExitLikelihood == Float.NEGATIVE_INFINITY)
+            this.totalExitLikelihood = likelihood;
+        else
+            this.totalExitLikelihood = LogMath.logAdd(this.totalExitLikelihood, likelihood);
     }
     public void addStateObservation(float likelihood)
     {
-        this.totalStateLikelihood = LogMath.logAdd(this.totalStateLikelihood, likelihood);
+        if (likelihood == Float.NEGATIVE_INFINITY) return;
+        if (this.totalStateLikelihood == Float.POSITIVE_INFINITY)
+            this.totalStateLikelihood = likelihood;
+        else
+            this.totalStateLikelihood = LogMath.logAdd(this.totalStateLikelihood, likelihood);
     }
     public void finish()
     {

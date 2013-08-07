@@ -7,113 +7,131 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.naming.InitialContext;
+
 import common.algorithms.hmm.Arc;
 import common.algorithms.hmm.LogMath;
 import common.algorithms.hmm.Node;
+import common.algorithms.hmm.StateExit;
+import common.exceptions.ImplementationError;
 
 public class NodeLogLikelihoodsCalculator
 {
     private interface ScorerArcCreator
     {
-        void iterate(NodeScorer[][] scorers, ScorerCreator creator);
-        Node getExitNode(Arc arc);
-    }
-    private interface ScorerCreator
-    {
-        void create(NodeScorer[] current, NodeScorer[] previous);
+        Node getEntryNode(Arc arc);
     }
     private final static ScorerArcCreator forwardArcCreator = new ScorerArcCreator() {
         @Override
-        public void iterate(NodeScorer[][] scorers, ScorerCreator creator)
+        public Node getEntryNode(Arc arc)
         {
-            creator.create(scorers[0], new NodeScorer[scorers[0].length]);
-            for (int i = 1; i < scorers.length; ++i)
-                 creator.create(scorers[i], scorers[i - 1]);
-        }
-        @Override
-        public Node getExitNode(Arc arc)
-        {
-            return arc.getLeadingToNode();
+            return arc.getOutgoingFromNode();
         }
     };
     private final static ScorerArcCreator backwardArcCreator = new ScorerArcCreator() {
         @Override
-        public void iterate(NodeScorer[][] scorers, ScorerCreator creator)
+        public Node getEntryNode(Arc arc)
         {
-            creator.create(scorers[scorers.length - 1], new NodeScorer[scorers[0].length]);
-            for (int i = scorers.length - 2; i >= 0; --i)
-                 creator.create(scorers[i], scorers[i + 1]);
-        }
-        @Override
-        public Node getExitNode(Arc arc)
-        {
-            return arc.getOutgoingFromNode();
+            return arc.getLeadingToNode();
         }
     };
     
     public ObservationSequenceLogLikelihoods calculate(
         double[][] observationSequence,
-        Node possibleModel)
+        Node possibleModel) throws ImplementationError
     {
         ArrayList<double[]> sequence = new ArrayList<double[]>();
         for (double[] observation : observationSequence) sequence.add(observation);
         ObservationSequenceLogLikelihoods backwardLikelihoods =
                 new SequenceScorer().scoreForSequence(
-                        sequence, createScorers(possibleModel, sequence.size(), forwardArcCreator));
+                        sequence, createScorers(possibleModel, sequence.size(), backwardArcCreator));
         Collections.reverse(sequence);
         ObservationSequenceLogLikelihoods forwardLikelihoods =
                 new SequenceScorer().scoreForSequence(
-                        sequence, createScorers(possibleModel, sequence.size(), backwardArcCreator));
+                        sequence, createScorers(possibleModel, sequence.size(), forwardArcCreator));
         
-        int count = 0;
-        int totalCount = 0;
-        for (NodeLogLikelihoods nodeLogLikelihoods : backwardLikelihoods) {
-            if (Math.abs(nodeLogLikelihoods.getLogLikelihood()) != Float.MAX_VALUE) ++count;
-            else totalCount++;
-        }
-        if (totalCount > 0)
-            System.err.println("backward " + count + " " + totalCount);
-        
-        count = 0;
-        totalCount = 0;
-        for (NodeLogLikelihoods nodeLogLikelihoods : forwardLikelihoods) {
-            if (Math.abs(nodeLogLikelihoods.getLogLikelihood()) != Float.MAX_VALUE) ++count;
-            totalCount++;
-        }
+        ObservationSequenceLogLikelihoods merged = mergeLikelihoods(backwardLikelihoods, forwardLikelihoods);
+        checkLikelihoods(merged);
+        ObservationSequenceLogLikelihoods normalized = normalize(merged);
+        checkLikelihoods(normalized);
+        return normalized;
+    }
 
-        if (totalCount > 0)
-            System.err.println("forward " + count + " " + totalCount);
+    private void checkLikelihoods(ObservationSequenceLogLikelihoods merged) throws ImplementationError
+    {
+        if (merged.getLogLikelihood() == Float.NEGATIVE_INFINITY)
+            throw new ImplementationError("sequence likelihood is negative infinity");
+        if (merged.getLogLikelihood() > 0)
+            throw new ImplementationError("sequence likelihood is greater than 0: " + merged.getLogLikelihood());
         
-        return normalize(mergeLikelihoods(backwardLikelihoods, forwardLikelihoods));
+        for (NodeLogLikelihoods nodeLL : merged) {
+            checkNodeLikelihoods(nodeLL);
+        }
+    }
+
+    private void checkNodeLikelihoods(NodeLogLikelihoods nodeLL) throws ImplementationError
+    {
+        if (nodeLL.getLogLikelihood() > 0)
+            throw new ImplementationError("node likelihood is greater than 0: " + nodeLL.getLogLikelihood());
+        
+        float sum = Float.NEGATIVE_INFINITY;
+        for (ArcLogLikelihood arcLL : nodeLL) {
+            sum = LogMath.logAdd(sum, checkArcLikelihoods(arcLL));
+        }
+        if (sum < nodeLL.getLogLikelihood())
+            throw new ImplementationError(
+                    "sum of probabilities of incoming arcs is less" +
+                            " than probability of reaching node with observing node in it (" +
+                            sum + " < " + nodeLL.getLogLikelihood() + ")");
+    }
+
+    private float checkArcLikelihoods(ArcLogLikelihood arcLL) throws ImplementationError
+    {
+        if (arcLL.getLogLikelihood() > 0)
+            throw new ImplementationError("arc likelihood is greater than 0: " + arcLL.getLogLikelihood());
+        return arcLL.getLogLikelihood();
     }
 
     private NodeScorer[][] createScorers(
-        Node possibleModel, int length, final ScorerArcCreator arcCreator)
+        Node possibleModel, int length, final ScorerArcCreator arcCreator) throws ImplementationError
     {
         final Node[] allNodes = getAllNodes(possibleModel);
+        int startNodeIndex = findStartingNode(possibleModel, allNodes);
+        if (startNodeIndex < 0)
+            throw new ImplementationError("entry node not in all nodes list");
         final Map<Node, Integer> indexes = new HashMap<Node, Integer>();
         for (int i = 0; i < allNodes.length; ++i) indexes.put(allNodes[i], i);
         
         NodeScorer[][] scorers = new NodeScorer[length][allNodes.length];
-        
-        arcCreator.iterate(scorers, new ScorerCreator() {
-            @Override
-            public void create(NodeScorer[] currentScorers, NodeScorer[] previousScorers)
-            {
-                for (int j = 0; j < currentScorers.length; ++j) {
-                    
-                    ArrayList<NodeScorerArc> arcScorers = new ArrayList<NodeScorerArc>();
+        NodeScorer initial = new NodeScorer(new Node("", null), new ArrayList<NodeScorerArc>(), 0);
+
+        for (int i = 0; i < length; ++i) {
+            for (int j = 0; j < scorers[i].length; ++j) {
+                ArrayList<NodeScorerArc> arcScorers = new ArrayList<NodeScorerArc>();
+                if (i > 0) {
                     for (Arc arc : allNodes[j]) {
-                        Node exitNode = arcCreator.getExitNode(arc);
-                        if (exitNode == null) continue;
+                        Node entryNode = arcCreator.getEntryNode(arc);
+                        if (entryNode == null) continue;
                         arcScorers.add(
-                            new NodeScorerArc(previousScorers[indexes.get(exitNode)], arc));
+                            new NodeScorerArc(scorers[i - 1][indexes.get(entryNode)], arc));
                     }
-                    currentScorers[j] = new NodeScorer(allNodes[j], arcScorers);
+                } else if (j == startNodeIndex) {
+                    StateExit intialTransition = new StateExit();
+                    intialTransition.updateLikelihood(0);
+                    arcScorers.add(new NodeScorerArc(initial, new Arc(intialTransition, null, allNodes[0])));
                 }
+                scorers[i][j] = new NodeScorer(allNodes[j], arcScorers, Float.NEGATIVE_INFINITY);
             }
-        });
+        }
         return scorers;
+    }
+
+    private int findStartingNode(Node starting, Node[] allNodes)
+    {
+        for (int i = 0; i < allNodes.length; ++i)
+            if (starting == allNodes[i])
+                return i;
+        return -1;
     }
 
     private Node[] getAllNodes(Node starting)
@@ -121,6 +139,7 @@ public class NodeLogLikelihoodsCalculator
         Set<Node> ret = new HashSet<Node>();
         ArrayList<Node> next = new ArrayList<Node>();
         next.add(starting);
+        ret.add(starting);
         while (!next.isEmpty()) {
             Node current = next.remove(next.size() - 1);
             for (Arc arc : current) {
@@ -161,7 +180,6 @@ public class NodeLogLikelihoodsCalculator
         Node node = likelihood.getNode();
         NodeLogLikelihoods endingLikelihood = backwardNodeLLs.get(observation).get(node);
         
-
         ArrayList<ArcLogLikelihood> arcLikelihoods = new ArrayList<ArcLogLikelihood>();
         for (ArcLogLikelihood arc : likelihood) {
             double[] nextObs = arc.getNextObservation();
@@ -173,7 +191,8 @@ public class NodeLogLikelihoodsCalculator
         return new NodeLogLikelihoods(
                 node,
                 observation,
-                likelihood.getLogLikelihood() + endingLikelihood.getLogLikelihood(),
+                likelihood.getLogLikelihood() + endingLikelihood.getLogLikelihoodWithoutObservation(),
+                likelihood.getLogLikelihoodWithoutObservation() + endingLikelihood.getLogLikelihoodWithoutObservation(),
                 arcLikelihoods);
     }
 
@@ -207,7 +226,7 @@ public class NodeLogLikelihoodsCalculator
         ArrayList<NodeLogLikelihoods> normalized = new ArrayList<NodeLogLikelihoods>();
         for (double[] key : likelihoodsPerObservation.keySet()) {
             ArrayList<NodeLogLikelihoods> observationLikelihoods = likelihoodsPerObservation.get(key);
-            float totalObservationLogLikelihood = 0;
+            float totalObservationLogLikelihood = Float.NEGATIVE_INFINITY;
             for (NodeLogLikelihoods nodeLikelihoods : observationLikelihoods) {
                 totalObservationLogLikelihood =
                     LogMath.logAdd(totalObservationLogLikelihood, nodeLikelihoods.getLogLikelihood());
