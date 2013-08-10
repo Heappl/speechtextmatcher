@@ -22,7 +22,7 @@ public class NodeScorer implements Iterable<NodeScorerArc>
         this.scoreWithoutObservation = initialScore;
     }
     
-    public String scoreForObservation(double[] observation) throws ImplementationError
+    public void scoreForObservation(double[] observation) throws ImplementationError
     {
         if (this.node == null) {
             throw new ImplementationError("node in nodes scorers is null");
@@ -32,14 +32,12 @@ public class NodeScorer implements Iterable<NodeScorerArc>
         for (NodeScorerArc arc : this.previousNodesScorers) {
             arcSum.logAdd(arc.getScore());
         }
-        if (arcSum.getResult() > 0)
-            throw new ImplementationError("arc probability sum is greater than 0: " + arcSum.getResult());
-        if (observationScore > 0)
-            throw new ImplementationError("current observation probability is greater than 0: " + observationScore);
+//        if (arcSum.getResult() > 0)
+//            throw new ImplementationError("arc probability sum is greater than 0: " + arcSum.getResult());
+//        if (observationScore > 0)
+//            throw new ImplementationError("current observation probability is greater than 0: " + observationScore);
         this.scoreWithoutObservation = arcSum.getResult();
         this.score = this.scoreWithoutObservation + observationScore;
-        
-        return "[" + this.node.getName() + " " + observationScore + " " + this.scoreWithoutObservation + "]";
     }
 
     public float getScore()

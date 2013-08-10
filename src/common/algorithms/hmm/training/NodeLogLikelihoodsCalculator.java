@@ -29,21 +29,25 @@ public class NodeLogLikelihoodsCalculator
         ObservationSequenceLogLikelihoods forwardLikelihoods = 
                 new SequenceScorer().scoreForSequence(
                         sequence, nodeScorerCreator.createForwardScorers(possibleModel));
-        new LikelihoodVerifier().checkLikelihoods(forwardLikelihoods, sequence, IArcDirectionWrapper.forwardArcWrapper);
+//        new LikelihoodVerifier().checkLikelihoods(
+//                forwardLikelihoods, sequence, IArcDirectionWrapper.forwardArcWrapper, false);
         
         Collections.reverse(sequence);
         ObservationSequenceLogLikelihoods backwardLikelihoods = 
                 new SequenceScorer().scoreForSequence(
                         sequence, nodeScorerCreator.createBackwardScorers(possibleModel));
-        new LikelihoodVerifier().checkLikelihoods(backwardLikelihoods, sequence, IArcDirectionWrapper.backwardArcWrapper);
+//        new LikelihoodVerifier().checkLikelihoods(
+//                backwardLikelihoods, sequence, IArcDirectionWrapper.backwardArcWrapper, false);
 
         Collections.reverse(sequence);
         ObservationSequenceLogLikelihoods merged =
                 new ForwardAndBackwardLikelihoodsMerger().mergeLikelihoods(
                         backwardLikelihoods, forwardLikelihoods);
-        new LikelihoodVerifier().checkLikelihoods(merged, sequence, IArcDirectionWrapper.forwardArcWrapper);
+//        new LikelihoodVerifier().checkLikelihoods(
+//                merged, sequence, IArcDirectionWrapper.forwardArcWrapper, false);
         ObservationSequenceLogLikelihoods normalized = normalize(merged);
-        new LikelihoodVerifier().checkLikelihoods(normalized, sequence, IArcDirectionWrapper.forwardArcWrapper);
+//        new LikelihoodVerifier().checkLikelihoods(
+//                normalized, sequence, IArcDirectionWrapper.forwardArcWrapper, true);
         return normalized;
     }
 

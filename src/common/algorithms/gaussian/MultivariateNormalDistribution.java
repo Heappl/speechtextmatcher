@@ -28,7 +28,8 @@ public class MultivariateNormalDistribution
             this.inversedCovariancesMatrix = null;
             System.err.println("singular matrix");
         }
-        this.constant_element = Math.log(Math.pow(2 * Math.PI, mean.length)) + Math.log(covariancesMatrixDeterminant);
+        this.constant_element =  -((double)mean.length * Math.log(2 * Math.PI)
+                + Math.log(covariancesMatrixDeterminant)) / 2.0;
     }
     
     public double[] getMean() { return mean; }
@@ -46,8 +47,7 @@ public class MultivariateNormalDistribution
         
         if (matrixPart.getEntry(0, 0) < 0)
             System.err.println("ERROR: " + matrixPart);
-        double ret = this.constant_element + matrixPart.getEntry(0, 0);
-        return -ret / 2.0;
+        return this.constant_element - matrixPart.getEntry(0, 0) / 2.0;
     }
     
     public String toString()

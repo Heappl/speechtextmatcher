@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import common.AudioLabel;
 import common.GenericListContainer;
 import common.algorithms.DataByTimesExtractor;
+import common.exceptions.ImplementationError;
 
 public class PhonemeHMMBasedAligner
 {
@@ -18,7 +19,7 @@ public class PhonemeHMMBasedAligner
                 new GenericListContainer<double[]>(data), totalTime, 0);
     }
 
-    public ArrayList<AudioLabel> align(AudioLabel[] chunks)
+    public ArrayList<AudioLabel> align(AudioLabel[] chunks) throws ImplementationError
     {
         System.err.println("aligning");
         ArrayList<AudioLabel> ret = new ArrayList<AudioLabel>();
@@ -27,7 +28,7 @@ public class PhonemeHMMBasedAligner
         return ret;
     }
     
-    public ArrayList<AudioLabel> align(AudioLabel chunk, ArrayList<double[]> audioData)
+    public ArrayList<AudioLabel> align(AudioLabel chunk, ArrayList<double[]> audioData) throws ImplementationError
     {
         String text = chunk.getLabel();
         double totalTime = chunk.getEnd() - chunk.getStart();

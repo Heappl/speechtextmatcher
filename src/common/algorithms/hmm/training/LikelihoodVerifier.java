@@ -1,6 +1,8 @@
 package common.algorithms.hmm.training;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import common.LogMath;
 import common.exceptions.ImplementationError;
@@ -10,16 +12,35 @@ public class LikelihoodVerifier
     public void checkLikelihoods(
         ObservationSequenceLogLikelihoods merged,
         ArrayList<double[]> sequence,
-        IArcDirectionWrapper arcWrapper) throws ImplementationError
+        IArcDirectionWrapper arcWrapper,
+        boolean checkIfSumsToOne) throws ImplementationError
     {
         if (merged.getLogLikelihood() == Float.NEGATIVE_INFINITY)
             throw new ImplementationError("sequence likelihood is negative infinity");
         if (merged.getLogLikelihood() > 0)
             throw new ImplementationError("sequence likelihood is greater than 0: " + merged.getLogLikelihood());
         
+        Map<double[], ArrayList<NodeLogLikelihoods>> likelihoodsPerObservation =
+                new HashMap<double[], ArrayList<NodeLogLikelihoods>>();
         for (NodeLogLikelihoods nodeLL : merged) {
             double[] next = findNextObservation(sequence, nodeLL.getObservation());
             checkNodeLikelihoods(nodeLL, next, arcWrapper);
+            if (checkIfSumsToOne) {
+                if (!likelihoodsPerObservation.containsKey(nodeLL.getObservation()))
+                    likelihoodsPerObservation.put(
+                            nodeLL.getObservation(), new ArrayList<NodeLogLikelihoods>());
+                likelihoodsPerObservation.get(nodeLL.getObservation()).add(nodeLL);
+            }
+        }
+        
+        if (checkIfSumsToOne) {
+            for (double[] observation : likelihoodsPerObservation.keySet()) {
+                LogMath total = new LogMath();
+                for (NodeLogLikelihoods nodeLL : likelihoodsPerObservation.get(observation))
+                    total.logAdd(nodeLL.getLogLikelihood());
+                if (Math.abs(total.getResult()) > 0.1)
+                    throw new ImplementationError("sum of likelihoods per observation is not 0: " + total.getResult());
+            }
         }
     }
 

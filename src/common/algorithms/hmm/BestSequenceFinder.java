@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import common.exceptions.ImplementationError;
+
 public class BestSequenceFinder
 {
     private final Node endingNode = new Node("", null);
@@ -31,7 +33,7 @@ public class BestSequenceFinder
             return soFar;
         }
 
-        public ArrayList<NodeScore> createNext(double[] observation)
+        public ArrayList<NodeScore> createNext(double[] observation) throws ImplementationError
         {
             if (this.node == endingNode) return new ArrayList<NodeScore>();
             ArrayList<NodeScore> ret = new ArrayList<NodeScore>();
@@ -51,7 +53,7 @@ public class BestSequenceFinder
         }
     }
     
-    public String[] findBestSequence(ArrayList<double[]> observations, Node model)
+    public String[] findBestSequence(ArrayList<double[]> observations, Node model) throws ImplementationError
     {
         Map<Node, NodeScore> bestNodeScores = new HashMap<Node, NodeScore>();
         bestNodeScores.put(model, new NodeScore(0, model, null));
@@ -61,7 +63,7 @@ public class BestSequenceFinder
         return bestNodeScores.get(endingNode).generateSequence().toArray(new String[0]);
     }
 
-    private Map<Node, NodeScore> createNext(double[] observation, Map<Node, NodeScore> bestNodeScores)
+    private Map<Node, NodeScore> createNext(double[] observation, Map<Node, NodeScore> bestNodeScores) throws ImplementationError
     {
         Map<Node, NodeScore> next = new HashMap<Node, NodeScore>();
         

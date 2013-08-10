@@ -3,6 +3,8 @@ package common.algorithms.hmm;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import common.exceptions.ImplementationError;
+
 public class State implements Iterable<StateExit>
 {
     private final ArrayList<StateExit> exits;
@@ -32,9 +34,11 @@ public class State implements Iterable<StateExit>
         return this.trainableScorer;
     }
 
-    public float observationLogLikelihood(double[] observation)
+    public float observationLogLikelihood(double[] observation) throws ImplementationError
     {
-        return Math.min(0, this.trainableScorer.observationLogLikelihood(observation));
+        float ret = this.trainableScorer.observationLogLikelihood(observation);
+//        if (ret > 0) throw new ImplementationError("observation likelihood is greater than 0: " + ret);
+        return ret;
     }
 }
 

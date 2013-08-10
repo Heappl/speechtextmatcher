@@ -78,16 +78,16 @@ public class ForwardAndBackwardLikelihoodsMerger
                     + "starting: " + startingCurrentLikelihood.getLogLikelihood() + " "
                     + startingCurrentLikelihood.getLogLikelihoodWithoutObservation() + ")");
         }
-        if (mergedNodeLikelihood > 0)
-            throw new ImplementationError("node likelihood is greater than 0: " + mergedNodeLikelihood);
-        float mergedLikelihoodWithoutObservation =
-                endingLikelihood.getLogLikelihoodWithoutObservation() +
-                startingCurrentLikelihood.getLogLikelihoodWithoutObservation();
-        if (mergedLikelihoodWithoutObservation < mergedNodeLikelihood) {
-            throw new ImplementationError(
-                "merged node likelihood without observation is smaller than the one with observation: " +
-                        mergedLikelihoodWithoutObservation + " < " + mergedNodeLikelihood);
-        }
+//        if (mergedNodeLikelihood > 0)
+//            throw new ImplementationError("node likelihood is greater than 0: " + mergedNodeLikelihood);
+//        float mergedLikelihoodWithoutObservation =
+//                endingLikelihood.getLogLikelihoodWithoutObservation() +
+//                startingCurrentLikelihood.getLogLikelihoodWithoutObservation();
+//        if (mergedLikelihoodWithoutObservation < mergedNodeLikelihood) {
+//            throw new ImplementationError(
+//                "merged node likelihood without observation is smaller than the one with observation: " +
+//                        mergedLikelihoodWithoutObservation + " < " + mergedNodeLikelihood);
+//        }
         return new NodeLogLikelihoods(
                 node,
                 observation,
@@ -106,8 +106,8 @@ public class ForwardAndBackwardLikelihoodsMerger
                 ((startArcLikelihood == null) ? 0 : startArcLikelihood.getLogLikelihood())
                 + arc.getExit().getLogLikelihood()
                 + ((endingArcLikelihood == null) ? 0 : endingArcLikelihood.getLogLikelihood());
-        if (likelihood > 0)
-            throw new ImplementationError("arc likelihood is greater than 0: " + likelihood);
+//        if (likelihood > 0)
+//            throw new ImplementationError("arc likelihood is greater than 0: " + likelihood);
         return new ArcLogLikelihood(arc, likelihood);
     }
 }

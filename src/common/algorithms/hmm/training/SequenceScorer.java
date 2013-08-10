@@ -13,24 +13,17 @@ public class SequenceScorer
         ArrayList<double[]> sequence,
         NodeScorer[][] scorers) throws ImplementationError
     {
-        String[] lls = new String[sequence.size()];
         ArrayList<NodeLogLikelihoods> nodesLogLikelihoods = new ArrayList<NodeLogLikelihoods>();
-        try {
-            for (int i = 0; i < sequence.size(); ++i) {
-                lls[i] = i + ": ";
-                for (int j = 0; j < scorers[i].length; ++j) {
-                    lls[i] += scorers[i][j].scoreForObservation(sequence.get(i));
-                    NodeLogLikelihoods scored =
-                        createNodeLogLikelihoods(
-                                scorers[i][j],
-                                sequence.get(i),
-                                (i + 1 < sequence.size()) ? sequence.get(i + 1) : null);
-                    nodesLogLikelihoods.add(scored);
-                }
+        for (int i = 0; i < sequence.size(); ++i) {
+            for (int j = 0; j < scorers[i].length; ++j) {
+                scorers[i][j].scoreForObservation(sequence.get(i));
+                NodeLogLikelihoods scored =
+                    createNodeLogLikelihoods(
+                            scorers[i][j],
+                            sequence.get(i),
+                            (i + 1 < sequence.size()) ? sequence.get(i + 1) : null);
+                nodesLogLikelihoods.add(scored);
             }
-        } catch (ImplementationError exc) {
-            new LinesExporter("/home/bartek/workspace/speechtextmatcher/test.txt." + System.currentTimeMillis()).export(lls);
-            throw exc;
         }
         
         float bestScore = Float.NEGATIVE_INFINITY;
@@ -44,8 +37,8 @@ public class SequenceScorer
     private NodeLogLikelihoods createNodeLogLikelihoods(
         NodeScorer nodeScorer, double[] observation, double[] nextObservation) throws ImplementationError
     {
-        if (nodeScorer.getScore() > 0)
-            throw new ImplementationError("node likelihood is greater than 0: " + nodeScorer.getScore());
+//        if (nodeScorer.getScore() > 0)
+//            throw new ImplementationError("node likelihood is greater than 0: " + nodeScorer.getScore());
         
         ArrayList<ArcLogLikelihood> arcLikelihoods = new ArrayList<ArcLogLikelihood>();
         
