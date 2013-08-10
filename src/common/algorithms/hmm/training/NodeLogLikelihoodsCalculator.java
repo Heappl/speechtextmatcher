@@ -9,8 +9,8 @@ import java.util.Set;
 
 import javax.naming.InitialContext;
 
+import common.LogMath;
 import common.algorithms.hmm.Arc;
-import common.algorithms.hmm.LogMath;
 import common.algorithms.hmm.Node;
 import common.algorithms.hmm.StateExit;
 import common.exceptions.ImplementationError;
@@ -42,13 +42,17 @@ public class NodeLogLikelihoodsCalculator
     {
         ArrayList<double[]> sequence = new ArrayList<double[]>();
         for (double[] observation : observationSequence) sequence.add(observation);
-        ObservationSequenceLogLikelihoods backwardLikelihoods =
-                new SequenceScorer().scoreForSequence(
-                        sequence, createScorers(possibleModel, sequence.size(), backwardArcCreator));
-        Collections.reverse(sequence);
+        
         ObservationSequenceLogLikelihoods forwardLikelihoods =
                 new SequenceScorer().scoreForSequence(
                         sequence, createScorers(possibleModel, sequence.size(), forwardArcCreator));
+        checkLikelihoods(forwardLikelihoods);
+        
+        Collections.reverse(sequence);
+        ObservationSequenceLogLikelihoods backwardLikelihoods =
+                new SequenceScorer().scoreForSequence(
+                        sequence, createScorers(possibleModel, sequence.size(), backwardArcCreator));
+        checkLikelihoods(backwardLikelihoods);
         
         ObservationSequenceLogLikelihoods merged = mergeLikelihoods(backwardLikelihoods, forwardLikelihoods);
         checkLikelihoods(merged);
@@ -73,16 +77,23 @@ public class NodeLogLikelihoodsCalculator
     {
         if (nodeLL.getLogLikelihood() > 0)
             throw new ImplementationError("node likelihood is greater than 0: " + nodeLL.getLogLikelihood());
-        
-        float sum = Float.NEGATIVE_INFINITY;
+        if (nodeLL.getLogLikelihoodWithoutObservation() > 0)
+            throw new ImplementationError("node likelihood wo observation is greater than 0: "
+                    + nodeLL.getLogLikelihoodWithoutObservation());
+        if (nodeLL.getLogLikelihood() > nodeLL.getLogLikelihoodWithoutObservation())
+            throw new ImplementationError("node likelihood is greater than node likelihood without observation: "
+                    + "(" + nodeLL.getLogLikelihood() + " > " + nodeLL.getLogLikelihoodWithoutObservation() + ")");
+   
+        LogMath arcSum = new LogMath();
         for (ArcLogLikelihood arcLL : nodeLL) {
-            sum = LogMath.logAdd(sum, checkArcLikelihoods(arcLL));
+            arcSum.logAdd(checkArcLikelihoods(arcLL));
         }
-        if (sum < nodeLL.getLogLikelihood())
+        if (arcSum.resultIsSet() && (arcSum.getResult() != nodeLL.getLogLikelihoodWithoutObservation()))
             throw new ImplementationError(
-                    "sum of probabilities of incoming arcs is less" +
-                            " than probability of reaching node with observing node in it (" +
-                            sum + " < " + nodeLL.getLogLikelihood() + ")");
+                    nodeLL.getNode().getName() + " " +
+                    "sum of probabilities of incoming arcs is different" +
+                    " than probability of being at node at given time (" +
+                    arcSum.getResult() + " != " + nodeLL.getLogLikelihood() + ")");
     }
 
     private float checkArcLikelihoods(ArcLogLikelihood arcLL) throws ImplementationError
@@ -120,7 +131,7 @@ public class NodeLogLikelihoodsCalculator
                     intialTransition.updateLikelihood(0);
                     arcScorers.add(new NodeScorerArc(initial, new Arc(intialTransition, null, allNodes[0])));
                 }
-                scorers[i][j] = new NodeScorer(allNodes[j], arcScorers, Float.NEGATIVE_INFINITY);
+                scorers[i][j] = new NodeScorer(allNodes[j], arcScorers, Float.NaN);
             }
         }
         return scorers;
@@ -154,59 +165,98 @@ public class NodeLogLikelihoodsCalculator
 
     private ObservationSequenceLogLikelihoods mergeLikelihoods(
         ObservationSequenceLogLikelihoods backwardLikelihoods,
-        ObservationSequenceLogLikelihoods forwardLikelihoods)
+        ObservationSequenceLogLikelihoods forwardLikelihoods) throws ImplementationError
     {
+        Map<double[], Map<Node, NodeLogLikelihoods>> forwardNodeLLs =
+                createMapOfNodeLikelihoods(forwardLikelihoods);
         Map<double[], Map<Node, NodeLogLikelihoods>> backwardNodeLLs =
-                new HashMap<double[], Map<Node,NodeLogLikelihoods>>();
-        for (NodeLogLikelihoods likelihood : backwardLikelihoods) {
-            if (!backwardNodeLLs.containsKey(likelihood.getObservation()))
-                backwardNodeLLs.put(likelihood.getObservation(), new HashMap<Node, NodeLogLikelihoods>());
-            backwardNodeLLs.get(likelihood.getObservation()).put(likelihood.getNode(), likelihood);
-        }
+                createMapOfNodeLikelihoods(forwardLikelihoods);
         
         ArrayList<NodeLogLikelihoods> merged = new ArrayList<NodeLogLikelihoods>();
         
         for (NodeLogLikelihoods likelihood : forwardLikelihoods) {
-            merged.add(createMergedLikelihood(likelihood, backwardNodeLLs));
+            merged.add(createMergedLikelihood(likelihood, forwardNodeLLs, backwardNodeLLs));
         }
         return new ObservationSequenceLogLikelihoods(forwardLikelihoods.getLogLikelihood(), merged);
     }
 
-    private NodeLogLikelihoods createMergedLikelihood(
-        NodeLogLikelihoods likelihood,
-        Map<double[], Map<Node, NodeLogLikelihoods>> backwardNodeLLs)
+    private Map<double[], Map<Node, NodeLogLikelihoods>> createMapOfNodeLikelihoods(
+        ObservationSequenceLogLikelihoods likelihoods)
     {
-        double[] observation = likelihood.getObservation();
-        Node node = likelihood.getNode();
-        NodeLogLikelihoods endingLikelihood = backwardNodeLLs.get(observation).get(node);
+        Map<double[], Map<Node, NodeLogLikelihoods>> ret = new HashMap<double[], Map<Node,NodeLogLikelihoods>>();
+        for (NodeLogLikelihoods likelihood : likelihoods) {
+            if (!ret.containsKey(likelihood.getObservation()))
+                ret.put(likelihood.getObservation(), new HashMap<Node, NodeLogLikelihoods>());
+            ret.get(likelihood.getObservation()).put(likelihood.getNode(), likelihood);
+        }
+        return ret;
+    }
+
+    private NodeLogLikelihoods createMergedLikelihood(
+        NodeLogLikelihoods arcsLikelihood,
+        Map<double[], Map<Node, NodeLogLikelihoods>> forwardNodeLLs,
+        Map<double[], Map<Node, NodeLogLikelihoods>> backwardNodeLLs) throws ImplementationError
+    {
+        double[] observation = arcsLikelihood.getObservation();
+        Node node = arcsLikelihood.getNode();
         
+        NodeLogLikelihoods endingLikelihood = backwardNodeLLs.get(observation).get(node);
+        double[] previousObservation = endingLikelihood.getNextObservation();
+
         ArrayList<ArcLogLikelihood> arcLikelihoods = new ArrayList<ArcLogLikelihood>();
-        for (ArcLogLikelihood arc : likelihood) {
-            double[] nextObs = arc.getNextObservation();
-            NodeLogLikelihoods endingArcLikelihood =
-                    (nextObs == null) ? null :
-                        backwardNodeLLs.get(nextObs).get(arc.getArc().getLeadingToNode());
-            arcLikelihoods.add(createArcLikelihoods(likelihood , endingArcLikelihood, arc.getArc()));
+        for (ArcLogLikelihood arc : arcsLikelihood) {
+            Node previousNode = arc.getArc().getOutgoingFromNode();
+            if (previousNode == null) continue;
+            NodeLogLikelihoods startingLikelihood = null;
+            if (previousObservation != null)
+                startingLikelihood = forwardNodeLLs.get(previousObservation).get(previousNode);
+            arcLikelihoods.add(createArcLikelihoods(startingLikelihood, endingLikelihood, arc.getArc()));
+        }
+
+        NodeLogLikelihoods startingCurrentLikelihood = forwardNodeLLs.get(observation).get(node);
+        float mergedNodeLikelihood =
+                endingLikelihood.getLogLikelihood() + startingCurrentLikelihood.getLogLikelihoodWithoutObservation();
+        float otherMergedLikelihood =
+                endingLikelihood.getLogLikelihoodWithoutObservation() + startingCurrentLikelihood.getLogLikelihood();
+        if (mergedNodeLikelihood != otherMergedLikelihood) {
+            throw new ImplementationError("merged node likelihoods don't agree: "
+                    + mergedNodeLikelihood + " != " + otherMergedLikelihood + " "
+                    + "(ending: " + endingLikelihood.getLogLikelihood() + " "
+                    + endingLikelihood.getLogLikelihoodWithoutObservation() + ", "
+                    + "starting: " + startingCurrentLikelihood.getLogLikelihood() + " "
+                    + startingCurrentLikelihood.getLogLikelihoodWithoutObservation() + ")");
+        }
+        if (mergedNodeLikelihood > 0)
+            throw new ImplementationError("node likelihood is greater than 0: " + mergedNodeLikelihood);
+        float mergedLikelihoodWithoutObservation =
+                endingLikelihood.getLogLikelihoodWithoutObservation() +
+                startingCurrentLikelihood.getLogLikelihoodWithoutObservation();
+        if (mergedLikelihoodWithoutObservation < mergedNodeLikelihood) {
+            throw new ImplementationError(
+                "merged node likelihood without observation is smaller than the one with observation: " +
+                        mergedLikelihoodWithoutObservation + " < " + mergedNodeLikelihood);
         }
         return new NodeLogLikelihoods(
                 node,
                 observation,
-                likelihood.getLogLikelihood() + endingLikelihood.getLogLikelihoodWithoutObservation(),
-                likelihood.getLogLikelihoodWithoutObservation() + endingLikelihood.getLogLikelihoodWithoutObservation(),
+                arcsLikelihood.getNextObservation(),
+                mergedNodeLikelihood,
+                mergedLikelihoodWithoutObservation,
                 arcLikelihoods);
     }
 
     private ArcLogLikelihood createArcLikelihoods(
         NodeLogLikelihoods startArcLikelihood,
         NodeLogLikelihoods endingArcLikelihood,
-        Arc arc)
+        Arc arc) throws ImplementationError
     {
-        float likelihood = startArcLikelihood.getLogLikelihood()
-                + arc.getExit().getLogLikelihood();
-        if (endingArcLikelihood != null)
-            likelihood += endingArcLikelihood.getLogLikelihood();
-        return new ArcLogLikelihood(arc, likelihood,
-                (endingArcLikelihood == null) ? null : endingArcLikelihood.getObservation());
+        float likelihood =
+                ((startArcLikelihood == null) ? 0 : startArcLikelihood.getLogLikelihood())
+                + arc.getExit().getLogLikelihood()
+                + ((endingArcLikelihood == null) ? 0 : endingArcLikelihood.getLogLikelihood());
+        if (likelihood > 0)
+            throw new ImplementationError("arc likelihood is greater than 0: " + likelihood);
+        return new ArcLogLikelihood(arc, likelihood);
     }
 
     private ObservationSequenceLogLikelihoods normalize(
@@ -226,15 +276,14 @@ public class NodeLogLikelihoodsCalculator
         ArrayList<NodeLogLikelihoods> normalized = new ArrayList<NodeLogLikelihoods>();
         for (double[] key : likelihoodsPerObservation.keySet()) {
             ArrayList<NodeLogLikelihoods> observationLikelihoods = likelihoodsPerObservation.get(key);
-            float totalObservationLogLikelihood = Float.NEGATIVE_INFINITY;
+            LogMath totalObservationLogLikelihood = new LogMath();
             for (NodeLogLikelihoods nodeLikelihoods : observationLikelihoods) {
-                totalObservationLogLikelihood =
-                    LogMath.logAdd(totalObservationLogLikelihood, nodeLikelihoods.getLogLikelihood());
+                totalObservationLogLikelihood.logAdd(nodeLikelihoods.getLogLikelihood());
             }
             for (NodeLogLikelihoods nodeLikelihoods : observationLikelihoods) {
                 normalized.add(new NodeLogLikelihoods(
-                        nodeLikelihoods,
-                        nodeLikelihoods.getLogLikelihood() - totalObservationLogLikelihood));
+                    nodeLikelihoods,
+                    nodeLikelihoods.getLogLikelihood() - totalObservationLogLikelihood.getResult()));
             }
         }
         return new ObservationSequenceLogLikelihoods(

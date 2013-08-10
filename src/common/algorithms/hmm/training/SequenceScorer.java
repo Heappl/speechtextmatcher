@@ -2,7 +2,7 @@ package common.algorithms.hmm.training;
 
 import java.util.ArrayList;
 
-import common.algorithms.hmm.LogMath;
+import common.LogMath;
 import common.exceptions.ImplementationError;
 
 public class SequenceScorer
@@ -42,20 +42,21 @@ public class SequenceScorer
         
         ArrayList<ArcLogLikelihood> arcLikelihoods = new ArrayList<ArcLogLikelihood>();
         
-        float aux = Float.NEGATIVE_INFINITY;
+        LogMath result = new LogMath();
         for (NodeScorerArc arc : nodeScorer) {
-            arcLikelihoods.add(new ArcLogLikelihood(arc.getArc(), arc.getScore(), nextObservation));
-            aux = LogMath.logAdd(aux, arc.getScore());
+            arcLikelihoods.add(new ArcLogLikelihood(arc.getArc(), arc.getScore()));
+            result.logAdd(arc.getScore());
         }
-        if ((aux != Float.NEGATIVE_INFINITY) && (aux < nodeScorer.getScore()))
+        if (result.getResult() != nodeScorer.getScoreWithoutObservation())
             throw new ImplementationError(
-                    "sum of probabilities of incoming arcs is less" +
-                            " than probability of reaching node with observing node in it (" +
-                            aux + " < " + nodeScorer.getScore() + ")");
+                    "sum of probabilities of incoming arcs is different" +
+                    " than probability of reaching node (" +
+                    result.getResult() + " < " + nodeScorer.getScore() + ")");
         
         return new NodeLogLikelihoods(
                 nodeScorer.getNode(),
                 observation,
+                nextObservation,
                 nodeScorer.getScore(),
                 nodeScorer.getScoreWithoutObservation(),
                 arcLikelihoods);

@@ -3,7 +3,7 @@ package common.algorithms.hmm.training;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import common.algorithms.hmm.LogMath;
+import common.LogMath;
 import common.algorithms.hmm.Node;
 import common.exceptions.ImplementationError;
 
@@ -28,16 +28,16 @@ public class NodeScorer implements Iterable<NodeScorerArc>
             throw new ImplementationError("node in nodes scorers is null");
         }
         float currentScore = this.node.getState().observationLogLikelihood(observation);
-        float arcSum = Float.NEGATIVE_INFINITY;
+        LogMath arcSum = new LogMath();
         for (NodeScorerArc arc : this.previousNodesScorers) {
-            arcSum = LogMath.logAdd(arcSum, arc.getScore());
+            arcSum.logAdd(arc.getScore());
         }
-        if (arcSum > 0)
+        if (arcSum.getResult() > 0)
             throw new ImplementationError("arc probability sum is greater than 0: " + arcSum);
         if (currentScore > 0)
             throw new ImplementationError("current observation probability is greater than 0: " + currentScore);
-        this.score = arcSum + currentScore;
-        this.scoreWithoutObservation = arcSum;
+        this.score = arcSum.getResult() + currentScore;
+        this.scoreWithoutObservation = arcSum.getResult();
     }
 
     public float getScore()

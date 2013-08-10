@@ -11,20 +11,23 @@ public class NodeLogLikelihoods implements Iterable<ArcLogLikelihood>
     private final float logLikelihood;
     private final float logLikelihoodWithoutObservation;
     private final double[] observation;
+    private final double[] nextObservation;
     private final ArrayList<ArcLogLikelihood> arcLikelihoods;
     
     public NodeLogLikelihoods(
         Node node,
         double[] observation,
+        double[] nextObservation,
         float logLikelihood,
         float logLikelihoodWithoutObservation,
-        ArrayList<ArcLogLikelihood> arcLikelihoods)
+        ArrayList<ArcLogLikelihood> incomingArcLikelihoods)
     {
         this.node = node;
         this.logLikelihood = logLikelihood;
         this.logLikelihoodWithoutObservation = logLikelihoodWithoutObservation;
-        this.arcLikelihoods = arcLikelihoods;
+        this.arcLikelihoods = incomingArcLikelihoods;
         this.observation = observation;
+        this.nextObservation = nextObservation;
     }
     
     public NodeLogLikelihoods(
@@ -36,6 +39,7 @@ public class NodeLogLikelihoods implements Iterable<ArcLogLikelihood>
         this.logLikelihoodWithoutObservation = nodeLikelihoods.logLikelihoodWithoutObservation;
         this.arcLikelihoods = nodeLikelihoods.arcLikelihoods;
         this.observation = nodeLikelihoods.observation;
+        this.nextObservation = nodeLikelihoods.nextObservation;
     }
 
     public Node getNode()
@@ -52,6 +56,11 @@ public class NodeLogLikelihoods implements Iterable<ArcLogLikelihood>
     public double[] getObservation()
     {
         return this.observation;
+    }
+
+    public double[] getNextObservation()
+    {
+        return this.nextObservation;
     }
 
     public float getLogLikelihood()

@@ -5,8 +5,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import common.LogMath;
 import common.algorithms.hmm.Arc;
-import common.algorithms.hmm.LogMath;
 import common.algorithms.hmm.Node;
 import common.algorithms.hmm.State;
 import common.algorithms.hmm.StateExit;

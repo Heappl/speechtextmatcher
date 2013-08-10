@@ -1,13 +1,13 @@
 package common.algorithms.hmm.training;
 
-import common.algorithms.hmm.LogMath;
+import common.LogMath;
 import common.algorithms.hmm.StateExit;
 
 public class TransitionTrainer
 {
     private StateExit exit;
-    private float totalExitLikelihood = Float.NEGATIVE_INFINITY;
-    private float totalStateLikelihood = Float.POSITIVE_INFINITY;
+    private LogMath totalExitLikelihood = new LogMath();
+    private LogMath totalStateLikelihood = new LogMath();
 
     public TransitionTrainer(StateExit exit)
     {
@@ -20,21 +20,16 @@ public class TransitionTrainer
     public void addObservation(float likelihood)
     {
         if (likelihood == Float.NEGATIVE_INFINITY) return;
-        if (this.totalExitLikelihood == Float.NEGATIVE_INFINITY)
-            this.totalExitLikelihood = likelihood;
-        else
-            this.totalExitLikelihood = LogMath.logAdd(this.totalExitLikelihood, likelihood);
+        this.totalExitLikelihood.logAdd(likelihood);
     }
     public void addStateObservation(float likelihood)
     {
         if (likelihood == Float.NEGATIVE_INFINITY) return;
-        if (this.totalStateLikelihood == Float.POSITIVE_INFINITY)
-            this.totalStateLikelihood = likelihood;
-        else
-            this.totalStateLikelihood = LogMath.logAdd(this.totalStateLikelihood, likelihood);
+        this.totalStateLikelihood.logAdd(likelihood);
     }
     public void finish()
     {
-        this.exit.updateLikelihood(this.totalExitLikelihood - this.totalStateLikelihood);
+        this.exit.updateLikelihood(
+            this.totalExitLikelihood.getResult() - this.totalStateLikelihood.getResult());
     }
 }

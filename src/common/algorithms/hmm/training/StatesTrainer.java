@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import common.algorithms.hmm.LogMath;
+import common.LogMath;
 import common.algorithms.hmm.Node;
 import common.algorithms.hmm.State;
 import common.algorithms.hmm.StateExit;
