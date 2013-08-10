@@ -6,11 +6,13 @@ public class LogMath
     {
         if (first == Float.NEGATIVE_INFINITY) return Float.NEGATIVE_INFINITY;
         if (second == Float.NEGATIVE_INFINITY) return Float.NEGATIVE_INFINITY;
-        return linearToLog(logToLinear(first) + logToLinear(second));
+        if (first < second) return logAdd(second, first);
+        
+        return first + linearToLog(1 + logToLinear(second - first));
     }
     public static double logToLinear(float logValue)
     {
-        return Math.exp(logValue);
+        return Math.exp((double)logValue);
     }
     public static float linearToLog(double value)
     {
@@ -33,6 +35,12 @@ public class LogMath
     }
     public float getResult()
     {
+        if (!resultIsSet()) return 0;
+        return result;
+    }
+    public float getResult(float defaultValue)
+    {
+        if (!resultIsSet()) return defaultValue;
         return result;
     }
     public boolean resultIsSet()

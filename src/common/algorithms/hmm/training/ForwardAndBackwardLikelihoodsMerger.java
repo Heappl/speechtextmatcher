@@ -93,7 +93,7 @@ public class ForwardAndBackwardLikelihoodsMerger
                 observation,
                 arcsLikelihood.getNextObservation(),
                 mergedNodeLikelihood,
-                mergedLikelihoodWithoutObservation,
+                mergedNodeLikelihood,
                 arcLikelihoods);
     }
 

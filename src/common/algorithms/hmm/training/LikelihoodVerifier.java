@@ -49,21 +49,21 @@ public class LikelihoodVerifier
         }
         
         LogMath arcSum = new LogMath();
-        System.err.print("node " + nodeLL.getNode().getName() + ": ");
         for (ArcLogLikelihood arcLL : nodeLL) {
             if (arcLL.getLogLikelihood() > 0)
                 throw new ImplementationError("arc likelihood is greater than 0: " + arcLL.getLogLikelihood());
             if (arcWrapper.getExitNode(arcLL.getArc()) != nodeLL.getNode())
-                throw new ImplementationError("arc is not incoming");
-            System.err.print(arcLL.getArc().getOutgoingFromNode().getName() + " ");
+                throw new ImplementationError("arc is not incoming "
+                        + arcWrapper.getExitNode(arcLL.getArc()) + " "
+                        + nodeLL.getNode());
             arcSum.logAdd(arcLL.getLogLikelihood());
         }
-        System.err.println();
-        if (arcSum.resultIsSet() && (arcSum.getResult() != nodeLL.getLogLikelihoodWithoutObservation()))
+        if (arcSum.resultIsSet()
+                && (Math.abs(arcSum.getResult() - nodeLL.getLogLikelihoodWithoutObservation()) > 0.1))
             throw new ImplementationError(
                     nodeLL.getNode().getName() + " " +
                     "sum of probabilities of incoming arcs is different" +
                     " than node's probability (" +
-                    arcSum.getResult() + " != " + nodeLL.getLogLikelihood() + ")");
+                    arcSum.getResult() + " != " + nodeLL.getLogLikelihoodWithoutObservation() + ")");
     }
 }

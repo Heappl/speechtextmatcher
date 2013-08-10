@@ -75,6 +75,6 @@ public class NodeLogLikelihoods implements Iterable<ArcLogLikelihood>
     
     public String toString()
     {
-        return "[" + this.node.getName() + " " + this.logLikelihood + "}";
+        return "[" + this.node.getName() + " " + this.logLikelihood + "]";
     }
 }

@@ -31,7 +31,7 @@ public class NodeScorerCreator
     }
 
     private NodeScorer[][] createScorers(
-        Node possibleModel, int length, final IArcDirectionWrapper arcCreator) throws ImplementationError
+        Node possibleModel, int length, final IArcDirectionWrapper arcWrapper) throws ImplementationError
     {
         final Node[] allNodes = getAllNodes(possibleModel);
         int startNodeIndex = findStartingNode(possibleModel, allNodes);
@@ -40,6 +40,16 @@ public class NodeScorerCreator
         final Map<Node, Integer> indexes = new HashMap<Node, Integer>();
         for (int i = 0; i < allNodes.length; ++i) indexes.put(allNodes[i], i);
         
+        final Map<Node, ArrayList<Arc>> incomingArcs = new HashMap<Node, ArrayList<Arc>>();
+        for (Node node : allNodes) {
+            for (Arc arc : node) {
+                Node nextNode = arcWrapper.getExitNode(arc);
+                if (!incomingArcs.containsKey(nextNode))
+                    incomingArcs.put(nextNode, new ArrayList<Arc>());
+                incomingArcs.get(nextNode).add(arc);
+            }
+        }
+        
         NodeScorer[][] scorers = new NodeScorer[length][allNodes.length];
         NodeScorer initial = new NodeScorer(new Node("", null), new ArrayList<NodeScorerArc>(), 0);
 
@@ -47,8 +57,8 @@ public class NodeScorerCreator
             for (int j = 0; j < scorers[i].length; ++j) {
                 ArrayList<NodeScorerArc> arcScorers = new ArrayList<NodeScorerArc>();
                 if (i > 0) {
-                    for (Arc arc : allNodes[j]) {
-                        Node entryNode = arcCreator.getEntryNode(arc);
+                    for (Arc arc : incomingArcs.get(allNodes[j])) {
+                        Node entryNode = arcWrapper.getEntryNode(arc);
                         if (entryNode == null) continue;
                         arcScorers.add(
                             new NodeScorerArc(scorers[i - 1][indexes.get(entryNode)], arc));
@@ -56,7 +66,10 @@ public class NodeScorerCreator
                 } else if (j == startNodeIndex) {
                     StateExit intialTransition = new StateExit();
                     intialTransition.updateLikelihood(0);
-                    arcScorers.add(new NodeScorerArc(initial, new Arc(intialTransition, null, allNodes[0])));
+                    arcScorers.add(
+                        new NodeScorerArc(
+                            initial,
+                            arcWrapper.createArc(intialTransition, initial.getNode(), possibleModel)));
                 }
                 scorers[i][j] = new NodeScorer(allNodes[j], arcScorers, Float.NaN);
             }
