@@ -2,6 +2,7 @@ package common.algorithms.hmm.training;
 
 import common.LogMath;
 import common.algorithms.hmm.StateExit;
+import common.exceptions.ImplementationError;
 
 public class TransitionTrainer
 {
@@ -27,11 +28,11 @@ public class TransitionTrainer
         if (likelihood == Float.NEGATIVE_INFINITY) return;
         this.totalStateLikelihood.logAdd(likelihood);
     }
-    public void finish()
+    public void finish() throws ImplementationError
     {
-        System.err.println("transiton update: "
-                + this.totalExitLikelihood.getResult() + " "
-                + this.totalStateLikelihood.getResult());
+        if (this.totalExitLikelihood.getResult() > this.totalStateLikelihood.getResult())
+            throw new ImplementationError("total exit likelihood is greater than total state likelihood: "
+                    + this.totalExitLikelihood.getResult() + " > " + this.totalStateLikelihood.getResult());
         this.exit.updateLikelihood(
             this.totalExitLikelihood.getResult() - this.totalStateLikelihood.getResult());
     }

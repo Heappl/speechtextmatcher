@@ -33,7 +33,7 @@ public class NodeScorer implements Iterable<NodeScorerArc>
             arcSum.logAdd(arc.getScore());
         }
         if (arcSum.getResult() > 0)
-            throw new ImplementationError("arc probability sum is greater than 0: " + arcSum);
+            throw new ImplementationError("arc probability sum is greater than 0: " + arcSum.getResult());
         if (observationScore > 0)
             throw new ImplementationError("current observation probability is greater than 0: " + observationScore);
         this.scoreWithoutObservation = arcSum.getResult();

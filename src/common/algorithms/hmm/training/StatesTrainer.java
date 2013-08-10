@@ -53,7 +53,7 @@ public class StatesTrainer
         this.totalLikelihood += sequenceLikelihoods.getLogLikelihood();
     }
 
-    public double retrainingFinished()
+    public double retrainingFinished() throws ImplementationError
     {
         for (TransitionTrainer trainer : this.transitionTrainers.values()) {
             trainer.finish();

@@ -15,19 +15,23 @@ public class SequenceScorer
     {
         String[] lls = new String[sequence.size()];
         ArrayList<NodeLogLikelihoods> nodesLogLikelihoods = new ArrayList<NodeLogLikelihoods>();
-        for (int i = 0; i < sequence.size(); ++i) {
-            lls[i] = i + ": ";
-            for (int j = 0; j < scorers[i].length; ++j) {
-                lls[i] += scorers[i][j].scoreForObservation(sequence.get(i));
-                NodeLogLikelihoods scored =
-                    createNodeLogLikelihoods(
-                            scorers[i][j],
-                            sequence.get(i),
-                            (i + 1 < sequence.size()) ? sequence.get(i + 1) : null);
-                nodesLogLikelihoods.add(scored);
+        try {
+            for (int i = 0; i < sequence.size(); ++i) {
+                lls[i] = i + ": ";
+                for (int j = 0; j < scorers[i].length; ++j) {
+                    lls[i] += scorers[i][j].scoreForObservation(sequence.get(i));
+                    NodeLogLikelihoods scored =
+                        createNodeLogLikelihoods(
+                                scorers[i][j],
+                                sequence.get(i),
+                                (i + 1 < sequence.size()) ? sequence.get(i + 1) : null);
+                    nodesLogLikelihoods.add(scored);
+                }
             }
+        } catch (ImplementationError exc) {
+            new LinesExporter("/home/bartek/workspace/speechtextmatcher/test.txt." + System.currentTimeMillis()).export(lls);
+            throw exc;
         }
-//        new LinesExporter("/home/bartek/workspace/speechtextmatcher/test.txt." + System.currentTimeMillis()).export(lls);
         
         float bestScore = Float.NEGATIVE_INFINITY;
         for (int j = 0; j < scorers[scorers.length - 1].length; ++j) {
