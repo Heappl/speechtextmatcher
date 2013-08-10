@@ -11,25 +11,22 @@ public class SequenceScorer
         ArrayList<double[]> sequence,
         NodeScorer[][] scorers) throws ImplementationError
     {
-        for (int i = 0; i < sequence.size(); ++i)
-            for (int j = 0; j < scorers[i].length; ++j)
-                scorers[i][j].scoreForObservation(sequence.get(i));
-        
-        float bestScore = Float.NEGATIVE_INFINITY;
-        for (int j = 0; j < scorers[scorers.length - 1].length; ++j) {
-            float currentScore = scorers[scorers.length - 1][j].getScore();
-            if (currentScore > bestScore) bestScore = currentScore;
-        }
-        
         ArrayList<NodeLogLikelihoods> nodesLogLikelihoods = new ArrayList<NodeLogLikelihoods>();
         for (int i = 0; i < sequence.size(); ++i) {
             for (int j = 0; j < scorers[i].length; ++j) {
+                scorers[i][j].scoreForObservation(sequence.get(i));
                 nodesLogLikelihoods.add(
                     createNodeLogLikelihoods(
                             scorers[i][j],
                             sequence.get(i),
                             (i + 1 < sequence.size()) ? sequence.get(i + 1) : null));
             }
+        }
+        
+        float bestScore = Float.NEGATIVE_INFINITY;
+        for (int j = 0; j < scorers[scorers.length - 1].length; ++j) {
+            float currentScore = scorers[scorers.length - 1][j].getScore();
+            if (currentScore > bestScore) bestScore = currentScore;
         }
         return new ObservationSequenceLogLikelihoods(bestScore, nodesLogLikelihoods);
     }
