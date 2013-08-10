@@ -68,10 +68,18 @@ public class NodeLogLikelihoodsCalculator
             for (NodeLogLikelihoods nodeLikelihoods : observationLikelihoods) {
                 totalObservationLogLikelihood.logAdd(nodeLikelihoods.getLogLikelihood());
             }
+            float divisor = totalObservationLogLikelihood.getResult();
             for (NodeLogLikelihoods nodeLikelihoods : observationLikelihoods) {
+                ArrayList<ArcLogLikelihood> newArcLikelihoods = new ArrayList<ArcLogLikelihood>();
+                for (ArcLogLikelihood arcLL : nodeLikelihoods)
+                    newArcLikelihoods.add(new ArcLogLikelihood(arcLL.getArc(), arcLL.getLogLikelihood() - divisor));
                 normalized.add(new NodeLogLikelihoods(
-                    nodeLikelihoods,
-                    nodeLikelihoods.getLogLikelihood() - totalObservationLogLikelihood.getResult()));
+                        nodeLikelihoods.getNode(),
+                        nodeLikelihoods.getObservation(),
+                        nodeLikelihoods.getNextObservation(),
+                        nodeLikelihoods.getLogLikelihood() - divisor,
+                        nodeLikelihoods.getLogLikelihoodWithoutObservation() - divisor,
+                        newArcLikelihoods));
             }
         }
         return new ObservationSequenceLogLikelihoods(

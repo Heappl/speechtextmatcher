@@ -30,18 +30,6 @@ public class NodeLogLikelihoods implements Iterable<ArcLogLikelihood>
         this.nextObservation = nextObservation;
     }
     
-    public NodeLogLikelihoods(
-        NodeLogLikelihoods nodeLikelihoods,
-        float updatedLikelihood)
-    {
-        this.node = nodeLikelihoods.node;
-        this.logLikelihood = updatedLikelihood;
-        this.logLikelihoodWithoutObservation = nodeLikelihoods.logLikelihoodWithoutObservation;
-        this.arcLikelihoods = nodeLikelihoods.arcLikelihoods;
-        this.observation = nodeLikelihoods.observation;
-        this.nextObservation = nodeLikelihoods.nextObservation;
-    }
-
     public Node getNode()
     {
         return this.node;

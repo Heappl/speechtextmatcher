@@ -29,6 +29,9 @@ public class TransitionTrainer
     }
     public void finish()
     {
+        System.err.println("transiton update: "
+                + this.totalExitLikelihood.getResult() + " "
+                + this.totalStateLikelihood.getResult());
         this.exit.updateLikelihood(
             this.totalExitLikelihood.getResult() - this.totalStateLikelihood.getResult());
     }

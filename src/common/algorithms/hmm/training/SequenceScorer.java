@@ -27,7 +27,7 @@ public class SequenceScorer
                 nodesLogLikelihoods.add(scored);
             }
         }
-        new LinesExporter("/home/bartek/workspace/speechtextmatcher/test.txt." + System.currentTimeMillis()).export(lls);
+//        new LinesExporter("/home/bartek/workspace/speechtextmatcher/test.txt." + System.currentTimeMillis()).export(lls);
         
         float bestScore = Float.NEGATIVE_INFINITY;
         for (int j = 0; j < scorers[scorers.length - 1].length; ++j) {
