@@ -34,7 +34,11 @@ public class NodeScorerCreator
         Node possibleModel, int length, final IArcDirectionWrapper arcWrapper) throws ImplementationError
     {
         final Node[] allNodes = getAllNodes(possibleModel);
-        int startNodeIndex = findStartingNode(possibleModel, allNodes);
+        boolean[] isExitting = new boolean[allNodes.length];
+        for (int i = 0; i < allNodes.length; ++i)
+            isExitting[i] = arcWrapper.isExittingNode(allNodes[i], possibleModel);
+        
+        int startNodeIndex = findStartingNode(possibleModel, allNodes, arcWrapper);
         if (startNodeIndex < 0)
             throw new ImplementationError("entry node not in all nodes list");
         final Map<Node, Integer> indexes = new HashMap<Node, Integer>();
@@ -51,7 +55,7 @@ public class NodeScorerCreator
         }
         
         NodeScorer[][] scorers = new NodeScorer[length][allNodes.length];
-        NodeScorer initial = new NodeScorer(new Node("", null), new ArrayList<NodeScorerArc>(), 0);
+        NodeScorer initial = new NodeScorer(new Node("", null), new ArrayList<NodeScorerArc>(), 0, false);
 
         for (int i = 0; i < length; ++i) {
             for (int j = 0; j < scorers[i].length; ++j) {
@@ -71,16 +75,16 @@ public class NodeScorerCreator
                             initial,
                             arcWrapper.createArc(intialTransition, initial.getNode(), possibleModel)));
                 }
-                scorers[i][j] = new NodeScorer(allNodes[j], arcScorers, Float.NaN);
+                scorers[i][j] = new NodeScorer(allNodes[j], arcScorers, Float.NaN, isExitting[j]);
             }
         }
         return scorers;
     }
 
-    private int findStartingNode(Node starting, Node[] allNodes)
+    private int findStartingNode(Node starting, Node[] allNodes, IArcDirectionWrapper arcWrapper)
     {
         for (int i = 0; i < allNodes.length; ++i)
-            if (starting == allNodes[i])
+            if (arcWrapper.isStartingNode(allNodes[i], starting))
                 return i;
         return -1;
     }

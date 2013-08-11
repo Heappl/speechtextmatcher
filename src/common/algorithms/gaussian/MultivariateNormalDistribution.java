@@ -4,6 +4,7 @@ import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.LUDecomposition;
 import org.apache.commons.math3.linear.RealMatrix;
 import common.exceptions.DeserializationException;
+import common.exceptions.ImplementationError;
 
 public class MultivariateNormalDistribution
 {
@@ -46,7 +47,7 @@ public class MultivariateNormalDistribution
         assert((matrixPart.getColumnDimension() != 1) || (matrixPart.getRowDimension() != 1));
         
         if (matrixPart.getEntry(0, 0) < 0)
-            System.err.println("ERROR: " + matrixPart);
+            throw new ImplementationError("matrix parts is less than 0");
         return this.constant_element - matrixPart.getEntry(0, 0) / 2.0;
     }
     

@@ -1,11 +1,8 @@
 package common.algorithms.hmm.training;
 
-import java.io.File;
 import java.util.ArrayList;
-
 import common.LogMath;
 import common.exceptions.ImplementationError;
-import dataExporters.LinesExporter;
 
 public class SequenceScorer
 {
@@ -26,12 +23,12 @@ public class SequenceScorer
             }
         }
         
-        float bestScore = Float.NEGATIVE_INFINITY;
+        float sequenceScore = Float.NEGATIVE_INFINITY;
         for (int j = 0; j < scorers[scorers.length - 1].length; ++j) {
-            float currentScore = scorers[scorers.length - 1][j].getScore();
-            if (currentScore > bestScore) bestScore = currentScore;
+            if (scorers[scorers.length - 1][j].isExitting() == false) continue;
+            sequenceScore = Math.max(sequenceScore, scorers[scorers.length - 1][j].getScore());
         }
-        return new ObservationSequenceLogLikelihoods(bestScore, nodesLogLikelihoods);
+        return new ObservationSequenceLogLikelihoods(sequenceScore, nodesLogLikelihoods);
     }
 
     private NodeLogLikelihoods createNodeLogLikelihoods(
@@ -39,19 +36,19 @@ public class SequenceScorer
     {
 //        if (nodeScorer.getScore() > 0)
 //            throw new ImplementationError("node likelihood is greater than 0: " + nodeScorer.getScore());
-        
         ArrayList<ArcLogLikelihood> arcLikelihoods = new ArrayList<ArcLogLikelihood>();
         
-        LogMath result = new LogMath();
-        for (NodeScorerArc arc : nodeScorer) {
-            arcLikelihoods.add(new ArcLogLikelihood(arc.getArc(), arc.getScore()));
-            result.logAdd(arc.getScore());
-        }
-        if (result.getResult() != nodeScorer.getScoreWithoutObservation())
-            throw new ImplementationError(
-                    "sum of probabilities of incoming arcs is different" +
-                    " than probability of reaching node (" +
-                    result.getResult() + " < " + nodeScorer.getScore() + ")");
+//        LogMath result = new LogMath();
+//        for (NodeScorerArc arc : nodeScorer) {
+//            arcLikelihoods.add(new ArcLogLikelihood(arc.getArc(), arc.getScore()));
+//            result.logAdd(arc.getScore());
+//        }
+//        float arcSum = result.getResult(-Float.MAX_VALUE);
+//        if (arcSum != nodeScorer.getScoreWithoutObservation())
+//            throw new ImplementationError(
+//                    "sum of probabilities of incoming arcs is different" +
+//                    " than probability of reaching node (" +
+//                    arcSum + " < " + nodeScorer.getScore() + ")");
         
         return new NodeLogLikelihoods(
                 nodeScorer.getNode(),

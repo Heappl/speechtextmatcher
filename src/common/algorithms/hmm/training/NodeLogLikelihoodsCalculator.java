@@ -29,64 +29,21 @@ public class NodeLogLikelihoodsCalculator
         ObservationSequenceLogLikelihoods forwardLikelihoods = 
                 new SequenceScorer().scoreForSequence(
                         sequence, nodeScorerCreator.createForwardScorers(possibleModel));
-//        new LikelihoodVerifier().checkLikelihoods(
-//                forwardLikelihoods, sequence, IArcDirectionWrapper.forwardArcWrapper, false);
+        new LikelihoodVerifier().checkLikelihoods(
+                forwardLikelihoods, sequence, IArcDirectionWrapper.forwardArcWrapper);
         
         Collections.reverse(sequence);
         ObservationSequenceLogLikelihoods backwardLikelihoods = 
                 new SequenceScorer().scoreForSequence(
                         sequence, nodeScorerCreator.createBackwardScorers(possibleModel));
-//        new LikelihoodVerifier().checkLikelihoods(
-//                backwardLikelihoods, sequence, IArcDirectionWrapper.backwardArcWrapper, false);
+        new LikelihoodVerifier().checkLikelihoods(
+                backwardLikelihoods, sequence, IArcDirectionWrapper.backwardArcWrapper);
 
         Collections.reverse(sequence);
         ObservationSequenceLogLikelihoods merged =
                 new ForwardAndBackwardLikelihoodsMerger().mergeLikelihoods(
                         backwardLikelihoods, forwardLikelihoods);
-//        new LikelihoodVerifier().checkLikelihoods(
-//                merged, sequence, IArcDirectionWrapper.forwardArcWrapper, false);
-        ObservationSequenceLogLikelihoods normalized = normalize(merged);
-//        new LikelihoodVerifier().checkLikelihoods(
-//                normalized, sequence, IArcDirectionWrapper.forwardArcWrapper, true);
-        return normalized;
-    }
-
-    private ObservationSequenceLogLikelihoods normalize(
-        ObservationSequenceLogLikelihoods likelihoods)
-    {
-        Map<double[], ArrayList<NodeLogLikelihoods>> likelihoodsPerObservation =
-                new HashMap<double[], ArrayList<NodeLogLikelihoods>>();
-        for (NodeLogLikelihoods nodeLikelihoods : likelihoods) {
-            ArrayList<NodeLogLikelihoods> observationLikelihoods = new ArrayList<NodeLogLikelihoods>();
-            if (likelihoodsPerObservation.containsKey(nodeLikelihoods.getObservation()))
-                observationLikelihoods = likelihoodsPerObservation.get(nodeLikelihoods.getObservation());
-            
-            observationLikelihoods.add(nodeLikelihoods);
-            likelihoodsPerObservation.put(nodeLikelihoods.getObservation(), observationLikelihoods);
-        }
-        
-        ArrayList<NodeLogLikelihoods> normalized = new ArrayList<NodeLogLikelihoods>();
-        for (double[] key : likelihoodsPerObservation.keySet()) {
-            ArrayList<NodeLogLikelihoods> observationLikelihoods = likelihoodsPerObservation.get(key);
-            LogMath totalObservationLogLikelihood = new LogMath();
-            for (NodeLogLikelihoods nodeLikelihoods : observationLikelihoods) {
-                totalObservationLogLikelihood.logAdd(nodeLikelihoods.getLogLikelihood());
-            }
-            float divisor = totalObservationLogLikelihood.getResult();
-            for (NodeLogLikelihoods nodeLikelihoods : observationLikelihoods) {
-                ArrayList<ArcLogLikelihood> newArcLikelihoods = new ArrayList<ArcLogLikelihood>();
-                for (ArcLogLikelihood arcLL : nodeLikelihoods)
-                    newArcLikelihoods.add(new ArcLogLikelihood(arcLL.getArc(), arcLL.getLogLikelihood() - divisor));
-                normalized.add(new NodeLogLikelihoods(
-                        nodeLikelihoods.getNode(),
-                        nodeLikelihoods.getObservation(),
-                        nodeLikelihoods.getNextObservation(),
-                        nodeLikelihoods.getLogLikelihood() - divisor,
-                        nodeLikelihoods.getLogLikelihoodWithoutObservation() - divisor,
-                        newArcLikelihoods));
-            }
-        }
-        return new ObservationSequenceLogLikelihoods(
-                likelihoods.getLogLikelihood(), normalized);
+        System.err.println(merged);
+        return merged;
     }
 }

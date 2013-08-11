@@ -18,11 +18,12 @@ public class NodeScorerArc
         float arcScore = this.arc.getExit().getLogLikelihood();
 //        if (arcScore > 0)
 //            throw new ImplementationError("arc score is greater than 0: " + arcScore);
-        float fromScore = ((this.from == null) ? 0 : this.from.getScore());
+        float fromScore = ((this.from == null) ? Float.NEGATIVE_INFINITY : this.from.getScore());
 //        if (fromScore > 0)
 //            throw new ImplementationError("from node score is greater than 0: " + fromScore);
 //        if (arcScore + fromScore > 0)
 //            throw new ImplementationError("arc total score is greater than 0: " + (arcScore + fromScore));
+//        System.err.println("arc: " + this.from.getNode() + " " + fromScore + " " + arcScore);
         return arcScore + fromScore;
     }
     public Arc getArc()

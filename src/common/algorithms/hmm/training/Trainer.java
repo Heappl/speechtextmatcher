@@ -73,10 +73,10 @@ public class Trainer
         for (int i = 0; i < subgraphs.length; ++i) {
             Set<State> subgraphStates = getAllStates(subgraphs[i]);
             float logLikelihood = LogMath.linearToLog((double)1 / (double)subgraphStates.size());
-            for (SingleStateTrainer stateTrainer : stateTrainers) {
-                if (subgraphStates.contains(stateTrainer.getState())) {
-                    for (int j = 0; j < setOfDataSequences[i].length; ++j)
-                        stateTrainer.addObservation(setOfDataSequences[i][j], logLikelihood);
+            for (int j = 0; j < setOfDataSequences[i].length; ++j) {
+                for (SingleStateTrainer stateTrainer : stateTrainers) {
+                    if (!subgraphStates.contains(stateTrainer.getState())) continue;
+                    stateTrainer.addObservation(setOfDataSequences[i][j], logLikelihood);
                 }
             }
         }
@@ -113,7 +113,6 @@ public class Trainer
                 next.add(arc.getLeadingToNode());
                 ret.add(arc.getLeadingToNode().getState());
             }
-            break;
         }
         return ret;
     }

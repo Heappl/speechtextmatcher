@@ -69,7 +69,7 @@ public class GaussianObservationScorer
     @Override
     public float observationLogLikelihood(double[] observation)
     {
-        if (this.distribution == null) return Float.POSITIVE_INFINITY;
+        if (this.distribution == null) return Float.NaN;
         return (float)Math.min(
                     Float.MAX_VALUE,
                     Math.max(-Float.MAX_VALUE, this.distribution.logLikelihood(observation)));

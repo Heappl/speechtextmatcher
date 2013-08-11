@@ -16,15 +16,19 @@ public class MapOfPhonemeStates
         StateExit loopExit = new StateExit();
         StateExit nextExit = new StateExit();
         State state;
-        public StateElements()
+        public StateElements(MultipleGaussianTrainer trainer)
         {
             ArrayList<StateExit> exits = new ArrayList<StateExit>();
             exits.add(nextExit);
             exits.add(loopExit);
-            state = new State(exits, new GaussianObservationScorer());
+            state = new State(
+                exits,
+                new SingleGaussianAdaptorOnMultipleGaussianTrainer(
+                    new GaussianObservationScorer(), trainer));
         }
     }
     private Map<String, StateElements> phonemStates = new HashMap<String, StateElements>();
+    private MultipleGaussianTrainer trainer = new MultipleGaussianTrainer();
     
     public Node createNode(Node next, String phoneme)
     {
@@ -38,7 +42,7 @@ public class MapOfPhonemeStates
     private StateElements getOrCreate(String phoneme)
     {
         if (!this.phonemStates.containsKey(phoneme))
-            this.phonemStates.put(phoneme, new StateElements());
+            this.phonemStates.put(phoneme, new StateElements(trainer));
         return this.phonemStates.get(phoneme);
     }
 }

@@ -1,6 +1,6 @@
 package common.exceptions;
 
-public class ImplementationError extends Exception {
+public class ImplementationError extends Error {
 
     private static final long serialVersionUID = 1L;
 

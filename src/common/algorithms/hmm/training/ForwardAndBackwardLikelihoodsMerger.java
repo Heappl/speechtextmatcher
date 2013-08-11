@@ -12,12 +12,14 @@ public class ForwardAndBackwardLikelihoodsMerger
 {
     public ObservationSequenceLogLikelihoods mergeLikelihoods(
         ObservationSequenceLogLikelihoods backwardLikelihoods,
-        ObservationSequenceLogLikelihoods forwardLikelihoods) throws ImplementationError
+        ObservationSequenceLogLikelihoods forwardLikelihoods)
     {
         Map<double[], Map<Node, NodeLogLikelihoods>> forwardNodeLLs =
                 createMapOfNodeLikelihoods(forwardLikelihoods);
         Map<double[], Map<Node, NodeLogLikelihoods>> backwardNodeLLs =
                 createMapOfNodeLikelihoods(backwardLikelihoods);
+        checkMaps(forwardNodeLLs, backwardNodeLLs);
+        checkMaps(backwardNodeLLs, forwardNodeLLs);
         
         ArrayList<NodeLogLikelihoods> merged = new ArrayList<NodeLogLikelihoods>();
         
@@ -25,6 +27,32 @@ public class ForwardAndBackwardLikelihoodsMerger
             merged.add(createMergedLikelihood(likelihood, forwardNodeLLs, backwardNodeLLs));
         }
         return new ObservationSequenceLogLikelihoods(forwardLikelihoods.getLogLikelihood(), merged);
+    }
+
+    private void checkMaps(
+        Map<double[], Map<Node, NodeLogLikelihoods>> first,
+        Map<double[], Map<Node, NodeLogLikelihoods>> second)
+    {
+        if (first.size() != second.size()) {
+            throw new ImplementationError("map sizes are different: " + first.size() + " " + second.size());
+        }
+        
+        int llsPerObservation = 0;
+        for (double[] observation : first.keySet()) {
+            llsPerObservation = first.get(observation).size();
+        }
+        for (double[] observation : first.keySet()) {
+            if (first.get(observation).size() != llsPerObservation)
+                throw new ImplementationError("a number of lls is not constant");
+        }
+        for (double[] observation : second.keySet()) {
+            if (second.get(observation).size() != llsPerObservation)
+                throw new ImplementationError("a number of in second map is not equal to lls per observation");
+        }
+        for (double[] observation : first.keySet()) {
+            if (!second.containsKey(observation))
+                throw new ImplementationError("second doesn't contain key " + observation);
+        }
     }
 
     private Map<double[], Map<Node, NodeLogLikelihoods>> createMapOfNodeLikelihoods(
@@ -43,7 +71,7 @@ public class ForwardAndBackwardLikelihoodsMerger
     private NodeLogLikelihoods createMergedLikelihood(
         NodeLogLikelihoods arcsLikelihood,
         Map<double[], Map<Node, NodeLogLikelihoods>> forwardNodeLLs,
-        Map<double[], Map<Node, NodeLogLikelihoods>> backwardNodeLLs) throws ImplementationError
+        Map<double[], Map<Node, NodeLogLikelihoods>> backwardNodeLLs)
     {
         double[] observation = arcsLikelihood.getObservation();
         Node node = arcsLikelihood.getNode();
