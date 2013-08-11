@@ -29,15 +29,15 @@ public class NodeLogLikelihoodsCalculator
         ObservationSequenceLogLikelihoods forwardLikelihoods = 
                 new SequenceScorer().scoreForSequence(
                         sequence, nodeScorerCreator.createForwardScorers(possibleModel));
-        new LikelihoodVerifier().checkLikelihoods(
-                forwardLikelihoods, sequence, IArcDirectionWrapper.forwardArcWrapper);
+//        new LikelihoodVerifier().checkLikelihoods(
+//                forwardLikelihoods, sequence, IArcDirectionWrapper.forwardArcWrapper);
         
         Collections.reverse(sequence);
         ObservationSequenceLogLikelihoods backwardLikelihoods = 
                 new SequenceScorer().scoreForSequence(
                         sequence, nodeScorerCreator.createBackwardScorers(possibleModel));
-        new LikelihoodVerifier().checkLikelihoods(
-                backwardLikelihoods, sequence, IArcDirectionWrapper.backwardArcWrapper);
+//        new LikelihoodVerifier().checkLikelihoods(
+//                backwardLikelihoods, sequence, IArcDirectionWrapper.backwardArcWrapper);
 
         Collections.reverse(sequence);
         ObservationSequenceLogLikelihoods merged =

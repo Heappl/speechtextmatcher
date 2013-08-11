@@ -63,8 +63,8 @@ public class StatesTrainer
         for (TransitionTrainer trainer : this.transitionTrainers.values()) {
             trainer.finish();
         }
-//        for (SingleStateTrainer trainer : this.stateTrainers.values())
-//            trainer.finish();
+        for (SingleStateTrainer trainer : this.stateTrainers.values())
+            trainer.finish();
         return this.totalLikelihood;
     }
 

@@ -18,8 +18,8 @@ public class ForwardAndBackwardLikelihoodsMerger
                 createMapOfNodeLikelihoods(forwardLikelihoods);
         Map<double[], Map<Node, NodeLogLikelihoods>> backwardNodeLLs =
                 createMapOfNodeLikelihoods(backwardLikelihoods);
-        checkMaps(forwardNodeLLs, backwardNodeLLs);
-        checkMaps(backwardNodeLLs, forwardNodeLLs);
+//        checkMaps(forwardNodeLLs, backwardNodeLLs);
+//        checkMaps(backwardNodeLLs, forwardNodeLLs);
         
         ArrayList<NodeLogLikelihoods> merged = new ArrayList<NodeLogLikelihoods>();
         
