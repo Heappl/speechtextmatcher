@@ -98,7 +98,7 @@ public class ForwardAndBackwardLikelihoodsMerger
                 endingLikelihood.getLogLikelihood() + startingCurrentLikelihood.getLogLikelihoodWithoutObservation();
         float otherMergedLikelihood =
                 endingLikelihood.getLogLikelihoodWithoutObservation() + startingCurrentLikelihood.getLogLikelihood();
-        if (Math.abs(mergedNodeLikelihood - otherMergedLikelihood) > 0.1) {
+        if (Math.abs(Math.log(mergedNodeLikelihood) - Math.log(otherMergedLikelihood)) > 0.1) {
             throw new ImplementationError("merged node likelihoods don't agree: "
                     + mergedNodeLikelihood + " != " + otherMergedLikelihood + " "
                     + "(ending: " + endingLikelihood.getLogLikelihood() + " "

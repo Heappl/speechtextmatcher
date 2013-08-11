@@ -14,7 +14,7 @@ import common.exceptions.ImplementationError;
 
 public class Trainer
 {
-    private double endingDifference = 0.001;
+    private double endingDifference = 100000;
     
     public Trainer()
     {

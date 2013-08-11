@@ -9,6 +9,7 @@ import common.algorithms.hmm.Node;
 import common.algorithms.hmm.State;
 import common.algorithms.hmm.StateExit;
 import common.exceptions.ImplementationError;
+import dataExporters.LinesExporter;
 
 public class StatesTrainer
 {
@@ -16,7 +17,8 @@ public class StatesTrainer
             new HashMap<State, SingleStateTrainer>();
     private Map<StateExit, TransitionTrainer> transitionTrainers =
             new HashMap<StateExit, TransitionTrainer>();
-    private double totalLikelihood = 0; 
+    private double totalLikelihood = 0;
+    private ArrayList<String> aux = new ArrayList<String>();
     
     public StatesTrainer(ArrayList<SingleStateTrainer> stateTrainers,
                          ArrayList<TransitionTrainer> transitionTrainers)
@@ -35,6 +37,7 @@ public class StatesTrainer
         NodeLogLikelihoodsCalculator likelihoodsCalculator = new NodeLogLikelihoodsCalculator();
         ObservationSequenceLogLikelihoods sequenceLikelihoods =
             likelihoodsCalculator.calculate(observationSequence, possibleModel);
+        aux.add(sequenceLikelihoods.toString());
         
         for (NodeLogLikelihoods likelihood : sequenceLikelihoods) {
             State nodeState = likelihood.getNode().getState();
@@ -55,11 +58,13 @@ public class StatesTrainer
 
     public double retrainingFinished() throws ImplementationError
     {
+        new LinesExporter("/home/bartek/workspace/speechtextmatcher/test.txt"
+                ).export(aux.toArray(new String[0]));
         for (TransitionTrainer trainer : this.transitionTrainers.values()) {
             trainer.finish();
         }
-        for (SingleStateTrainer trainer : this.stateTrainers.values())
-            trainer.finish();
+//        for (SingleStateTrainer trainer : this.stateTrainers.values())
+//            trainer.finish();
         return this.totalLikelihood;
     }
 

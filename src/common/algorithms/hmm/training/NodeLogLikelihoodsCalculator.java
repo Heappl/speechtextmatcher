@@ -43,7 +43,6 @@ public class NodeLogLikelihoodsCalculator
         ObservationSequenceLogLikelihoods merged =
                 new ForwardAndBackwardLikelihoodsMerger().mergeLikelihoods(
                         backwardLikelihoods, forwardLikelihoods);
-        System.err.println(merged);
         return merged;
     }
 }
