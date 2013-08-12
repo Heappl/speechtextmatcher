@@ -17,8 +17,7 @@ public class StatesTrainer
             new HashMap<State, SingleStateTrainer>();
     private Map<StateExit, TransitionTrainer> transitionTrainers =
             new HashMap<StateExit, TransitionTrainer>();
-    private double totalLikelihood = 0;
-    private ArrayList<String> aux = new ArrayList<String>();
+    private LogMath totalLikelihood = new LogMath();
     
     public StatesTrainer(ArrayList<SingleStateTrainer> stateTrainers,
                          ArrayList<TransitionTrainer> transitionTrainers)
@@ -37,9 +36,12 @@ public class StatesTrainer
         NodeLogLikelihoodsCalculator likelihoodsCalculator = new NodeLogLikelihoodsCalculator();
         ObservationSequenceLogLikelihoods sequenceLikelihoods =
             likelihoodsCalculator.calculate(observationSequence, possibleModel);
-        aux.add(sequenceLikelihoods.toString());
         
+        int index = 0;
         for (NodeLogLikelihoods likelihood : sequenceLikelihoods) {
+            if (likelihood.getObservation() != observationSequence[index]) ++index;
+            if (likelihood.getObservation() != observationSequence[index]) 
+                throw new ImplementationError("observations are not sequential: " + index);
             State nodeState = likelihood.getNode().getState();
             double[] observation = likelihood.getObservation();
             this.stateTrainers.get(nodeState).addObservation(observation, likelihood.getLogLikelihood());
@@ -47,25 +49,23 @@ public class StatesTrainer
                 StateExit arcStateExit = arcLikelihood.getArc().getExit();
                 if (arcStateExit == null) throw new ImplementationError("null arc state exit");
                 if (!this.transitionTrainers.containsKey(arcStateExit)) continue;
-                this.transitionTrainers.get(arcStateExit)
-                    .addObservation(arcLikelihood.getLogLikelihood());
-                this.transitionTrainers.get(arcStateExit)
-                    .addStateObservation(likelihood.getLogLikelihood());
+//                this.transitionTrainers.get(arcStateExit)
+//                    .addObservation(arcLikelihood.getLogLikelihood());
+//                this.transitionTrainers.get(arcStateExit)
+//                    .addStateObservation(likelihood.getLogLikelihood());
             }
         }
-        this.totalLikelihood += sequenceLikelihoods.getLogLikelihood();
+        this.totalLikelihood.logAdd(sequenceLikelihoods.getLogLikelihood());
     }
 
     public double retrainingFinished() throws ImplementationError
     {
-        new LinesExporter("/home/bartek/workspace/speechtextmatcher/test.txt"
-                ).export(aux.toArray(new String[0]));
-        for (TransitionTrainer trainer : this.transitionTrainers.values()) {
-            trainer.finish();
-        }
+//        for (TransitionTrainer trainer : this.transitionTrainers.values()) {
+//            trainer.finish();
+//        }
         for (SingleStateTrainer trainer : this.stateTrainers.values())
             trainer.finish();
-        return this.totalLikelihood;
+        return this.totalLikelihood.getResult();
     }
 
     public void retrainStateTrainersSecondPhase(double[][] observationSequence, Node possibleModel) throws ImplementationError

@@ -23,8 +23,7 @@ public class MapOfPhonemeStates
             exits.add(loopExit);
             state = new State(
                 exits,
-                new SingleGaussianAdaptorOnMultipleGaussianTrainer(
-                    new GaussianObservationScorer(), trainer));
+                new GaussianObservationScorer());
         }
     }
     private Map<String, StateElements> phonemStates = new HashMap<String, StateElements>();

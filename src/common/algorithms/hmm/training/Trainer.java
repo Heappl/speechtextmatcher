@@ -14,7 +14,7 @@ import common.exceptions.ImplementationError;
 
 public class Trainer
 {
-    private double endingDifference = 100000;
+    private double endingDifference = 0.1;
     
     public Trainer()
     {
@@ -38,6 +38,7 @@ public class Trainer
             if (Math.abs(likelihoodSoFar - likelihood) <= this.endingDifference) break;
             likelihoodSoFar = likelihood;
             iteration++;
+//            if (iteration > 2) break;
         }
     }
     

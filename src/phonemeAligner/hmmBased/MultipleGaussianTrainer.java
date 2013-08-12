@@ -43,7 +43,7 @@ public class MultipleGaussianTrainer
 
     private void flushObservationAgain()
     {
-        normalize();
+//        normalize();
         for (ScorerLogLikelihood scorerWithLL : currentObservationLikelihoods) {
             scorerWithLL.scorer.addObservationAgain(currentObservation, scorerWithLL.logLikelihood);
         }
@@ -69,7 +69,7 @@ public class MultipleGaussianTrainer
 
     private void flushObservation()
     {
-        normalize();
+//        normalize();
         for (ScorerLogLikelihood scorerWithLL : currentObservationLikelihoods) {
             scorerWithLL.scorer.addObservation(currentObservation, scorerWithLL.logLikelihood);
         }
