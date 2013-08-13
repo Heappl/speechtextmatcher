@@ -17,13 +17,15 @@ public class MainTextToSpeechByLengthMatcher
     	String textFile = args[1];
     	String labelsOutputPath = args[2];
 
-    	WaveImporter waveImporterForOfflineSpeechRecognition = new WaveImporter(waveFile, "config_nospeech_nomel.xml");
+    	WaveImporter waveImporterForOfflineSpeechRecognition = new WaveImporter(
+    	        waveFile, "../textAligners/config_nospeech_nomel.xml");
     	OfflineSpeechRecognizer speechRecognizer = new OfflineSpeechRecognizer(20, 10);
     	
     	waveImporterForOfflineSpeechRecognition.registerObserver(speechRecognizer);
     	waveImporterForOfflineSpeechRecognition.process();
     	waveImporterForOfflineSpeechRecognition.done();
     	
+    	System.err.println("extracting speeches");
     	Speeches speeches = speechRecognizer.findSpeechParts();
     	if (args.length > 3)
     	{
@@ -34,12 +36,14 @@ public class MainTextToSpeechByLengthMatcher
 	        }
 	    	new AudacityLabelsExporter(speechesOutputPath).export(speechLabels);
     	}
+    	System.err.println("speeches: " + speeches.size());
     
         Text text = new Text(new TextImporter(textFile), speeches.getTotalTime());
         
         TextToSpeechByLengthAligner byLengthAligner = new TextToSpeechByLengthAligner();
         IncrementalTextToSpeechAligner incrementalAligner =
         		new IncrementalTextToSpeechAligner(byLengthAligner);
+        System.err.println("aligning");
         AudioLabel[] matched = incrementalAligner.findMatching(text, speeches);
     	new AudacityLabelsExporter(labelsOutputPath).export(matched);
         System.err.println("END");

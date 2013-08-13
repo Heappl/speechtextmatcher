@@ -58,13 +58,13 @@ def merge_by_words(merging, target):
     
 def merge_by_times(merging, target):
     def timeFilter((start, end, l), (tstart, tend, tl)):
-        return (start >= tstart - 0.1) and (end <= tend - 0.1)
-    def extractFromTime(target):
-        return mergeLabels([label for label in merging if timeFilter(label, target)])
-    return [extractFromTime(label) for label in target]
+        return (start >= tstart - 0.3) and (end <= tend + 0.3)
+    def extractFromTime(targetLabel, lookupList):
+        return mergeLabels([label for label in lookupList if timeFilter(label, targetLabel)])
+    return [extractFromTime(label, merging) for label in target]
     
 
-def countTimeDifferent(first, second, diff):
+def countTimeDifference(first, second, diff):
     if (len(first) != len(second)):
         print "error: first and second length don't agree"
         sys.exit(1)
@@ -86,7 +86,7 @@ def countTimeDifferent(first, second, diff):
             total += 1
     return (len(second) - total, len(second), aveStartDiff / len(first), aveEndDiff / len(first), maxDiff)
      
-def countWordDifferent(first, second):
+def countWordDifference(first, second):
     def wordDiff(first, second):
         matched = 0
         for i in range(0, len(first) + 1):
@@ -110,7 +110,14 @@ def countWordDifferent(first, second):
 firstMergedByWords = merge_by_words(first, second)       
 firstMergedByTimes = merge_by_times(first, second)       
     
-print countTimeDifferent(firstMergedByWords, second, 0.5)
-print countWordDifferent(firstMergedByTimes, second)
+print countTimeDifference(firstMergedByWords, second, 0.3)
+print countWordDifference(firstMergedByTimes, second)
+
+#pause base alignment - simple
+#(210, 715, 3.409846153846155, 3.516975611888207, 32.3939375000009)
+#{0: 219, 1: 158, 2: 58, 3: 43, 4: 36, 5: 19, 6: 18, 7: 17, 8: 20, 9: 13, 10: 8, 11: 4, 12: 5, 13: 10, 14: 8, 15: 5, 16: 6, 17: 5, 18: 6, 19: 2, 20: 2, 21: 2, 22: 5, 23: 5, 24: 3, 25: 1, 26: 3, 27: 3, 28: 2, 29: 5, 30: 3, 31: 3, 32: 1, 34: 1, 35: 1, 38: 1, 41: 2, 42: 1, 44: 1, 47: 2, 51: 1, 52: 1, 53: 1, 54: 1, 62: 1, 70: 1, 71: 1, 94: 1}
+#incremental
+#(207, 708, 4.0902118644067835, 4.2215441384181975, 32.3939375000009)
+#{0: 214, 1: 159, 2: 53, 3: 30, 4: 31, 5: 19, 6: 15, 7: 16, 8: 15, 9: 12, 10: 10, 11: 7, 12: 6, 13: 14, 14: 11, 15: 9, 16: 5, 17: 4, 18: 7, 19: 3, 20: 3, 21: 1, 22: 6, 23: 4, 24: 4, 25: 1, 26: 6, 27: 4, 28: 2, 29: 4, 30: 3, 31: 1, 32: 3, 33: 2, 34: 1, 35: 2, 37: 1, 38: 1, 39: 1, 40: 2, 41: 1, 42: 1, 44: 1, 46: 2, 47: 2, 49: 1, 53: 1, 54: 1, 67: 1, 70: 1, 71: 2, 80: 1, 94: 1}
 
 
