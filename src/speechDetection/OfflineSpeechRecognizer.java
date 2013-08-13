@@ -42,55 +42,55 @@ public class OfflineSpeechRecognizer implements IWaveObserver {
 	
 	public Speeches findSpeechParts()
 	{
-		double[] weights = new SpectrumWeights(allData).getWeights();
-		for (int i = 0; i < spectrumSize; ++i) weights[i] *= 1000;
-		for (int i = 0; i < allData.size(); ++i) {
-			for (int j = 0; j < spectrumSize; ++j) {
-				allData.get(i).getSpectrum()[j] = Math.log(allData.get(i).getSpectrum()[j]) * weights[j];
-			}
-		}
-		
-		double average = 0;
-	    for (int i = 0; i < allData.size(); ++i)
-	    {
-	    	double[] curr = allData.get(i).getSpectrum();
-	    	for (int j = 0; j < spectrumSize; ++j)
-	    		average += curr[j];
-	    }
-	    average /= allData.size();
-	    
-	    boolean[] isSpeech = new boolean[allData.size() + 2];
-	    for (int i = 0; i < allData.size(); ++i)
-	    {
-	    	double[] curr = allData.get(i).getSpectrum();
-	    	double sum = 0;
-	    	for (int j = 0; j < spectrumSize; ++j) sum += curr[j];
-	    	isSpeech[i + 1] = (sum >= average);
-	    }
-	    
+        double[] weights = new SpectrumWeights(allData).getWeights();
+        for (int i = 0; i < spectrumSize; ++i) weights[i] *= 1000;
+        for (int i = 0; i < allData.size(); ++i) {
+            for (int j = 0; j < spectrumSize; ++j) {
+                allData.get(i).getSpectrum()[j] = Math.log(allData.get(i).getSpectrum()[j]) * weights[j];
+            }
+        }
+        
+        double average = 0;
+        for (int i = 0; i < allData.size(); ++i)
+        {
+            double[] curr = allData.get(i).getSpectrum();
+            for (int j = 0; j < spectrumSize; ++j)
+                average += curr[j];
+        }
+        average /= allData.size();
+        
+        boolean[] isSpeech = new boolean[allData.size() + 2];
+        for (int i = 0; i < allData.size(); ++i)
+        {
+            double[] curr = allData.get(i).getSpectrum();
+            double sum = 0;
+            for (int j = 0; j < spectrumSize; ++j) sum += curr[j];
+            isSpeech[i + 1] = (sum >= average);
+        }
+        
         fillHoles(isSpeech, true, this.speechGravity, 0);
         fillHoles(isSpeech, true, this.speechGravity, 0);
         fillHoles(isSpeech, false, this.nonSpeechGravity, 2 * this.nonSpeechGravity);
         fillHoles(isSpeech, false, this.nonSpeechGravity, 2 * this.nonSpeechGravity);
-	    
-	    int start = -1;
-	    ArrayList<Speech> out = new ArrayList<Speech>();
-	    for (int i = 0; i < allData.size(); ++i)
-	    {
-	    	if ((start >= 0) && ((i == allData.size() - 1) || !isSpeech[i]))
-	    	{
-	    		Speech speech = new Speech(
-	    				allData.get(start).getStartTime(),
-	    				allData.get(i).getEndTime() + 0.2,
-	    				start,
-	    				i);
-	    		out.add(speech);
-	    		start = -1;
-	    	}
-	    	if ((start < 0) && isSpeech[i])
-	    		start = i;
-	    }
-	    return new Speeches(out);
+        
+        int start = -1;
+        ArrayList<Speech> out = new ArrayList<Speech>();
+        for (int i = 0; i < allData.size(); ++i)
+        {
+            if ((start >= 0) && ((i == allData.size() - 1) || !isSpeech[i]))
+            {
+                Speech speech = new Speech(
+                        allData.get(start).getStartTime(),
+                        allData.get(i).getEndTime() + 0.2,
+                        start,
+                        i);
+                out.add(speech);
+                start = -1;
+            }
+            if ((start < 0) && isSpeech[i])
+                start = i;
+        }
+        return new Speeches(out);
 	}
 
 	public Speeches findSpeechParts2()
