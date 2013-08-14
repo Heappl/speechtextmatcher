@@ -43,14 +43,13 @@ public class MainLargeChunkPhonemeAlignment
 
         IterativePhonemeScorerTraining aligner =
             new IterativePhonemeScorerTraining(
-                //Double.POSITIVE_INFINITY,
-                3,
+                Double.POSITIVE_INFINITY,
                 prepared,
                 dataExtractor.getPowerData(),
                 new GraphemesToPolishPhonemesConverter(),
                 dataExtractor.getTotalTime());
 
-        new PhonemeScorerExporter(outputFile).export(aligner.train(15));
+        new PhonemeScorerExporter(outputFile).export(aligner.train(30));
         new AudacityLabelsExporter(outputPhonemeLabelsFile).export(aligner.getLastResults());
         System.err.println("END");
     }

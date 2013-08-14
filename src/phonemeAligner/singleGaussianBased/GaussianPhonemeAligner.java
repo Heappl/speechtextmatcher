@@ -101,7 +101,13 @@ public class GaussianPhonemeAligner
         {
             double frameScore = this.dataScorer.score(audio);
             double noChangeScore = this.bestScore + frameScore;
-            double changeScore = ((previous != null) ? previous.getScore() : Double.NEGATIVE_INFINITY) + frameScore;
+            double changeScore =
+                    ((previous != null) ?
+                            (previous.getScore() + previous.dataScorer.transitionScore()) :
+                                Double.NEGATIVE_INFINITY)
+                    + frameScore;
+            if ((previous != null) && (changeScore == Double.POSITIVE_INFINITY))
+                throw new ImplementationError(changeScore + " " + previous.dataScorer.transitionScore());
             
             if (noChangeScore > changeScore) {
                 this.bestScore = noChangeScore;

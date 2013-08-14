@@ -2,6 +2,7 @@ package phonemeScorers.trainers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import phonemeScorers.GaussianMixturePhonemeScorer;
 
@@ -20,19 +21,21 @@ public class PhonemeGuasianMixtureTrainer
     {
         private double[][] data;
         private String phoneme;
+        private double transitionScore = 0;
         
-        public PhonemeData(String phoneme, double[][] data)
+        public PhonemeData(String phoneme, double[][] data, double transitionScore)
         {
             System.err.println(phoneme + " " + data.length);
             this.data = data;
             this.phoneme = phoneme;
+            this.transitionScore = transitionScore;
         }
 
-        public GaussianMixturePhonemeScorer train(int numOfModels) throws ImplementationError
+        public GaussianMixturePhonemeScorer train(int numOfModels)
         {
             GaussianMixtureExpectedMaximalization em = new GaussianMixtureExpectedMaximalization();
             MixtureGaussianModel mixtureModel = new MixtureGaussianModel(em.calculate(data, numOfModels));
-            return new GaussianMixturePhonemeScorer(mixtureModel, phoneme);
+            return new GaussianMixturePhonemeScorer(mixtureModel, this.transitionScore, phoneme);
         }
     }
     
@@ -45,7 +48,8 @@ public class PhonemeGuasianMixtureTrainer
     {
         ArrayList<PhonemeData> phonemes = extractPhonemeData(phonemeLabels, data, totalTime); 
         
-        ArrayList<GaussianMixturePhonemeScorer> trainedScorers = new ArrayList<GaussianMixturePhonemeScorer>();
+        ArrayList<GaussianMixturePhonemeScorer> trainedScorers =
+                new ArrayList<GaussianMixturePhonemeScorer>();
         
         for (PhonemeData phoneme : phonemes) {
             trainedScorers.add(phoneme.train(modelsPerPhoneme));
@@ -59,16 +63,28 @@ public class PhonemeGuasianMixtureTrainer
             ArrayList<double[]> data,
             double totalTime)
     {
-        HashMap<String, ArrayList<double[]>> dataPerPhoneme = new HashMap<String, ArrayList<double[]>>();
+        Map<String, ArrayList<double[]>> dataPerPhoneme = new HashMap<String, ArrayList<double[]>>();
+        Map<String, Double> transitionScoresPerPhoneme = new HashMap<String, Double>();
+        Map<String, Integer> phonemeCounts = new HashMap<String, Integer>();
         
         DataByTimesExtractor<double[]> dataExtractor =
                 new DataByTimesExtractor<double[]>(new GenericListContainer<double[]>(data), totalTime, 0);
         
         for (AudioLabel label : phonemeLabels) {
             ArrayList<double[]> phonemeData = dataExtractor.extract(label.getStart(), label.getEnd());
-            if (dataPerPhoneme.containsKey(label.getLabel()))
+            double current = 1.0 / (double)phonemeData.size();
+            if (dataPerPhoneme.containsKey(label.getLabel())) {
+                double previous = transitionScoresPerPhoneme.get(label.getLabel());
+                int previousCount = phonemeCounts.get(label.getLabel());
+                transitionScoresPerPhoneme.put(label.getLabel(), previous + current);
+                phonemeCounts.put(label.getLabel(), previousCount + 1);
                 dataPerPhoneme.get(label.getLabel()).addAll(phonemeData);
-            else dataPerPhoneme.put(label.getLabel(), phonemeData);
+            }
+            else {
+                dataPerPhoneme.put(label.getLabel(), phonemeData);
+                transitionScoresPerPhoneme.put(label.getLabel(), current);
+                phonemeCounts.put(label.getLabel(), 1);
+            }
         }
         
         ArrayList<PhonemeData> ret = new ArrayList<PhonemeData>();
@@ -79,7 +95,9 @@ public class PhonemeGuasianMixtureTrainer
             for (int i = 0; i < phonemeData.size(); ++i) {
                 phonemePoints[i] = phonemeData.get(i);
             }
-            ret.add(new PhonemeData(key, phonemePoints));
+            double transitionScore = transitionScoresPerPhoneme.get(key);
+            transitionScore /= phonemeCounts.get(key);
+            ret.add(new PhonemeData(key, phonemePoints, Math.log(transitionScore)));
         }
         return ret;
     }

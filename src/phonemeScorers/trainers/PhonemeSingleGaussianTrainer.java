@@ -34,20 +34,27 @@ public class PhonemeSingleGaussianTrainer
     private IPhonemeScorer trainScorer(
         String phoneme, ArrayList<AudioLabel> labelList, ArrayList<double[]> data, double totalTime)
     {
-        System.err.println("training " + phoneme);
         DataByTimesExtractor<double[]> dataExtractor =
                 new DataByTimesExtractor<double[]>(new GenericListContainer<double[]>(data), totalTime, 0);
             
         ArrayList<double[]> phonemeData = new ArrayList<double[]>();
+        double transitionScore = 0;
         for (AudioLabel label : labelList) {
-            phonemeData.addAll(dataExtractor.extract(label.getStart(), label.getEnd()));
+            ArrayList<double[]> extracted = dataExtractor.extract(label.getStart(), label.getEnd());
+            if (extracted.size() > 0)
+                transitionScore += 1.0 / (double)extracted.size();
+            else transitionScore += 1.0;
+            phonemeData.addAll(extracted);
         }
+        transitionScore /= labelList.size();
         double[][] phonemePoints = new double[phonemeData.size()][];
         for (int i = 0; i < phonemeData.size(); ++i)
             phonemePoints[i] = phonemeData.get(i);
         MultivariateNormalDistribution model =
                 new MultivariateDataStatistics(phonemePoints).getDistribution();
-        return new SingleGaussianPhonemeScorer(model, phoneme);
+        if (Math.log(transitionScore) == Double.POSITIVE_INFINITY)
+            throw new ImplementationError(phoneme + " " + labelList.size() + " " + transitionScore);
+        return new SingleGaussianPhonemeScorer(model, Math.log(transitionScore), phoneme);
     }
 
     private HashMap<String, ArrayList<AudioLabel>> sortLabels(ArrayList<AudioLabel> labels)
