@@ -4,10 +4,12 @@ import graphemesToPhonemesConverters.IWordToPhonemesConverter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 
 import phonemeScorers.IPhonemeScorer;
 
+import common.Alignment;
 import common.AudioLabel;
 import common.GenericListContainer;
 import common.algorithms.DataByTimesExtractor;
@@ -60,23 +62,36 @@ public class GaussianAligner
     public ArrayList<AudioLabel> align(IPhonemeScorer[] phonemeScorers) throws ImplementationError
     {
         ArrayList<AudioLabel> phonemeLabels = new ArrayList<AudioLabel>();
+        double totalScore = 0;
         for (AudioLabel word : chunks) {
-            ArrayList<AudioLabel> wordPhonemes = findPhonemes(word, phonemeScorers);
-            phonemeLabels.addAll(wordPhonemes);
+            Alignment alignment = findPhonemes(word, phonemeScorers);
+            totalScore += alignment.getScore();
+            phonemeLabels.addAll(alignment.getLabels());
         }
+        Collections.sort(phonemeLabels, new Comparator<AudioLabel>() {
+            @Override
+            public int compare(AudioLabel o1, AudioLabel o2)
+            {
+                if (o1.getStart() < o2.getStart()) return -1;
+                if (o1.getStart() > o2.getStart()) return 1;
+                return 0;
+            }
+        });
         
+        System.err.println("alignment score: " + totalScore);
         return phonemeLabels;
     }
     
-    private ArrayList<AudioLabel> findPhonemes(
+    private Alignment findPhonemes(
             AudioLabel chunk, IPhonemeScorer[] phonemeScorers) throws ImplementationError
     {
-        if (chunk.getEnd() <= chunk.getStart()) return new ArrayList<AudioLabel>();
+        if (chunk.getEnd() <= chunk.getStart())
+            return new Alignment(new ArrayList<AudioLabel>(), -Double.MAX_VALUE);
         
         String[] phonemes = splitChunk(chunk.getLabel());
         ArrayList<double[]> audio = this.dataExtractor.extract(chunk.getStart(), chunk.getEnd());
         GaussianPhonemeAligner aligner = new GaussianPhonemeAligner(phonemeScorers);
-        return aligner.align(phonemes, audio, chunk.getStart(), chunk.getEnd()).getLabels();
+        return aligner.align(phonemes, audio, chunk.getStart(), chunk.getEnd());
     }
 
     public String[] splitChunk(String chunk)
