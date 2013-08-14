@@ -44,7 +44,7 @@ public class MainTextToSpeechByLengthMatcher
         IncrementalTextToSpeechAligner incrementalAligner =
         		new IncrementalTextToSpeechAligner(byLengthAligner);
         System.err.println("aligning");
-        AudioLabel[] matched = incrementalAligner.findMatching(text, speeches);
+        AudioLabel[] matched = byLengthAligner.findMatching(text, speeches);
     	new AudacityLabelsExporter(labelsOutputPath).export(matched);
         System.err.println("END");
 	}
