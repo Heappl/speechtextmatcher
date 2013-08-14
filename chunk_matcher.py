@@ -56,9 +56,9 @@ def merge_by_words(merging, target):
             break
     return ret
     
-def merge_by_times(merging, target):
+def merge_by_times(merging, target, timeDiffAllowed):
     def timeFilter((start, end, l), (tstart, tend, tl)):
-        return (start >= tstart - 0.3) and (end <= tend + 0.3)
+        return (start < tend) and (end > tstart)
     def extractFromTime(targetLabel, lookupList):
         return mergeLabels([label for label in lookupList if timeFilter(label, targetLabel)])
     return [extractFromTime(label, merging) for label in target]
@@ -96,7 +96,7 @@ def countWordDifference(first, second):
                         matched = max(matched, k - i)
         if (len(args) > 3) and (matched == 0):
             print (first, second)
-        return len(first) + len(second) - 2 * matched
+        return max(len(first), len(second)) - matched
 
     diffs = [wordDiff(label1, label2) for ((s1, e1, label1), (s2, e2, label2)) in zip(first, second)]
     ret = {}
@@ -108,14 +108,15 @@ def countWordDifference(first, second):
     return ret
 
 firstMergedByWords = merge_by_words(first, second)       
-firstMergedByTimes = merge_by_times(first, second)       
+firstMergedByTimes = merge_by_times(first, second, 0.5)     
     
-print countTimeDifference(firstMergedByWords, second, 0.3)
+print countTimeDifference(firstMergedByWords, second, 0.5)
 print countWordDifference(firstMergedByTimes, second)
 
 #pause base alignment - simple
-#(210, 715, 3.409846153846155, 3.516975611888207, 32.3939375000009)
-#{0: 219, 1: 158, 2: 58, 3: 43, 4: 36, 5: 19, 6: 18, 7: 17, 8: 20, 9: 13, 10: 8, 11: 4, 12: 5, 13: 10, 14: 8, 15: 5, 16: 6, 17: 5, 18: 6, 19: 2, 20: 2, 21: 2, 22: 5, 23: 5, 24: 3, 25: 1, 26: 3, 27: 3, 28: 2, 29: 5, 30: 3, 31: 3, 32: 1, 34: 1, 35: 1, 38: 1, 41: 2, 42: 1, 44: 1, 47: 2, 51: 1, 52: 1, 53: 1, 54: 1, 62: 1, 70: 1, 71: 1, 94: 1}
+#(154, 503, 5.243697813121271, 5.230329647117267, 37.940000000000055)
+#{0: 179, 1: 54, 2: 20, 3: 27, 4: 25, 5: 27, 6: 26, 7: 16, 8: 21, 9: 14, 10: 5, 11: 9, 12: 6, 13: 6, 14: 7, 15: 5, 16: 7, 17: 9, 18: 3, 19: 3, 20: 6, 21: 3, 22: 2, 23: 1, 28: 1, 29: 1, 30: 1, 31: 1, 33: 1, 36: 1, 37: 1, 39: 2, 40: 2, 41: 1, 45: 1, 54: 1, 58: 1, 59: 1, 61: 2, 62: 1, 64: 1, 66: 1, 69: 1}
+
 #incremental
 #(207, 708, 4.0902118644067835, 4.2215441384181975, 32.3939375000009)
 #{0: 214, 1: 159, 2: 53, 3: 30, 4: 31, 5: 19, 6: 15, 7: 16, 8: 15, 9: 12, 10: 10, 11: 7, 12: 6, 13: 14, 14: 11, 15: 9, 16: 5, 17: 4, 18: 7, 19: 3, 20: 3, 21: 1, 22: 6, 23: 4, 24: 4, 25: 1, 26: 6, 27: 4, 28: 2, 29: 4, 30: 3, 31: 1, 32: 3, 33: 2, 34: 1, 35: 2, 37: 1, 38: 1, 39: 1, 40: 2, 41: 1, 42: 1, 44: 1, 46: 2, 47: 2, 49: 1, 53: 1, 54: 1, 67: 1, 70: 1, 71: 2, 80: 1, 94: 1}

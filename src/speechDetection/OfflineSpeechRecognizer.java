@@ -42,30 +42,123 @@ public class OfflineSpeechRecognizer implements IWaveObserver {
 	
 	public Speeches findSpeechParts()
 	{
-        double[] weights = new SpectrumWeights(allData).getWeights();
-        for (int i = 0; i < spectrumSize; ++i) weights[i] *= 1000;
+//        double[] weights = new SpectrumWeights(allData).getWeights();
+//        for (int i = 0; i < spectrumSize; ++i) weights[i] *= 1000;
+//        for (int i = 0; i < allData.size(); ++i) {
+//            for (int j = 0; j < spectrumSize; ++j) {
+//                allData.get(i).getSpectrum()[j] = Math.log(allData.get(i).getSpectrum()[j]) * weights[j];
+//            }
+//        }
+	    
+	    int endIndex = spectrumSize;
+	    
+	    double[] average = new double[endIndex];
+	    for (int i = 0; i < allData.size(); ++i) {
+	        for (int j = 0; j < endIndex; ++j) {
+	            average[j] += allData.get(i).getSpectrum()[j];
+	        }
+	    }
+        for (int j = 0; j < endIndex; ++j) average[j] /= allData.size();
+        
+        double[] backgroundAverage = new double[endIndex];
+        int backgroundAverageCount = 0;
+        int countThreshold = 0;
         for (int i = 0; i < allData.size(); ++i) {
-            for (int j = 0; j < spectrumSize; ++j) {
-                allData.get(i).getSpectrum()[j] = Math.log(allData.get(i).getSpectrum()[j]) * weights[j];
+            int count = 0;
+            for (int j = 0; j < endIndex; ++j) {
+                if (allData.get(i).getSpectrum()[j] >= average[j])
+                    ++count;
+            }
+            if (count > countThreshold) {
+                for (int j = 0; j < endIndex; ++j) {
+                    backgroundAverage[j] += allData.get(i).getSpectrum()[j];
+                }
+                ++backgroundAverageCount;
             }
         }
+        for (int j = 0; j < endIndex; ++j) backgroundAverage[j] /= backgroundAverageCount;
+	    
+//        double averagePower = 0;
+//        for (int i = 0; i < allData.size(); ++i)
+//        {
+//            double power = calculatePower(allData.get(i));
+//            averagePower += power;
+//        }
+//        averagePower /= allData.size();
+//        
+//        double backgroundAveragePower = 0;
+//        int count = 0;
+//        for (int i = 0; i < allData.size(); ++i)
+//        {
+//            double power = calculatePower(allData.get(i));
+//            if (power < averagePower) {
+//                backgroundAveragePower += power;
+//                ++count;
+//            }
+//        }
+//        backgroundAveragePower /= count;
+//        
+//        double[] backgroundAverage = new double[spectrumSize];
+//        int backgroundAverageCount = 0;
+//        for (int i = 0; i < allData.size(); ++i)
+//        {
+//            double power = calculatePower(allData.get(i));
+//            if (power < backgroundAveragePower) {
+//                for (int j = 0; j < spectrumSize; ++j)
+//                    backgroundAverage[j] += allData.get(i).getSpectrum()[j];
+//                ++backgroundAverageCount;
+//            }
+//        }
+//        for (int j = 0; j < spectrumSize; ++j)
+//            backgroundAverage[j] /= backgroundAverageCount;
+//
+//        for (int i = 0; i < allData.size(); ++i) {
+//            for (int j = 0; j < spectrumSize; ++j) {
+//                allData.get(i).getSpectrum()[j] -= backgroundAverage[j];
+//            }
+//        }
+//        averagePower = 0;
+//        for (int i = 0; i < allData.size(); ++i)
+//        {
+//            double power = calculatePower(allData.get(i));
+//            averagePower += power;
+//        }
+//        averagePower /= allData.size();
+//        
+//        backgroundAveragePower = 0;
+//        count = 0;
+//        for (int i = 0; i < allData.size(); ++i)
+//        {
+//            double power = calculatePower(allData.get(i));
+//            if (power < averagePower) {
+//                backgroundAveragePower += power;
+//                ++count;
+//            }
+//        }
+//        backgroundAveragePower /= count;
         
-        double average = 0;
-        for (int i = 0; i < allData.size(); ++i)
-        {
-            double[] curr = allData.get(i).getSpectrum();
-            for (int j = 0; j < spectrumSize; ++j)
-                average += curr[j];
-        }
-        average /= allData.size();
+//        double backgroundVariance = 0;
+//        for (int i = 0; i < allData.size(); ++i)
+//        {
+//            double[] curr = allData.get(i).getSpectrum();
+//            double sum = 0;
+//            for (int j = 0; j < spectrumSize; ++j)
+//                sum += curr[j] * curr[j];
+//            sum /= spectrumSize;
+//            if (Math.sqrt(sum) < average)
+//                backgroundVariance += (Math.sqrt(sum) - average) * (Math.sqrt(sum) - average);
+//        }
+//        backgroundVariance = Math.sqrt(backgroundVariance / count);
         
         boolean[] isSpeech = new boolean[allData.size() + 2];
         for (int i = 0; i < allData.size(); ++i)
         {
-            double[] curr = allData.get(i).getSpectrum();
-            double sum = 0;
-            for (int j = 0; j < spectrumSize; ++j) sum += curr[j];
-            isSpeech[i + 1] = (sum >= average);
+            int count = 0;
+            for (int j = 0; j < endIndex; ++j) {
+                if (allData.get(i).getSpectrum()[j] >= backgroundAverage[j])
+                    ++count;
+            }
+            isSpeech[i + 1] = (count > countThreshold);
         }
         
         fillHoles(isSpeech, true, this.speechGravity, 0);
@@ -93,7 +186,14 @@ public class OfflineSpeechRecognizer implements IWaveObserver {
         return new Speeches(out);
 	}
 
-	public Speeches findSpeechParts2()
+	private double calculatePower(Data data)
+    {
+	    double ret = 0;
+	    for (double value : data.getSpectrum())
+	        ret += value;
+        return ret;
+    }
+    public Speeches findSpeechParts2()
 	{
 		System.err.println("spectrum size: " + allData.get(0).getSpectrum().length);
 		
@@ -148,7 +248,7 @@ public class OfflineSpeechRecognizer implements IWaveObserver {
 	    	{
 	    		Speech speech = new Speech(
 	    				allData.get(start).getStartTime(),
-	    				allData.get(i).getEndTime(),
+	    				allData.get(i).getEndTime() + 0.1,
 	    				start,
 	    				i);
 	    		out.add(speech);

@@ -59,7 +59,7 @@ public class Trainer
         
         for (State state : allStates) {
             for (StateExit exit : state) {
-                exit.updateLikelihood(LogMath.linearToLog(1.0 / (double)state.numOfExits()));
+                exit.updateLikelihood(0);//LogMath.linearToLog(1.0 / (double)state.numOfExits()));
                 transitionTrainers.add(new TransitionTrainer(exit));
             }
         }

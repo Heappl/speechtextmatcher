@@ -17,7 +17,7 @@ public class StatesTrainer
             new HashMap<State, SingleStateTrainer>();
     private Map<StateExit, TransitionTrainer> transitionTrainers =
             new HashMap<StateExit, TransitionTrainer>();
-    private LogMath totalLikelihood = new LogMath();
+    private float totalLikelihood = 0;
     
     public StatesTrainer(ArrayList<SingleStateTrainer> stateTrainers,
                          ArrayList<TransitionTrainer> transitionTrainers)
@@ -45,17 +45,17 @@ public class StatesTrainer
             State nodeState = likelihood.getNode().getState();
             double[] observation = likelihood.getObservation();
             this.stateTrainers.get(nodeState).addObservation(observation, likelihood.getLogLikelihood());
-            for (ArcLogLikelihood arcLikelihood : likelihood) {
-                StateExit arcStateExit = arcLikelihood.getArc().getExit();
-                if (arcStateExit == null) throw new ImplementationError("null arc state exit");
-                if (!this.transitionTrainers.containsKey(arcStateExit)) continue;
+//            for (ArcLogLikelihood arcLikelihood : likelihood) {
+//                StateExit arcStateExit = arcLikelihood.getArc().getExit();
+//                if (arcStateExit == null) throw new ImplementationError("null arc state exit");
+//                if (!this.transitionTrainers.containsKey(arcStateExit)) continue;
 //                this.transitionTrainers.get(arcStateExit)
 //                    .addObservation(arcLikelihood.getLogLikelihood());
 //                this.transitionTrainers.get(arcStateExit)
 //                    .addStateObservation(likelihood.getLogLikelihood());
-            }
+//            }
         }
-        this.totalLikelihood.logAdd(sequenceLikelihoods.getLogLikelihood());
+        this.totalLikelihood += sequenceLikelihoods.getLogLikelihood();
     }
 
     public double retrainingFinished() throws ImplementationError
@@ -65,7 +65,7 @@ public class StatesTrainer
 //        }
         for (SingleStateTrainer trainer : this.stateTrainers.values())
             trainer.finish();
-        return this.totalLikelihood.getResult();
+        return this.totalLikelihood;
     }
 
     public void retrainStateTrainersSecondPhase(double[][] observationSequence, Node possibleModel) throws ImplementationError
