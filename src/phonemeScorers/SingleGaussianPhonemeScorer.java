@@ -39,7 +39,8 @@ public class SingleGaussianPhonemeScorer implements IPhonemeScorer
     @Override
     public String serialize()
     {
-        return this.getClass().getCanonicalName() + "{" + phoneme + ":" + model.serialize() + "}";
+        return this.getClass().getCanonicalName() + "{" + phoneme + ":" + this.transitionScore + ":"
+                    + model.serialize() + "}";
     }
 
     @Override
