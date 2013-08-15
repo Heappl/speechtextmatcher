@@ -1,0 +1,365 @@
+corpora/af1k1/af1k1001.wav lubić czardaszowy pląs
+corpora/af1k1/af1k1002.wav cudzy brzuch i buzia w drzewie
+corpora/af1k1/af1k1003.wav w żądzy zejdę z gwoździa
+corpora/af1k1/af1k1004.wav krociowych sum nie żal mi
+corpora/af1k1/af1k1005.wav móc czuć każdy odczynnik
+corpora/af1k1/af1k1006.wav on łom kładzie lampy i kołpak
+corpora/af1k1/af1k1007.wav rybactwo smutnieje on się śmieje
+corpora/af1k1/af1k1008.wav on liczne taśmy w cuglach da
+corpora/af1k1/af1k1009.wav ten chór dusiłem licznie
+corpora/af1k1/af1k1010.wav chciałbym wpaść na sesję
+corpora/af1k1/af1k1011.wav żółtko wlazło i co zrobić
+corpora/af1k1/af1k1012.wav wór rur żelaznych warzył
+corpora/af1k1/af1k1013.wav u nas ludzie zwą to fuchy
+corpora/af1k1/af1k1014.wav on myje wróble w zoo
+corpora/af1k1/af1k1015.wav boś cały w wiśniowym soku
+corpora/af1k1/af1k1016.wav na czczo chleby i pyry z dżemem
+corpora/af1k1/af1k1017.wav podobno bardzo wielki uczony
+corpora/af1k1/af1k1018.wav lech być podlejszym chce
+corpora/af1k1/af1k1019.wav ten ciepły dom z dachówką
+corpora/af1k1/af1k1020.wav toż gdzieś tam w noc ciemną
+corpora/af1k1/af1k1021.wav żre jesz zioła jak dżem dżon
+corpora/af1k1/af1k1022.wav i wszyscy są na okrągło
+corpora/af1k1/af1k1023.wav jak bym był jednak w domu
+corpora/af1k1/af1k1024.wav masz dzisiaj różyczkę zieloną
+corpora/af1k1/af1k1025.wav weź daj im soli drogi dyzmo
+corpora/af1k1/af1k1026.wav weź masz ramki opolskie
+corpora/af1k1/af1k1027.wav dźgnął nas cicho pod zamkiem
+corpora/af1k1/af1k1028.wav tam śpi wojsko z bronią
+corpora/af1k1/af1k1029.wav nie odchodź bo żona idzie
+corpora/af1k1/af1k1030.wav książe daj pół ziemi i siostrę
+corpora/af1k1/af1k1031.wav tym można atakować
+corpora/af1k1/af1k1032.wav zmyślny kot psotny ujdzie
+corpora/af1k1/af1k1033.wav niech pan sunie na wschód
+corpora/af1k1/af1k1034.wav ten górnik wyżył z ochłapu
+corpora/af1k1/af1k1035.wav czy upewnić się czy łże
+corpora/af1k1/af1k1036.wav od ilu wolniej ślepcze
+corpora/af1k1/af1k1037.wav dał snycerz matce tlen zimą
+corpora/af1k1/af1k1038.wav niech trzy e na ef trzy
+corpora/af1k1/af1k1039.wav chwat okno urwał wam ziuto
+corpora/af1k1/af1k1040.wav toż swój lew chadza chroń go
+corpora/af1k1/af1k1041.wav mój torf ma u izy od dżona
+corpora/af1k1/af1k1042.wav lecz wuj nasz pił równo
+corpora/af1k1/af1k1043.wav babciu oddaj w mig mój dżem
+corpora/af1k1/af1k1044.wav on i ewa noc i dzień szli z nim
+corpora/af1k1/af1k1045.wav obcy ptak co drzemał na pniu
+corpora/af1k1/af1k1046.wav wśród sosen kwiat i drzewa
+corpora/af1k1/af1k1047.wav ktoś bił się srodze
+corpora/af1k1/af1k1048.wav kwaśny jęzor z kur lub gęsi
+corpora/af1k1/af1k1049.wav koń warczy jak ćma w noc szarą
+corpora/af1k1/af1k1050.wav oj bardziej niż wasz był szary
+corpora/af1k1/af1k1051.wav pędź do chmur myjko
+corpora/af1k1/af1k1052.wav idą do ełku ulicą i jedzą
+corpora/af1k1/af1k1053.wav on szył im szwy dziś
+corpora/af1k1/af1k1054.wav on dziś chce mieć szybwagon
+corpora/af1k1/af1k1055.wav lecz są gzymsy albo gzik
+corpora/af1k1/af1k1056.wav tam go oblał mój zuch kawą
+corpora/af1k1/af1k1057.wav też chroń słońce ewo
+corpora/af1k1/af1k1058.wav zrób chop siup malcze
+corpora/af1k1/af1k1059.wav idą za młodym co serce ma
+corpora/af1k1/af1k1060.wav lecz późną nocką idą raźniej
+corpora/af1k1/af1k1061.wav mat szach tą wieżą
+corpora/af1k1/af1k1062.wav tam dalszy zięć to był
+corpora/af1k1/af1k1063.wav nasz not ma tam dźwig
+corpora/af1k1/af1k1064.wav zlot się w pełni skończył
+corpora/af1k1/af1k1065.wav zapną w ten czas ten pas
+corpora/af1k1/af1k1066.wav daj choć samą ćwiartkę
+corpora/af1k1/af1k1067.wav też leć za nim z szybą
+corpora/af1k1/af1k1068.wav toć różni się mój frak często
+corpora/af1k1/af1k1069.wav oddziel dziś go oldze
+corpora/af1k1/af1k1070.wav lecz z czym ten frajer zjadł
+corpora/af1k1/af1k1071.wav król lew nam życie wziął
+corpora/af1k1/af1k1072.wav woź żyto bo zżęty mój łan
+corpora/af1k1/af1k1073.wav zgrabnie ją kat bił w pas
+corpora/af1k1/af1k1074.wav idź jak kot cicho po mchu
+corpora/af1k1/af1k1075.wav wal po tym czymś stopą
+corpora/af1k1/af1k1076.wav ten był czwarty z zuchów
+corpora/af1k1/af1k1077.wav palcu eli atłas i no
+corpora/af1k1/af1k1078.wav czmychnie w górę gałęzi
+corpora/af1k1/af1k1079.wav obmyj dzban z dziurą okrągłą
+corpora/af1k1/af1k1080.wav widzą chrzan biały na rzęsach
+corpora/af1k1/af1k1081.wav koń drogą marną szedł
+corpora/af1k1/af1k1082.wav od zimy dzwon wisi ojcze
+corpora/af1k1/af1k1083.wav karpi zimą brać nie czas
+corpora/af1k1/af1k1084.wav drożdże są czymś solone
+corpora/af1k1/af1k1085.wav znów łamał haki od góry
+corpora/af1k1/af1k1086.wav nasz jan je ojca perłę
+corpora/af1k1/af1k1087.wav aśka z izą niech się pną
+corpora/af1k1/af1k1088.wav daj żyć całej ziemii
+corpora/af1k1/af1k1089.wav też zjesz coś czy dżem raczej
+corpora/af1k1/af1k1090.wav piękny dyngus miał dżon
+corpora/af1k1/af1k1091.wav z tą ewą łukasz i kacper grają
+corpora/af1k1/af1k1092.wav na węch naszą aleją już szła
+corpora/af1k1/af1k1093.wav żył ładniej niż świnka lub płaz
+corpora/af1k1/af1k1094.wav mierź babcię lub brata nas nie
+corpora/af1k1/af1k1095.wav wierch gór dżungarii
+corpora/af1k1/af1k1096.wav olzą płyńmy wskroś zaolzia
+corpora/af1k1/af1k1097.wav na półce ciężkie połcie
+corpora/af1k1/af1k1098.wav ksiąc lśnił mocno noc całą
+corpora/af1k1/af1k1099.wav wiedźma zsiada z przęsła
+corpora/af1k1/af1k1_0_.wav zero
+corpora/af1k1/af1k1100.wav w brydżce cmokają się i gwiżdżą
+corpora/af1k1/af1k1101.wav żmije są sine bo są zimne
+corpora/af1k1/af1k1102.wav niech za mur idą dżdżownice
+corpora/af1k1/af1k1103.wav spręż ciało na pierś jana 
+corpora/af1k1/af1k1104.wav on żył zacniej niż żonka 
+corpora/af1k1/af1k1105.wav tęsknił żigolak pod żlebem 
+corpora/af1k1/af1k1106.wav wyżły i koń piją u źródła
+corpora/af1k1/af1k1107.wav ból łokcia u dżokeja to klęska
+corpora/af1k1/af1k1108.wav ma bzika po krzywdzie na poczcie
+corpora/af1k1/af1k1109.wav cwany jaś szyje dżinsy
+corpora/af1k1/af1k1110.wav chodźże w ciąży z jadzią
+corpora/af1k1/af1k1111.wav król robił z zimna na hałdzie 
+corpora/af1k1/af1k1112.wav palcie dżazgi olchy z sensem
+corpora/af1k1/af1k1113.wav najjaśniej gada z tą lalką dziś
+corpora/af1k1/af1k1114.wav bank chłopski tą ceną dzwoni
+corpora/af1k1/af1k1_1_.wav jeden
+corpora/af1k1/af1k1_2_.wav dwa
+corpora/af1k1/af1k1_3_.wav trzy
+corpora/af1k1/af1k1_4_.wav cztery
+corpora/af1k1/af1k1_5_.wav pięć
+corpora/af1k1/af1k1_6_.wav sześć
+corpora/af1k1/af1k1_7_.wav siedem
+corpora/af1k1/af1k1_8_.wav osiem
+corpora/af1k1/af1k1_9_.wav dziewięć
+corpora/af1k1/af1k1ada.wav adam
+corpora/af1k1/af1k1agn.wav agnieszka
+corpora/af1k1/af1k1agt.wav agata
+corpora/af1k1/af1k1alc.wav alicja
+corpora/af1k1/af1k1alf.wav alfred
+corpora/af1k1/af1k1aln.wav alina
+corpora/af1k1/af1k1alx.wav aleksander
+corpora/af1k1/af1k1ana.wav anastazja
+corpora/af1k1/af1k1and.wav andrzej
+corpora/af1k1/af1k1ani.wav aniela
+corpora/af1k1/af1k1ann.wav anna
+corpora/af1k1/af1k1ant.wav antoni
+corpora/af1k1/af1k1anz.wav andżelika
+corpora/af1k1/af1k1apo.wav apolonia
+corpora/af1k1/af1k1ark.wav arkadiusz
+corpora/af1k1/af1k1art.wav artur
+corpora/af1k1/af1k1a__.wav a
+corpora/af1k1/af1k1a-_.wav ą
+corpora/af1k1/af1k1bar.wav barbara
+corpora/af1k1/af1k1bea.wav beata
+corpora/af1k1/af1k1ben.wav benon
+corpora/af1k1/af1k1ber.wav bernard
+corpora/af1k1/af1k1be_.wav be
+corpora/af1k1/af1k1bgd.wav bogdan
+corpora/af1k1/af1k1bgm.wav bogumił
+corpora/af1k1/af1k1bla.wav błażej
+corpora/af1k1/af1k1bls.wav bolesław
+corpora/af1k1/af1k1boz.wav bożena
+corpora/af1k1/af1k1bro.wav bronisław
+corpora/af1k1/af1k1brt.wav bartłomiej
+corpora/af1k1/af1k1bsl.wav bogusław
+corpora/af1k1/af1k1cec.wav cecylia
+corpora/af1k1/af1k1cel.wav celina
+corpora/af1k1/af1k1ce_.wav ce
+corpora/af1k1/af1k1cez.wav cezary
+corpora/af1k1/af1k1cfn.wav cofnij
+corpora/af1k1/af1k1ci_.wav će
+corpora/af1k1/af1k1cyp.wav cyprian
+corpora/af1k1/af1k1cze.wav czesław
+corpora/af1k1/af1k1de_.wav de
+corpora/af1k1/af1k1djn.wav diana
+corpora/af1k1/af1k1dmn.wav damian
+corpora/af1k1/af1k1dnl.wav daniel
+corpora/af1k1/af1k1dnt.wav danuta
+corpora/af1k1/af1k1dom.wav dominik
+corpora/af1k1/af1k1drj.wav daria
+corpora/af1k1/af1k1drs.wav dariusz
+corpora/af1k1/af1k1drt.wav dorota
+corpora/af1k1/af1k1edm.wav edmund
+corpora/af1k1/af1k1edw.wav edward
+corpora/af1k1/af1k1edy.wav edyta
+corpora/af1k1/af1k1ef_.wav ef
+corpora/af1k1/af1k1elg.wav eugenia
+corpora/af1k1/af1k1eli.wav eliza
+corpora/af1k1/af1k1els.wav eugeniusz
+corpora/af1k1/af1k1el_.wav el
+corpora/af1k1/af1k1elz.wav elżbieta
+corpora/af1k1/af1k1emj.wav emilia
+corpora/af1k1/af1k1eml.wav emil
+corpora/af1k1/af1k1em_.wav em
+corpora/af1k1/af1k1en_.wav en
+corpora/af1k1/af1k1er_.wav er
+corpora/af1k1/af1k1esi.wav eś
+corpora/af1k1/af1k1es_.wav es
+corpora/af1k1/af1k1esz.wav esz
+corpora/af1k1/af1k1eu_.wav eł
+corpora/af1k1/af1k1e__.wav e
+corpora/af1k1/af1k1e-_.wav ę
+corpora/af1k1/af1k1ewa.wav ewa
+corpora/af1k1/af1k1fil.wav filip
+corpora/af1k1/af1k1fla.wav felicja
+corpora/af1k1/af1k1fln.wav felicjan
+corpora/af1k1/af1k1flo.wav florentyna
+corpora/af1k1/af1k1flr.wav florian 
+corpora/af1k1/af1k1flx.wav feliks
+corpora/af1k1/af1k1fra.wav franciszek
+corpora/af1k1/af1k1fry.wav fryderyk
+corpora/af1k1/af1k1gen.wav genowefa
+corpora/af1k1/af1k1ger.wav gerard
+corpora/af1k1/af1k1ge_.wav ge
+corpora/af1k1/af1k1gra.wav grażyna
+corpora/af1k1/af1k1gus.wav gustaw
+corpora/af1k1/af1k1gze.wav grzegorz
+corpora/af1k1/af1k1hal.wav halina
+corpora/af1k1/af1k1han.wav hanna
+corpora/af1k1/af1k1ha_.wav ha
+corpora/af1k1/af1k1hel.wav helena
+corpora/af1k1/af1k1hen.wav henryk
+corpora/af1k1/af1k1hie.wav hieronim
+corpora/af1k1/af1k1hon.wav honorata
+corpora/af1k1/af1k1hub.wav hubert
+corpora/af1k1/af1k1iga.wav iga
+corpora/af1k1/af1k1ign.wav ignacy
+corpora/af1k1/af1k1ire.wav ireneusz
+corpora/af1k1/af1k1irn.wav irena
+corpora/af1k1/af1k1i__.wav i
+corpora/af1k1/af1k1iwo.wav iwona
+corpora/af1k1/af1k1iza.wav izabela
+corpora/af1k1/af1k1izy.wav izydor
+corpora/af1k1/af1k1jan.wav jan
+corpora/af1k1/af1k1jar.wav jarosław
+corpora/af1k1/af1k1jck.wav jacek
+corpora/af1k1/af1k1jdw.wav jadwiga
+corpora/af1k1/af1k1jez.wav jerzy
+corpora/af1k1/af1k1jja.wav julia
+corpora/af1k1/af1k1jkp.wav jakub
+corpora/af1k1/af1k1jlj.wav julian
+corpora/af1k1/af1k1jln.wav jolanta
+corpora/af1k1/af1k1jls.wav juliusz
+corpora/af1k1/af1k1jlt.wav julita
+corpora/af1k1/af1k1jnn.wav julianna
+corpora/af1k1/af1k1jns.wav janusz
+corpora/af1k1/af1k1joa.wav joanna
+corpora/af1k1/af1k1jot.wav jot
+corpora/af1k1/af1k1jst.wav justyna
+corpora/af1k1/af1k1jzf.wav józef
+corpora/af1k1/af1k1kat.wav katarzyna
+corpora/af1k1/af1k1ka_.wav ka
+corpora/af1k1/af1k1kaz.wav kazimierz
+corpora/af1k1/af1k1kld.wav klaudia
+corpora/af1k1/af1k1klm.wav klementyna
+corpora/af1k1/af1k1kln.wav klaudyna
+corpora/af1k1/af1k1kml.wav kamil
+corpora/af1k1/af1k1knr.wav konrad
+corpora/af1k1/af1k1krl.wav karol
+corpora/af1k1/af1k1krn.wav karolina
+corpora/af1k1/af1k1krp.wav kropka
+corpora/af1k1/af1k1krs.wav krystyna
+corpora/af1k1/af1k1krz.wav krzysztof
+corpora/af1k1/af1k1ku_.wav ku
+corpora/af1k1/af1k1kzm.wav kazimiera
+corpora/af1k1/af1k1lcj.wav lucjan
+corpora/af1k1/af1k1lcn.wav lucyna 
+corpora/af1k1/af1k1ldj.wav lidia
+corpora/af1k1/af1k1ldm.wav ludmiła
+corpora/af1k1/af1k1ldw.wav ludwik
+corpora/af1k1/af1k1leh.wav lech
+corpora/af1k1/af1k1leo.wav leon
+corpora/af1k1/af1k1les.wav leszek
+corpora/af1k1/af1k1lkd.wav leokadia
+corpora/af1k1/af1k1lks.wav łukasz
+corpora/af1k1/af1k1lnd.wav leonard
+corpora/af1k1/af1k1luc.wav łucja
+corpora/af1k1/af1k1lun.wav łucjan
+corpora/af1k1/af1k1mac.wav maciej
+corpora/af1k1/af1k1mch.wav michał
+corpora/af1k1/af1k1mgd.wav magdalena
+corpora/af1k1/af1k1mir.wav mirosław
+corpora/af1k1/af1k1mjc.wav mieczysław
+corpora/af1k1/af1k1mkl.wav mikołaj
+corpora/af1k1/af1k1mlg.wav małgorzata
+corpora/af1k1/af1k1mnk.wav monika
+corpora/af1k1/af1k1mrc.wav marcin
+corpora/af1k1/af1k1mrj.wav maria
+corpora/af1k1/af1k1mrk.wav marek
+corpora/af1k1/af1k1mrl.wav mariola
+corpora/af1k1/af1k1mrn.wav marian
+corpora/af1k1/af1k1mrs.wav mariusz
+corpora/af1k1/af1k1mrt.wav marta
+corpora/af1k1/af1k1mrz.wav marzena
+corpora/af1k1/af1k1mtu.wav mateusz
+corpora/af1k1/af1k1nie.wav nie
+corpora/af1k1/af1k1nik.wav nikodem
+corpora/af1k1/af1k1nin.wav nina
+corpora/af1k1/af1k1ni_.wav eń
+corpora/af1k1/af1k1nrb.wav norbert
+corpora/af1k1/af1k1ntl.wav natalia
+corpora/af1k1/af1k1nwl.wav nowa linia
+corpora/af1k1/af1k1olg.wav olga
+corpora/af1k1/af1k1oln.wav oleńka
+corpora/af1k1/af1k1olt.wav olgierd
+corpora/af1k1/af1k1o__.wav o
+corpora/af1k1/af1k1pe_.wav pe
+corpora/af1k1/af1k1plg.wav pelagia
+corpora/af1k1/af1k1pln.wav paulina
+corpora/af1k1/af1k1prz.wav przemysław
+corpora/af1k1/af1k1psz.wav przecinek
+corpora/af1k1/af1k1ptr.wav piotr
+corpora/af1k1/af1k1pwl.wav paweł
+corpora/af1k1/af1k1rbt.wav robert
+corpora/af1k1/af1k1rdl.wav rudolf
+corpora/af1k1/af1k1rds.wav radosław
+corpora/af1k1/af1k1rfl.wav rafał
+corpora/af1k1/af1k1rgn.wav regina
+corpora/af1k1/af1k1rjm.wav rajmund
+corpora/af1k1/af1k1rmn.wav roman
+corpora/af1k1/af1k1rmt.wav romuald
+corpora/af1k1/af1k1rnt.wav renata
+corpora/af1k1/af1k1rys.wav ryszard
+corpora/af1k1/af1k1rz_.wav żet
+corpora/af1k1/af1k1sbj.wav sobiesław
+corpora/af1k1/af1k1sbn.wav sabina
+corpora/af1k1/af1k1sbs.wav sebastian
+corpora/af1k1/af1k1sci.wav ścibor
+corpora/af1k1/af1k1slm.wav sławomir
+corpora/af1k1/af1k1slw.wav sylwia
+corpora/af1k1/af1k1spc.wav spacja
+corpora/af1k1/af1k1stf.wav stefan
+corpora/af1k1/af1k1stn.wav stanisław
+corpora/af1k1/af1k1stp.wav stop
+corpora/af1k1/af1k1swi.wav światosław
+corpora/af1k1/af1k1swr.wav seweryn
+corpora/af1k1/af1k1szc.wav szczepan
+corpora/af1k1/af1k1szm.wav szymon
+corpora/af1k1/af1k1tdr.wav teodor
+corpora/af1k1/af1k1tdu.wav tadeusz
+corpora/af1k1/af1k1te_.wav te
+corpora/af1k1/af1k1tfl.wav teofil
+corpora/af1k1/af1k1tms.wav tomasz
+corpora/af1k1/af1k1trs.wav teresa
+corpora/af1k1/af1k1urb.wav urban
+corpora/af1k1/af1k1urs.wav urszula
+corpora/af1k1/af1k1u__.wav u
+corpora/af1k1/af1k1vik.wav wiktoria
+corpora/af1k1/af1k1wal.wav walentyna
+corpora/af1k1/af1k1wcl.wav wacław
+corpora/af1k1/af1k1wjc.wav wojciech
+corpora/af1k1/af1k1wjl.wav wioletta
+corpora/af1k1/af1k1wkt.wav wiktor
+corpora/af1k1/af1k1wla.wav władysław
+corpora/af1k1/af1k1wld.wav waldemar
+corpora/af1k1/af1k1wln.wav walenty
+corpora/af1k1/af1k1wlo.wav włodzimierz
+corpora/af1k1/af1k1wnc.wav wincenty
+corpora/af1k1/af1k1wnd.wav wanda
+corpora/af1k1/af1k1wrn.wav weronika
+corpora/af1k1/af1k1wsl.wav wiesław
+corpora/af1k1/af1k1wtl.wav witold
+corpora/af1k1/af1k1wu_.wav wu
+corpora/af1k1/af1k1y__.wav y
+corpora/af1k1/af1k1zan.wav żaneta
+corpora/af1k1/af1k1zbg.wav zbigniew
+corpora/af1k1/af1k1zdz.wav zdzisław
+corpora/af1k1/af1k1zet.wav zet
+corpora/af1k1/af1k1zfj.wav zofia
+corpora/af1k1/af1k1zgm.wav zygmunt
+corpora/af1k1/af1k1ziu.wav ziuta
+corpora/af1k1/af1k1zi_.wav ziet
+corpora/af1k1/af1k1zle.wav źle
+corpora/af1k1/af1k1znn.wav zenon
+corpora/af1k1/af1k1zuz.wav zuzanna
