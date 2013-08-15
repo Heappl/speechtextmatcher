@@ -1,5 +1,6 @@
 package phonemeScorers;
 
+import common.LogMath;
 import common.algorithms.gaussian.MixtureGaussianModel;
 import common.exceptions.DeserializationException;
 import common.exceptions.ImplementationError;
@@ -8,14 +9,14 @@ public class GaussianMixturePhonemeScorer implements IPhonemeScorer
 {
     private MixtureGaussianModel gaussianMixtureModel = null;
     private String phoneme = "";
-    private double transitionScore = 0;
+    private float transitionScore = 0;
 
     public GaussianMixturePhonemeScorer()
     {
     }
     public GaussianMixturePhonemeScorer(
         MixtureGaussianModel gaussianMixtureModel,
-        double transitionScore,
+        float transitionScore,
         String phoneme)
     {
         this.gaussianMixtureModel = gaussianMixtureModel;
@@ -57,11 +58,16 @@ public class GaussianMixturePhonemeScorer implements IPhonemeScorer
                 prefixLength + phoneme.length() + transitionScore.length() + 2,
                 line.length() - 1);
         MixtureGaussianModel model = MixtureGaussianModel.deserialize(modelData);
-        return new GaussianMixturePhonemeScorer(model, Double.valueOf(transitionScore), phoneme);
+        return new GaussianMixturePhonemeScorer(model, Float.valueOf(transitionScore), phoneme);
     }
     @Override
-    public double transitionScore()
+    public float transitionScore()
     {
         return this.transitionScore;
+    }
+    @Override
+    public float noTransitionScore()
+    {
+        return LogMath.linearToLog(1 - LogMath.logToLinear(this.transitionScore));
     }
 }

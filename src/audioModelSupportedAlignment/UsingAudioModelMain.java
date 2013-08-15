@@ -16,7 +16,7 @@ import graphemesToPhonemesConverters.DictionaryGenerator;
 import graphemesToPhonemesConverters.GraphemesToRussianPhonemesConverter;
 import speechDetection.OfflineSpeechRecognizer;
 
-public class UsingEnglishAudioModelMain
+public class UsingAudioModelMain
 {
 	public static URL audioModelUrl() throws MalformedURLException
 	{

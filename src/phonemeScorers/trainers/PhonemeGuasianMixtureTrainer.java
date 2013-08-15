@@ -9,6 +9,7 @@ import phonemeScorers.GaussianMixturePhonemeScorer;
 
 import common.AudioLabel;
 import common.GenericListContainer;
+import common.LogMath;
 import common.algorithms.DataByTimesExtractor;
 import common.algorithms.gaussian.GaussianMixtureExpectedMaximalization;
 import common.algorithms.gaussian.MixtureGaussianModel;
@@ -21,9 +22,9 @@ public class PhonemeGuasianMixtureTrainer
     {
         private double[][] data;
         private String phoneme;
-        private double transitionScore = 0;
+        private float transitionScore = 0;
         
-        public PhonemeData(String phoneme, double[][] data, double transitionScore)
+        public PhonemeData(String phoneme, double[][] data, float transitionScore)
         {
             System.err.println(phoneme + " " + data.length);
             this.data = data;
@@ -97,7 +98,7 @@ public class PhonemeGuasianMixtureTrainer
             }
             double transitionScore = transitionScoresPerPhoneme.get(key);
             transitionScore /= phonemeCounts.get(key);
-            ret.add(new PhonemeData(key, phonemePoints, Math.log(transitionScore)));
+            ret.add(new PhonemeData(key, phonemePoints, LogMath.linearToLog(transitionScore)));
         }
         return ret;
     }

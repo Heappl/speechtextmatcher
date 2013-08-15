@@ -10,6 +10,7 @@ import phonemeScorers.SingleGaussianPhonemeScorer;
 
 import common.AudioLabel;
 import common.GenericListContainer;
+import common.LogMath;
 import common.algorithms.DataByTimesExtractor;
 import common.algorithms.gaussian.MultivariateNormalDistribution;
 import common.exceptions.ImplementationError;
@@ -54,7 +55,7 @@ public class PhonemeSingleGaussianTrainer
                 new MultivariateDataStatistics(phonemePoints).getDistribution();
         if (Math.log(transitionScore) == Double.POSITIVE_INFINITY)
             throw new ImplementationError(phoneme + " " + labelList.size() + " " + transitionScore);
-        return new SingleGaussianPhonemeScorer(model, Math.log(transitionScore), phoneme);
+        return new SingleGaussianPhonemeScorer(model, LogMath.linearToLog(transitionScore), phoneme);
     }
 
     private HashMap<String, ArrayList<AudioLabel>> sortLabels(ArrayList<AudioLabel> labels)

@@ -1,6 +1,7 @@
 package phonemeScorers;
 
 
+import common.LogMath;
 import common.algorithms.gaussian.MultivariateNormalDistribution;
 import common.exceptions.DeserializationException;
 import common.exceptions.ImplementationError;
@@ -10,14 +11,14 @@ public class SingleGaussianPhonemeScorer implements IPhonemeScorer
 
     private MultivariateNormalDistribution model = null;
     private String phoneme = "";
-    private double transitionScore = 0;
+    private float transitionScore = 0;
     
     public SingleGaussianPhonemeScorer()
     {
     }
     
     public SingleGaussianPhonemeScorer(
-        MultivariateNormalDistribution gaussianModel, double transitionScore, String phoneme)
+        MultivariateNormalDistribution gaussianModel, float transitionScore, String phoneme)
     {
         this.model = gaussianModel;
         this.phoneme = phoneme;
@@ -54,12 +55,18 @@ public class SingleGaussianPhonemeScorer implements IPhonemeScorer
                 prefixLength + phoneme.length() + transitionScore.length() + 2,
                 line.length() - 1);
         MultivariateNormalDistribution model = MultivariateNormalDistribution.deserialize(modelData);
-        return new SingleGaussianPhonemeScorer(model, Double.valueOf(transitionScore), phoneme);
+        return new SingleGaussianPhonemeScorer(model, Float.valueOf(transitionScore), phoneme);
     }
 
     @Override
-    public double transitionScore()
+    public float transitionScore()
     {
         return this.transitionScore;
+    }
+
+    @Override
+    public float noTransitionScore()
+    {
+        return LogMath.linearToLog(1 - LogMath.logToLinear(this.transitionScore));
     }
 }
