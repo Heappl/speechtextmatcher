@@ -13,6 +13,7 @@ import dataExporters.AudacityLabelsExporter;
 import dataProducers.TextImporter;
 import dataProducers.WaveImporter;
 import graphemesToPhonemesConverters.DictionaryGenerator;
+import graphemesToPhonemesConverters.GraphemesToCorporaPlPhonenemsConverter;
 import graphemesToPhonemesConverters.GraphemesToRussianPhonemesConverter;
 import speechDetection.OfflineSpeechRecognizer;
 
@@ -25,6 +26,8 @@ public class UsingAudioModelMain
 //    	return classLoader.findResource("WSJ_8gau_13dCep_16k_40mel_130Hz_6800Hz");
 		return new URL(
 			"file:/home/bartek/workspace/speechtextmatcher/voxforge-ru-0.2/model_parameters/msu_ru_nsh.cd_cont_1000_8gau_16000/");
+//        return new URL(
+//            "file:/home/bartek/workspace/speechtextmatcher/pl_corpora_snuv/");
 	}
 	
     public static void main(String[] args) throws Exception
@@ -39,7 +42,8 @@ public class UsingAudioModelMain
 
         Speeches speeches = null;
         {
-	    	WaveImporter waveImporterForOfflineSpeechRecognition = new WaveImporter(inputWavePath, "config_nospeech_nomel.xml");
+	    	WaveImporter waveImporterForOfflineSpeechRecognition = new WaveImporter(
+	    	        inputWavePath, "config_nospeech_nomel.xml");
 	    	OfflineSpeechRecognizer speechRecognizer = new OfflineSpeechRecognizer(20, 10);
 	//    	
 	    	waveImporterForOfflineSpeechRecognition.registerObserver(speechRecognizer);
@@ -54,6 +58,7 @@ public class UsingAudioModelMain
         Text text = new Text(new TextImporter(inputTextPath), speeches.getTotalTime());
         String rawText = join(text.getWords(), " ");
         new DictionaryGenerator(text, new GraphemesToRussianPhonemesConverter()).store(dictTempPath);
+//        new DictionaryGenerator(text, new GraphemesToCorporaPlPhonenemsConverter()).store(dictTempPath);
         AudioInputStream stream = AudioSystem.getAudioInputStream(new File(inputWavePath));
     	ArrayList<AudioLabel> results = new Aligner().align(acousticModel, dictionary, stream, rawText);
 //    	ArrayList<AudioLabel> results = new PauseBasedAligner(acousticModel, dictionary).align(stream, text, speeches);
