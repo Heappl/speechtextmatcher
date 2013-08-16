@@ -54,11 +54,9 @@ public class WordToPhonemeAlignerBasedOnHMM {
 		DataByTimesExtractor<double[]> dataExtractor = new DataByTimesExtractor<double[]>(
                 new GenericListContainer<double[]>(data), totalTime, 0);
 		
-		int count = 100;
 		for (AudioLabel word : words) {
 			ArrayList<double[]> wordData = dataExtractor.extract(word.getStart(), word.getEnd());
 			ret.addAll(this.phonemeSearch.findPhonemes(word, wordData, powerStatistics.getBackgroundMean()));
-			if (count-- < 0) break;
 		}
 		
 		return ret;
