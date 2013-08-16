@@ -1,12 +1,9 @@
 package textAligners;
 
-import java.util.ArrayList;
-
 import graphemesToPhonemesConverters.GraphemesToPolishPhonemesConverter;
 import phonemeScorers.IPhonemeScorer;
 import phonemeScorers.io.PhonemeScorerImporter;
 import speechDetection.OfflineSpeechRecognizer;
-import common.AudioLabel;
 import common.Speeches;
 import common.Text;
 import common.exceptions.DeserializationException;
@@ -71,12 +68,19 @@ public class MainTextToSpeechByGaussianMatcher
 //                extractor.getTotalTime());
 //        new AudacityLabelsExporter(labelsOutputPath).export(aligner.align(text, speeches));
         
-        IterativeGaussianSearchAligner aligner = new IterativeGaussianSearchAligner(
+//        IterativeGaussianSearchAligner aligner = new IterativeGaussianSearchAligner(
+//                scorers,
+//                new GraphemesToPolishPhonemesConverter(),
+//                extractor.getPowerData(),
+//                extractor.getTotalTime());
+//        new AudacityLabelsExporter(labelsOutputPath).export(aligner.align(text));
+        
+        BreadthSearchBestCutAligner aligner = new BreadthSearchBestCutAligner(
                 scorers,
                 new GraphemesToPolishPhonemesConverter(),
-                extractor.getPowerData(),
-                extractor.getTotalTime());
-        new AudacityLabelsExporter(labelsOutputPath).export(aligner.align(text));
+                100);
+        new AudacityLabelsExporter(labelsOutputPath).export(
+                aligner.align(text, extractor.getPowerData(), extractor.getTotalTime()));
         System.err.println("END");
     }
 }
