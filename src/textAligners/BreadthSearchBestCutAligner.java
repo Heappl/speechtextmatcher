@@ -31,6 +31,7 @@ public class BreadthSearchBestCutAligner
         ArrayList<String> phonemes = new ArrayList<String>();
         phonemes.add("sil");
         for (String word : text.getWords()) {
+            word = word.replace("'", "");
             for (String phoneme : this.converter.convert(word).get(0).split(" "))
                 phonemes.add(phoneme);
             phonemes.add("sil");
