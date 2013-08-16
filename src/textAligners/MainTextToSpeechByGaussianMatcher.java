@@ -1,9 +1,12 @@
 package textAligners;
 
+import java.util.ArrayList;
+
 import graphemesToPhonemesConverters.GraphemesToPolishPhonemesConverter;
 import phonemeScorers.IPhonemeScorer;
 import phonemeScorers.io.PhonemeScorerImporter;
 import speechDetection.OfflineSpeechRecognizer;
+import common.AudioLabel;
 import common.Speeches;
 import common.Text;
 import common.exceptions.DeserializationException;
@@ -54,17 +57,26 @@ public class MainTextToSpeechByGaussianMatcher
             waveImporterForOfflineSpeechRecognition.done();
             waveImporterForAudioFeatures.done();
         }
-        
+
+        System.err.println("importing text");
         Text text = new Text(new TextImporter(textFile), speeches.getTotalTime());
+        System.err.println("importing gaussian scorers");
         IPhonemeScorer[] scorers = new PhonemeScorerImporter(new TextImporter(gaussianFile)).getScorers();
 
         System.err.println("aligning");
-        GaussianBasedAligner aligner = new GaussianBasedAligner(
+//        GaussianBasedAligner aligner = new GaussianBasedAligner(
+//                scorers,
+//                new GraphemesToPolishPhonemesConverter(),
+//                extractor.getPowerData(),
+//                extractor.getTotalTime());
+//        new AudacityLabelsExporter(labelsOutputPath).export(aligner.align(text, speeches));
+        
+        IterativeGaussianSearchAligner aligner = new IterativeGaussianSearchAligner(
                 scorers,
                 new GraphemesToPolishPhonemesConverter(),
                 extractor.getPowerData(),
                 extractor.getTotalTime());
-        new AudacityLabelsExporter(labelsOutputPath).export(aligner.align(text, speeches));
+        new AudacityLabelsExporter(labelsOutputPath).export(aligner.align(text));
         System.err.println("END");
     }
 }
