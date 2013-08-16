@@ -27,7 +27,7 @@ corpora/af1k1/af1k1026.wav weź masz ramki opolskie
 corpora/af1k1/af1k1027.wav dźgnął nas cicho pod zamkiem
 corpora/af1k1/af1k1028.wav tam śpi wojsko z bronią
 corpora/af1k1/af1k1029.wav nie odchodź bo żona idzie
-corpora/af1k1/af1k1030.wav książe daj pół ziemi i siostrę
+corpora/af1k1/af1k1030.wav książę daj pół ziemi i siostrę
 corpora/af1k1/af1k1031.wav tym można atakować
 corpora/af1k1/af1k1032.wav zmyślny kot psotny ujdzie
 corpora/af1k1/af1k1033.wav niech pan sunie na wschód
@@ -44,7 +44,7 @@ corpora/af1k1/af1k1043.wav babciu oddaj w mig mój dżem
 corpora/af1k1/af1k1044.wav on i ewa noc i dzień szli z nim
 corpora/af1k1/af1k1045.wav obcy ptak co drzemał na pniu
 corpora/af1k1/af1k1046.wav wśród sosen kwiat i drzewa
-corpora/af1k1/af1k1047.wav ktoś bił się srodze
+corpora/af1k1/af1k1047.wav ktoś wbił się srodze
 corpora/af1k1/af1k1048.wav kwaśny jęzor z kur lub gęsi
 corpora/af1k1/af1k1049.wav koń warczy jak ćma w noc szarą
 corpora/af1k1/af1k1050.wav oj bardziej niż wasz był szary
@@ -74,7 +74,7 @@ corpora/af1k1/af1k1073.wav zgrabnie ją kat bił w pas
 corpora/af1k1/af1k1074.wav idź jak kot cicho po mchu
 corpora/af1k1/af1k1075.wav wal po tym czymś stopą
 corpora/af1k1/af1k1076.wav ten był czwarty z zuchów
-corpora/af1k1/af1k1077.wav palcu eli atłas i no
+corpora/af1k1/af1k1077.wav w palcu eli atłas i no
 corpora/af1k1/af1k1078.wav czmychnie w górę gałęzi
 corpora/af1k1/af1k1079.wav obmyj dzban z dziurą okrągłą
 corpora/af1k1/af1k1080.wav widzą chrzan biały na rzęsach
@@ -95,7 +95,7 @@ corpora/af1k1/af1k1094.wav mierź babcię lub brata nas nie
 corpora/af1k1/af1k1095.wav wierch gór dżungarii
 corpora/af1k1/af1k1096.wav olzą płyńmy wskroś zaolzia
 corpora/af1k1/af1k1097.wav na półce ciężkie połcie
-corpora/af1k1/af1k1098.wav ksiąc lśnił mocno noc całą
+corpora/af1k1/af1k1098.wav księżyc lśnił mocno noc całą
 corpora/af1k1/af1k1099.wav wiedźma zsiada z przęsła
 corpora/af1k1/af1k1_0_.wav zero
 corpora/af1k1/af1k1100.wav w brydżce cmokają się i gwiżdżą
