@@ -48,6 +48,7 @@ public class BreadthSearchBestCutAligner
         ArrayList<AudioLabel> wordLabels = new ArrayList<AudioLabel>();
         ArrayList<AudioLabel> filteredPhonemeLabels = filterOutSils(phonemesLabels);
         for (String word : text.getWords()) {
+            word = word.replace("'", "");
             String[] phonemes = this.converter.convert(word).get(0).split(" ");
             if (phonemes.length > filteredPhonemeLabels.size()) break;
             ArrayList<AudioLabel> currWordLabels = extractLabels(phonemes, filteredPhonemeLabels);
