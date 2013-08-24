@@ -19,7 +19,7 @@ public class MainTextToSpeechByLengthMatcher
 
     	WaveImporter waveImporterForOfflineSpeechRecognition = new WaveImporter(
     	        waveFile, "../textAligners/config_nospeech_nomel.xml");
-    	OfflineSpeechRecognizer speechRecognizer = new OfflineSpeechRecognizer(30, 10);
+    	OfflineSpeechRecognizer speechRecognizer = new OfflineSpeechRecognizer(20, 10);
     	
     	waveImporterForOfflineSpeechRecognition.registerObserver(speechRecognizer);
     	waveImporterForOfflineSpeechRecognition.process();
