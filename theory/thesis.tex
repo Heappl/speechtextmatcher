@@ -16,6 +16,7 @@ The purpose of this final master degree project was to experiment with various a
 
 
 \newpage
+\setcounter{tocdepth}{2}
 \tableofcontents
 
 \newpage
@@ -37,7 +38,7 @@ Each of these cell is excited by different frequency of mechanical wave of inter
 Humans can hear frequencies, that begins as low as 12Hz (under laboratory conditions) to 20kHz (for adults usually much lower). However speech range is a little bit smaller than that [3]: \newline
 
 \begin{center}
-    \includegraphics[scale=0.38]{speech_range.jpg}
+    \includegraphics[scale=0.5]{speech_range.jpg}
 \end {center}
 
 
@@ -193,5 +194,123 @@ Which on it's own can be seen as way of separating signals, since it is more eas
 In the example with echo, we could have used the cepstrum to separate echoed signal from initial signal, and it might be used to filter out an audio feedback.
 
 \end{minipage}
+
+\newpage
+\subsection{Sphinx frontend}
+
+
+Sphinx is a speech recognition toolkit with a lot of useful functionalities for any speech related problem.  \newline
+There is a certain common way to prepare a speech signal for the further processing. With slight variations in each step, the useful informations about speech are drawn from a cepstrum of the reduced signal (in the number of data dimensions), as presented in this chapter. \newline
+
+In order to skip the reinvention of the wheel, I used the fronted part of the sphinx library in any experiment in this project.
+The sphinx fronted performs signal transformation and produces data composed of only 39 voice features,
+while actually only 13 are base ones and the rest is a derivation of these. \newline
+
+Sphinx frontend is a list of transformations executed on the result of the transformation placed higher in the list.
+In another words it is a transformation composition. \newline
+\newline
+This Sphinx frontend pipeline includes: \newline
+\begin{itemize}
+	\item Data Blocker,
+	\item Preemphasizer,
+	\item Windower,
+	\item Discrete Fourier Transform,
+	\item Mel Frequency Filter Bank,
+	\item Discrete Cosine Transform,
+	\item Cepstral Mean Normalization,
+	\item Deltas Feature Extractor.
+\end{itemize}
+
+\subsubsection{Data Blocker}
+
+This initial transformation reads incoming double data read from audio source (file or microphone) and
+prepares blocks of the data to be used in later phases. In our case blocks contain 10ms of audio data.
+
+\subsubsection{Preemphasizer}
+
+The Preemphasizer applies a formula: $Y[i]=x[i]-(X[i-1] * preemphasizerFactor)$.
+The purpose of this transformation is to emphasize the high frequency components. It is kind of filter,
+which allows high frequency components to pass through, but weakens the low frequency ones.
+
+
+\newpage
+\subsubsection{Raised cosine windower}
+
+Creates windows from the incoming data. A windowing function
+\begin{equation}
+    W(n)=(1-\alpha) - \alpha cos(\frac{2 \pi n}{N - 1})
+\end{equation}
+ is applied afterwards. Alpha coefficient set to 0.46 results with a mentioned before Hamming windowing
+ function, which is a default setting and the one used by me.
+
+\subsubsection{Discrete Fourier Transform}
+
+Implementation of fast Fourier transform .The FFT can perform transformation with complexity $\Omega(Nlog(N))$,
+where N is the size of the input data.
+It can be perform on whole data, however in speech we would like to get an information of the frequencies 
+of a small frame, that contains consistent speech signal, in particular a single phoneme.
+The output data is the power spectrum of input data window and the complex/phase information is lost.
+The number of FFT points is the closest power of 2 equal or larger to the number of samples in the incoming window of data. However the input signal is real, so resulting FFT is symmetric, so only half of the data is returned and the output size is $\frac{FFT points}{2} + 1$.
+
+\subsubsection{Mel frequency filter bank}
+
+This step is a part of calculating a Mel Frequency Cepstrum. \newline
+
+Conversion of frequency spectrum into a mel-spectrum using triangular overlapping windows defined as:
+\begin{equation}
+    w(n) = 1 - |\frac{n - (N - 1)/2}{(N + 1)/2}|
+\end{equation}
+
+
+The number of triangles/filters defined the size of mel-spectrum and the sphinx's default is 40. \newline
+The filters are chosen, so the result would simulate a mel-scale given by the formula:
+\begin{equation}
+    melFreq = 2595 log(1 + linearFrequency / 700)
+\end{equation}
+
+The given filters should look like in the picture:
+\begin{center}
+    \includegraphics[scale=0.4]{mel_filters.jpg}
+\end {center}
+
+Not all frequencies are covered by the filters.
+The chosen range of frequencies may differ for various audio encodings,
+but generally should cover only the speech ranges.
+The default values for 16kHz sample rate streams are 130Hz-6800Hz and are not changed in this project.
+
+\newpage
+\subsubsection{Discrete Cosine Transform}
+
+Another part of calculating Mel Frequency Cepstral Coefficient vector.  \newline
+
+It applies a logarithm and the DCT type II to the input data.  \newline
+
+A DCT type II (most common) coefficients are defined as: 
+\begin{equation}
+    C(u) = \alpha(u)\sum_{x=0}^{N-1} f(x)cos[\frac{\pi(2x+1)u}{2N}] 
+\end{equation}
+and it is quite tightly related to real part of the Fourier Transform. [18]
+The transform represents a function as a sum of cosine functions and it is equivalent to the DFT operating
+real data with even symmetry. \newline
+The number of dimensions returned is set by default to 13.
+
+\subsubsection{Cepstral Mean Normalization}
+
+Performs a normalization of MFCC vector by subtracting a mean of all the input. There are two versions
+of this step. One that calculates mean online and the other that reads all data before performing
+subtraction.
+
+\subsubsection{Deltas feature extractor}
+
+The final transformation in the sphinx frontend chain. It calculates first and second order derivative of the
+cepstrum as additional features of the speech signal. It improves noticeable speech processing algorithms
+by adding additional information about changes in the cepstrum data. \newline
+
+For the initial cepstrum data it adds additionally twice the size vector with first and second order
+differences, calculated as shown in the picture:
+\begin{center}
+    \includegraphics[scale=0.6]{deltas_calc.jpg}
+\end {center}
+
 
 \end{document}
