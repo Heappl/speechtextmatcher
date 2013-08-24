@@ -1,9 +1,10 @@
 
-\documentclass[12pt,a4paper]{article}
-\usepackage{graphicx}
+\documentclass[12pt,a4paper,english]{article}
+\usepackage{graphicx, babel, csquotes, multicol, amssymb, fullpage}
+\MakeOuterQuote{"}
 \begin{document}
 
-\title{ Text alignment knowledge requirement analysis}
+\title{Analysis of knowledge requirements for text alignment problem}
 \author{Bartosz Kalińczuk}
 \date{\today}
 \maketitle
@@ -28,7 +29,7 @@ The purpose of this final master degree project was to experiment with various a
 
 Speech is a most efficient way the human communicate. For generations this process was refined by evolution, so we can easily exchange messages even in hard situations. For this purpose our vocal mechanisms must well cooperate with our hearing ability. There is a certain set of sounds we can produce and our ears evolved to hear them as well as possible.\newline 
 
-What is sound? According to dictionary: „Vibrations transmitted through an elastic solid or liquid or gas, with frequencies in the approximate range of 20 to 20000 hertz, capable of being detected by human organs of hearing”. [1]\newline
+What is sound? According to dictionary: "Vibrations transmitted through an elastic solid or liquid or gas, with frequencies in the approximate range of 20 to 20000 hertz, capable of being detected by human organs of hearing". [1]\newline
 
 How do we hear? Human ear consist about 30000 hair-cells, which can convert mechanical wave of the sound into electromagnetic wave inside auditory nerves [2]. 
 Each of these cell is excited by different frequency of mechanical wave of internal ear fluids, so it is no surprise, that people can hear only a certain range of frequencies, as stated in definition. These we expect to be finely tuned to the range of the sounds we can produce. Although it seems, that we can hear a bit more, but as we don't need that, it happens, that as we grow older, our hearing range is getting smaller, because our hear cells fail sometimes, but mostly those responsible for high frequencies, which we don't use too often.\newline
@@ -119,5 +120,78 @@ Note that it emphasises values in the middle of the window, so our actual window
     \includegraphics[scale=0.3]{window_shifting.jpg}
 \end {center}
 
+\newpage
+A human speech signal in frequency and time domain: [3]
+\begin{center}
+    \includegraphics[scale=0.8]{speech_spectrogram.jpg}
+\end {center}
+
+\newpage
+\subsection{Cepstrum}
+
+Looking at the frequency spectrum of human speech we see, that  the signal in the frequency domain contain features that are quite periodic. As it is with converting initial signal with DFT, we would like to extract the information of periodicity in the spectrum. 
+A cepstrum of the signal gives us this additional information. \newline
+
+The word is derived by reordering characters in the word spectrum to indicate switch of domains, similarly as word 'quefrency'. The cepstrum operates in the domain of time and the basic intuition is, that it reveals a rate of change in the different spectrum bands. 
+For example a cepstrum of an echoed signal in the picture below shows clearly a three 'quefrencies' of the echo of the signal. [12]
+\begin{center}
+    \includegraphics[scale=0.4]{echo_cepstrum.jpg}
+\end {center}
+
+
+Cepstrum definition is: "Inverse Fourier transform of the logarithm of the magnitude of the Fourier transform" or:
+\begin{equation}
+    C=|F^{-1}{log(|F{f(t)}|^2)}|^2
+\end{equation}
+
+,or:
+\begin{equation}
+    c_x[n] = \frac{1}{2\pi} \int_{-\pi}^{\pi}log |X(e^{j \omega})| e^{j \omega n} d\omega
+\end{equation}
+
+This is the definition of the power cepstrum, since it is calculated from the magnitude of each frequency band. However there also exists a complex, real and phase cepstrum depending on what part of initial Fourier transform it uses.
+In speech related problems a power cepstrum is usually used and I haven't see any reason to not focus only on this.
+
+
+\newpage
+\addtolength{\textwidth}{4cm}
+This is a typical cepstrum sequence of the vowel [3] computed every 10ms. \newline
+
+\begin{minipage}[-100,0]{5cm}
+\includegraphics[width=5cm,height=21cm]{vowel_cepstrum.jpg}
+\end{minipage}
+\begin{minipage}[5cm,0]{9cm}
+
+If the sound becomes periodic in the frequency domain it's quefrency domain contains a peak which is related to the periodicity of the sound. \newline
+
+Note that similar results can be obtained by taking just additional DFT of the signal. Inverse Fourier Transform is closely related to Fourier Transform and also performs a split of the function into periodic components. \newline
+\newline
+After all IFT is defined:
+\begin{equation}
+     f(x) = \int_{\mathbb{R} ^ n} e^{2 i \pi x \zeta} \hat{f}(\zeta) d\zeta
+\end{equation}
+while FT is defined: 
+\begin{equation}
+    \hat{f}(\zeta) = \int_{\mathbb{R} ^ n} f(x) e^{-2 i \pi \zeta x} dx
+\end{equation}
+
+Why taking logarithm of the magnitude? It serves as a normalization of power spectrum. In speech for example it happens, that low frequency components are usually more powerful than high frequncy components and by normalizing the signal, the periodicity becomes more apparent. \newline
+
+
+A bit different way of looking at the signal cepstrum is as a homomorphic transformation which changes convolution into sum. [3]
+\begin{equation}
+x(n) = e(n) * h(n)
+\end{equation}
+\begin{equation}
+\hat x(n) = \hat e(n) + \hat h(n)
+\end{equation}
+
+
+Which on it's own can be seen as way of separating signals, since it is more easy to extract elements from a sum, than from a convolution.
+\newline
+\newline
+In the example with echo, we could have used the cepstrum to separate echoed signal from initial signal, and it might be used to filter out an audio feedback.
+
+\end{minipage}
 
 \end{document}
