@@ -1,6 +1,6 @@
 
 \documentclass[12pt,a4paper,english]{article}
-\usepackage{graphicx, babel, csquotes, multicol, amssymb, fullpage}
+\usepackage{graphicx, babel, csquotes, multicol, amssymb, fullpage, amsmath}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \MakeOuterQuote{"}
@@ -482,21 +482,64 @@ Expected-Maximization method is a technique for estimating parameters of any und
     argmax_{\theta} Pr(X | \theta)
 \end{equation}
 
-For certain distribution parameters, that maximize likelihood of the data, can be solved, i.e. calculated mean vector and variance are parameters to normal distribution, that do maximize the likelihood of observing the observation data.
+For certain distributions, parameters, that maximize likelihood of the data, can be solved with analytic methods, i.e. calculated mean vector and variance are parameters to normal distribution, that do maximize the likelihood of observing the training data. \newline
 We can calculate a derivative of normal density function to show it:
+\begin{multline}
+    ln(\prod_{x in X} (\frac 1 {\sqrt{2\pi\sigma^2}} e^{\frac{-(x-\mu)^2}{2\sigma^2}}))d\mu  = \sum_{x \epsilon X}[\frac{-1} 2 ln(2\pi)-ln(\sigma)- \frac{(x-\mu)^2} {2 \sigma^2} ]d\mu = ... \\
+    ...= \frac {-1} {2 \sigma^2} \sum_{x in X}{(x-\mu)^2}d\mu = \frac 1 {\sigma^2} \sum_{x in X}{(x-\mu)}=0 \iff \\
+    \iff \sum_{x in X}{(x-\mu)}=0 \iff \mu = \frac 1 {|X|} \sum_{x in X}x
+\end{multline}
 
+what is a definition of a mean. \newline 
 
-what is a definition of a mean,
+\begin{multline}
+    ln(\prod_{x \epsilon X} Pr(x | \sigma))d\sigma = \sum_{x \epsilon X}[\frac {-1} 2 ln(2\pi)-ln(\sigma)- \frac {(x-\mu)^2} {2 \sigma^2} ]d\sigma = ... \\
+    ...= \sum_{x \epsilon X}[\frac {-1} \sigma + (x-\mu)^2 \sigma^{-3}] = \frac {-1} {\sigma} \sum_{x \epsilon X}[1-(x-\mu)^2 \sigma^{-2}]=... \\
+    ...= 0 \iff \sigma^{-2} \sum_{x \epsilon X}(x-\mu)^2 - | X |=0 \iff \sigma^{-2} | X | = \sum_{x \epsilon X}(x-\mu)^2 \iff \sigma^2 = \frac 1 {|X|} \sum_{x \epsilon X}(x-\mu)^2
+\end{multline}
 
+what is a definition of variance and a standard deviation is a square root of variance. \newline
+And similarly can be done for many other distributions, including multivariate normal distribution. \newline
 
-what is a definition of variance and standard deviation is a square root of variance.
-And similarly can be done for many other distributions, including multivariate normal distribution.
+\newpage
 
-It is not always the case, that one can calculate parameters so easily, i.e. mixture models of several populations may not give so easily.
+It is not always the case, that one can calculate parameters so easily, i.e. mixture models of several populations may not give up so easily.
 Let's consider a mixture of Gaussian models of some populations. We have a random population, where each point is randomly drawn from each distribution. 
-So the total likelihood of any point is: , where is a probability of drawing a point from ith distribution and  is a density function of ith model.
+So the total likelihood of any point is: $\sum_{i=0}^N p_i f_i(x)$, where $p_i$ is a probability of drawing a point from ith distribution and $f_i$ is a density function of ith model. \newline
 
-Since each model from a mixture is easily solvable, if we knew to which model each point belonged, than estimating parameters would be easy, or at least what is the probability, that given point was drawn from a given class (see chapter about Gaussian model).
+Since each model from a mixture is easily solvable, if we knew to which model each point belonged, than estimating parameters would be easy,
+or at least if we knew what is the probability, that given point was drawn from each given class (see chapter about Gaussian model). \newline
+On the other hand it would be simple to calculate a probability, that a point was drawn from some distribution if we knew all the parameters of all models. \newline
 
+
+The Expected-Maximization technique deals with this problem, by finding better parameters using their previous estimation, and thus by iterating over series of converging estimates it is guaranteed to find some local maximum. \newline
+
+
+\begin{equation}
+    Q(\Theta^i,\Theta^{ i-1})= E[log Pr(\chi, \Upsilon | \Theta) | \chi, \Theta^{i-1}]
+\end{equation}
+
+ , where $\Upsilon$ is an unknown data, which can be estimated using $\Theta^{i-1}$, and when known, then $\Theta^{i}$ can be found, by find the parameters, which maximize log likelihood of observing random variables $\chi$ and $\Upsilon$. \newline
+
+
+Thus the EM algorithm contains two steps in single iteration: \newline
+    expectation step and maximization step. \newline
+\begin{itemize}
+	\item During E step, we find $\Upsilon$ data given previous estimate of $\Theta$.
+	\item During M step, we calculate $\Theta$, that maximizes likelihood of observed data and expected hidden data.
+\end{itemize}
+In each iteration a likelihood $Q(\Theta^i,\Theta^{ i-1})$ converges to some local maximum. \newline
+
+We are happy with only local maximum, because the problem resists our efforts to solve it analytically. \newline
+
+
+For example a mixture model can be trained using following steps: \newline
+\begin{itemize}
+    \item In E step we calculate a probability, that a observation is drawn from each class.
+    \item In M step we use this probabilities to calculate a new parameters ($\{(\mu_i, \sigma_i, p_i)\}$), that maximize likelihood of our observed data, as well as an estimated probability of data classification.
+\end{itemize}
+
+\newpage
+\subsection{Hidden Markov Model}
 
 \end{document}
