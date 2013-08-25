@@ -542,4 +542,101 @@ For example a mixture model can be trained using following steps: \newline
 \newpage
 \subsection{Hidden Markov Model}
 
+We can describe an HMM by a triple:
+\begin{equation}
+    \lambda=(A, B, \pi)
+\end{equation}
+ where $A$ is a transition matrix $A = \{ a_{ij} \} = p(Q_t=j | Q_{t-1}=i)$, \newline
+ $B$ is a observation probability function vector $B = \{ b_i \}$, where each $b_i$ is a function calculating likelihood that a given observation $Q_t$  is produced by state $i$, \newline
+ and $\pi$ is an initial state distribution  $\pi_i=P(Q_1=i)$ \newline
+
+For our purpose a $B$ functions will be a Gaussian multivariate distribution of observations emitted by a state. \newline
+
+The most probable state sequence for given sequence of observations can be calculated using dynamic programming (i.e. Viterbi algorithm). \newline
+The algorithm iterates over over the discrete time indexes $t_1, ..., t_n$, where at each moment only one observation $Q_{t_k}$ is emitted. \newline
+
+The k-th iteration produces a vector o probabilities $P_k=[p_1, ..., p_m]$ of the best state sequence ending at a state $i$ at the moment $t_k$.
+For the initial moment the vector is equal to state intial probabilities $\pi$. \newline
+
+The $P_{k+1}$ is calculated as follows:
+\begin{equation}
+    P_{k+1, i} = max(P_{k, j} a_{j, i} b_i(Q_{k+1}))
+\end{equation}
+where $a_{j, i}$ is a probability of transition from state $j$ to state $i$, \newline
+and $b_i(Q_{k+1})$ is probability, that state $i$ emitted observation $Q_{k+1}$. \newline
+
+At the end a maximum probability from elements of $P_n$ gives us a probability of observing the sequence with the maximum likelihood for given sequence of observations. \newline
+
+To find actual sequence of states, we can keep a state for which a maximum was produced for each moment $t_k$ and state $i$ and recreate the maximum likelihood path.
+
+\newpage
+\subsection{Baum Welch algorithm}
+
+To train Hidden Markov Models we have to use a generalized version of EM algorithm, namely a Baum-Welch algorithm. \newline
+In the training of HMM we have observed data $X$ and we want to find parameters set $\theta$, which will maximize the probability of observing $X$, meaning:
+\begin{equation}
+    argmax_\theta(Pr(X | \theta)))
+\end{equation}
+
+If we knew what was the sequence of states in the HMM, we would be able to calculate optimal value of $\theta$ parameters. However we don't know, what the states of HMM were, hence hidden in the name. On the other hand if we knew $\theta$, then we could easily calculate sequence of states, which would maximize the probability of emitting input observations (i.e. using Viterbi algorithm). \newline
+
+EM technique is meant for such a situations. \newline
+
+In the EM spirit, for each iteration we will perform two steps, bringing us to some local maximum: \newline
+\begin{description}
+    \item[expectation step]
+	Given previous estimation of parameters $\theta$, we calculate the probabilities of being at any time $t$ and at any state $i$: $Pr(s_i, t)$
+    \item[maximization step]
+	Given probabilities of being at any state $i$, we calculate next estimation of $\theta$ parameters, which will maximize the likelihood of observing $X$: $argmax_\theta(Pr(X | \theta))$.
+\end{description}
+
+How can we calculate $\theta = \{A, B\}$ parameters? \newline
+Where:
+\begin{description}
+    \item[A =] transition probabilities (probability of transition between any two states)
+	\item[B =] observation probabilities (probability of observing any data at any given time)
+\end{description}
+
+To calculate observation probabilities, we need:
+\begin{equation}
+    \alpha_i(t) = Pr(being \: after \: t \: steps \: at \: state \: i)
+\end{equation}
+\begin{equation}
+    \beta_i(t) = Pr(ending \: sequence | being \: after \: t \: steps \: at \: state \: i)
+\end{equation}
+
+Both of these values can be calculated using dynamic programming. One is calculated by Viterbi's algorithm in forward passage, the other can be calculated in similar manner by backward passage.
+
+\newpage
+
+Combining these values, we can obtain:
+
+\begin{equation}
+    Pr(being \: at \: time \: \boldsymbol{t} \: at state \: \boldsymbol{i}) = \frac {\alpha_i(t)\beta_i(t)} {\sum_{j=1}^{N} \alpha_j(t)\beta_j(t) }
+\end{equation}
+	
+and:
+	
+\begin{equation}
+    Pr(transition \: between \: states \: \boldsymbol{i} \: \boldsymbol{j} \: at \: time \: \boldsymbol{t}) = \frac {\alpha_i(t)a_{ij}\beta_j(t + 1)b_j(o_{t+1})} {\sum_{i=1}^{N} \sum_{j=1}^{N} \alpha_i(t)a_{ij}\beta_j(t + 1)b_j(o_{t+1})}
+\end{equation}
+
+Probability of transition from states i to state j at any given time is:
+	
+\begin{equation}
+    Pr(transition \: \boldsymbol{i} \: \boldsymbol{j}) = \frac {\sum_{t=1}^{T-1} Pr(transition \: between \: states \: \boldsymbol{i} \: \boldsymbol{j} \: at \: time \: \boldsymbol{t})} {\sum_{t=1}^{T-1} Pr(being \: at \: time \: \boldsymbol{t} \: at \: state \: \boldsymbol{i}) }
+\end{equation}
+	
+
+The probability of being at time $t$ at state $i$ can be used to calculated new probabilities of emitting observation $o_t$ at time $t$ by a state $i$,
+since it is emitted by the state with a probability of being at this state at this time. \newline
+
+New parameters of multivariate normal distribution would be:
+\begin{equation}
+    \vec \mu = \frac 1 T \sum_{t=1}^{T} Pr(being \: at \: time \: \boldsymbol{t} \: at \: state \: \boldsymbol{i}) \vec o_t
+\end{equation}
+\begin{equation}
+    \tilde C = \frac 1 T \sum_{t=1}^{T} Pr(being \: at \: time \: \bold{t} \: at \: state \: \bold{i})(\vec o_t - \vec \mu) \cdot (\vec o_t - \vec \mu)^T
+\end{equation}
+
 \end{document}
