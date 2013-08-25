@@ -639,4 +639,61 @@ New parameters of multivariate normal distribution would be:
     \tilde C = \frac 1 T \sum_{t=1}^{T} Pr(being \: at \: time \: \bold{t} \: at \: state \: \bold{i})(\vec o_t - \vec \mu) \cdot (\vec o_t - \vec \mu)^T
 \end{equation}
 
+
+\newpage
+\begin{center}
+    \section{Simple pause and length based alignment}
+\end {center}
+\setcounter{equation}{0}
+
+The basic idea behind this approach is to match sentences with continuous sequence of speech.
+Humans rarely make pauses inside a sub-sentence and rarely continue to another sentence without a pause. \newline
+One simple approach to the alignment problem, which utilizes this fact, is to match part of speech with a portion of a text,
+which would take a similar time to say it. \newline \newline
+
+\subsection{Speech Detection}
+
+Before we can continue with an alignment, we need to detect pauses first or dually we need to detect speeches. \newline
+
+On its own in various environments  the problem is quite hard, however we don't want to consider situations where extracting speech from background is too difficult. It is true, that humans are quite proficient at extracting speech from quite challenging situations like recognizing words of the song, or distinguishing speakers in a crowd.
+However even humans are not perfect, and are often prone for errors. Recognizing song lyrics is not always an easy task, and it remains an open question how much you can attribute the difficulty of this to the background music, how much to changed modulation of singer voice and how much to overabundance of signal in melody scale.
+On the other hand, humans can hear voices in white noise, or in the sounds of nature. Sound hallucinations are the most common among all. It's an easy test, where you try to hear something, where it is not there, but after couple of minutes, you'll start to imagine things. People are sometimes overfit to hear speech. \newline
+
+We leave this problematic cases and focus only on situations where noise to signal ratio is low and we can utilize statistics to detect speech. \newline
+
+Our signal contains speech and silence parts and we assume an environment where speech is clearly louder than silence/noise. Obviously it may also contain non-speech parts which are similar to actual spoken words, like i.e. inhales or other sounds that talking people can make during speech intervals. At this point I don't care about them and leave dealing with them to other approaches. \newline
+This is preprocessing of the speech signal required by every single approach to either speech recognition or alignment. 
+
+\newpage
+
+Speech parts are loud and silence is well, silent, almost at least. If we knew some threshold value, that splits a background noise from the speech, than algorithm of detecting the speech would be to find those parts that are consistently louder then the threshold.  \newline
+
+The problem is to find the threshold and how to deal with consistency of the signal above it, since a small peak can always happen in the background, and a speech is sometimes quite quiet. \newline
+One should choose wisely how to deal with it, since in theory it is possible to figure out even small pauses in the speech signal, like i.e. between syllables.
+I found out, that on one hand it is quite difficult to find these pauses and at the same time to not ignore endings of the sentences, which often are slowly fading to silence (because speaker lacks of breath). On another an alignment using length estimations don't improve, when we detect too many pauses,
+because the algorithm works better when the chunks of signal are bigger, so there's a greater chance they align with punctuation marks at the text. \newline
+
+In the speech recognition systems a detection algorithms have to process the incoming data in an online fashion. Sphinx library implements Bent-Schmidt-Nielsen algorithm, which calculates background noise level and current average signal online, meaning it is updated with each incoming frame. \newline
+When signal average level of processed window (see 2.5) is larger than a signal threshold (input constant) and a background average, than the window is classified as a speech. \newline
+\begin{equation}
+    Ave(signal) - Ave(background) > threshold
+\end{equation}
+Whetever the signal was marked as part of speech signal, the background average is always updated.\newline
+
+
+I found this algorithm to be too volatile at the beginning of the recording and it stops too easily at the middle of the longer sentence. I really needed an offline algorithm, which could detect quite reliably longer pauses, which are better aligned with punctuation marks. \newline
+
+Firstly my algorithm worked with a spectrum of a given window. It processed the window of the same length, but a volume was calculated as a sum of magnitudes of all frequencies. On it's own it doesn't give me additional gain, but I also experimented with different transformations of frequency spectrum:
+\begin{itemize}
+    \item weighting frequencies depending on distance from normal distribution, what in theory should favour these bands, that are responsible for speech signal,
+    \item applying logarithm or square root, to check how different band contribute to speech signal, by normalizing the power of each frequency
+    \item counting how many times a magnitude of frequency exceeds an average value of a background
+\end{itemize}
+
+
+\newpage
+
+Distance from a normal distribution showed me, that lower frequencies have more irregular histogram, which agrees with the consensus, that most important speech data are located at lower frequency bands. \newline 
+I also found out, that by increasing magnitude differences in favour of lower frequencies gave me better results, then decreasing them, what also agrees with above.
+
 \end{document}
