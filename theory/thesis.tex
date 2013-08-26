@@ -3,6 +3,7 @@
 \usepackage{graphicx, babel, csquotes, multicol, amssymb, fullpage, amsmath}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
+\usepackage[table]{xcolor}
 \MakeOuterQuote{"}
 \begin{document}
 
@@ -695,5 +696,178 @@ Firstly my algorithm worked with a spectrum of a given window. It processed the 
 
 Distance from a normal distribution showed me, that lower frequencies have more irregular histogram, which agrees with the consensus, that most important speech data are located at lower frequency bands. \newline 
 I also found out, that by increasing magnitude differences in favour of lower frequencies gave me better results, then decreasing them, what also agrees with above.
+
+
+
+
+
+\newpage
+
+\begin{center}
+\begin{tabular}{| p{8cm} | p{8cm} |}
+\hline
+\cellcolor[gray]{0.8}
+synthesized texts &
+\cellcolor[gray]{0.8}
+Notes on erroneous parts in synthesized speech using words and phonemes initiated by pause based alignment
+\\ \hline
+"Rosja przedwojenna była wymarzoną areną dorobku dla ludzi tego typu zwłaszcza pochodzących z Królestwa" &
+- „areną” – „a” is missing \newline
+- jumps between phonemes are clearly visible, although they are not disturbing enough to cloud the meaning
+\\ \hline
+"Wiadomości zaczerpnięte w klasach gimnazjalnych wrodzona inteligencja która wraz ze zdrowiem towarzyszyła poszukiwaczowi posady i na zawołanie zjawiała się nie siana i nie pielęgnowana wytrzymałość odwaga wesołość i pewna odrobina drwiny z Moskala u którego się służy lecz nad którym jednak panuje się mimo wszystko torowały drogę od niższej do wyższej pozycji" &
+- the phonemes of word „mimo” are quite short, so listener need to be really focused, to not miss a meaning of the word, \newline
+- after „zjawiała się” there are two extra words „do wyjścia”,
+closer inspections showed, that „się” was included as whole, but was badly aligned,
+\\ \hline
+"Trzeba przyznać że nie ostatnią rolę grała w tej operze protekcja cicha pokorna dobra wróżka prowadząca za rękę od niskiego do coraz wyższego rodaka tu i tam zaczepionego nogą lub łokciem na tej rosyjskiej drabinie" &
+- „przyznać” - „ć” is actually „ź” \newline
+- „tej” is something else \newline
+- „protekcja” - hearable „w” before „t” \newline
+- „spokojna” - something extra after „k” \newline
+- „zaczepionego” - „z” is missing \newline
+- „drabinie” - „ie” is missing \newline
+\\ \hline
+"Chrząszcz brzmi w trzcinie w Szczebrzeszynie W szczękach chrząszcza trzeszczy miąższ Czcza szczypawka czka w Szczecinie" &
+- „brzmi” - „żm” phoneme sequence was not found in whole text so it was omitted in the synthesized audio, \newline
+- „czcza” sounds like „cza”, \newline
+- „Szczecinie” - „ie” missing
+\\ \hline
+"Chrząszcza szczudłem przechrzcił wąż Strząsa skrzydła z dżdżu A trzmiel w puszczy, tuż przy Pszczynie Straszny wszczyna szum" &
+- „wąż” - „ą” is missing \newline
+- „straszny” - „ny” is missing \newline
+- „szum” - „m” is strange
+\\ \hline
+"Litwo Ojczyzno moja ty jesteś jak zdrowie Ile cię trzeba cenić ten tylko się dowie Kto cię stracił Dziś piękność twą w całej ozdobie Widzę i opisuję bo tęsknię po tobie" &
+- „cenić” - „ć” is missing \newline
+- „stracił” - extra „e” or even kind of „em” \newline
+- „piękność” - very short „e” \newline
+- „ozdobie” - first „o” is missing, second sounds like „ą” \newline
+- „tobie” - short „e”
+\\ \hline
+\end{tabular}
+\end{center}
+
+\newpage
+
+\begin{center}
+\begin{tabular}{| p{8cm} | p{8cm} |}
+\hline
+\cellcolor[gray]{0.8}
+synthesized texts &
+\cellcolor[gray]{0.8}
+Notes on erroneous parts in synthesized speech using words and phonemes initiated by pause based alignment
+\\ \hline
+"Panno święta co Jasnej bronisz Częstochowy I w Ostrej świecisz Bramie Ty co gród zamkowy Nowogródzki ochraniasz z jego wiernym ludem" &
+- „świecisz” - „ś” sounds weird like "sz" through teeth, \newline
+- „co” - hearable „t” at end, \newline
+- „gród” - missing „g”, \newline
+- „nowogródzki” - extra „na” at the beginnings and „dz” sounds like „jz”, \newline
+- „ochraniasz” - first „o” is actually „w”, \newline
+- „wiernym” - quite bad, at the beginning there is extra „pły”, and there is missing „r” making it completely unrecognizeable
+\\ \hline
+"Jak mnie dziecko do zdrowia powróciłaś cudem Gdy od płaczącej matki, pod Twoją opiekę Ofiarowany martwą podniosłem powiekę I zaraz mogłem pieszo do Twych świątyń progu Iść za wrócone życie podziękować Bogu Tak nas powrócisz cudem na Ojczyzny łono" &
+- „mnie” - extra „u” at the beginning, \newline
+- „ofiarowany” - first „o” sounds like „he”
+\\ \hline
+"Tymczasem przenoś moją duszę utęsknioną Do tych pagórków leśnych, do tych łąk zielonych Szeroko nad błękitnym Niemnem rozciągnionych" &
+- „łąk” - extra short „a” at the beginning
+\\ \hline
+"Do tych pól malowanych zbożem rozmaitem Wyzłacanych pszenicą, posrebrzanych żytem Gdzie bursztynowy świerzop, gryka jak śnieg biała Gdzie panieńskim rumieńcem dzięcielina pała" &
+- „do” - extra „łe” at the end, \newline
+- „rozmaitem” - sounds like „smeitem”, \newline
+- „gryka” - noticeable short „ł” at the end, \newline
+- „panieńskim” - „ie” is short, \newline
+- „rumieńcem” - a pause between „m” and „ie”
+\\ \hline
+"A wszystko przepasane jakby wstęgą miedzą Zieloną na niej z rzadka ciche grusze siedzą" &
+- „wstęgą” - only „gą” is recognizeable
+\\ \hline
+"na stole z powyłamywanymi nogami leżą śliwki czereśnie pomarańcze i ogórki" &
+- „leżą” - extra „na” up front, \newline
+- „czereśnie” - missing „re”
+\\ \hline
+"W czasie suszy szosa sucha" &
+\\ \hline
+"Za górami za lasami znajduję się wysoka wieża strzeżona przez smoka" &
+\\ \hline
+\end{tabular}
+\end{center}
+
+\newpage
+
+\begin{center}
+\begin{tabular}{| p{8cm} | p{8cm} |}
+\hline
+\cellcolor[gray]{0.8}
+synthesized texts &
+\cellcolor[gray]{0.8}
+Notes on erroneous parts in synthesized speech using words and phonemes initiated by pause based alignment
+\\ \hline
+"Maksymalistyczny egzystencjalny program Mrożka polegał właśnie na stawianiu świata pod znakiem zapytania w świetle jak najbardziej trzeźwych zarzutów o jego niewystarczalność" &
+- „maksymalistyczny” - first „m” is actually an „s”, extra „lny” at the end, \newline
+- „mrożka” - „first „m” is actually „z”, \newline
+- „polegał” - extra short trailing „o”, \newline
+- „o” - very short and faint
+\\ \hline
+"Mrożek jako krytyk cywilizacji widział w niej nadto przemoc mechanizm mielenia jednostek na proszek W rewolucjach brzydził go fetor mierzwy w jaką zmieniają się górnolotne czyste ideały" &
+- „mechanizm”- sounds like „mechaniźmie”, because „z” is „ź”, \newline
+- „jednostek” - short but loud extra „w” at the beginning, \newline
+- „brzydził” - noticeable „g” between „y” and „dz”, \newline
+- „fetor” - trailing „e”, \newline
+- „ mierzwy” - missing „y”, \newline
+- „jaką” - a bit distorted and unrecognizeable, \newline
+- „ideały” - „i” is replaced by „u” and extra „j” between „e” and „a”
+
+\\ \hline
+"Pomimo języka groteski którym tak chętnie się posługiwał był przede wszystkim piewcą głębi sztuki jej ocalającego kontemplacyjnego wymiaru" &
+- „pomimo” - some artefact in ending „o”, \newline
+- „jej” - something extra at the beginning, \newline
+- „ocalającego” - some „r” after „oca”
+
+\\ \hline
+"Przy czym nigdy głośno o tym nie mówił Jednocześnie sceptycznie i ostrożnie podchodził do kwestii wyobraźni widząc w niej zasadę kierującą ludzkimi poczynaniami a co z kolei skutkuje każdorazowo totalitarną eksterminacją" &
+- „kwestii” - last „i” like „j”, \newline
+- „wyobraźni” - missing „ob” changing the meaning of the word, \newline
+- „totalitarną” - „ą” sounds like „ąu”
+
+\\ \hline
+\end{tabular}
+\end{center}
+\newpage
+\begin{center}
+    \section{Bibliography}
+\end {center}
+
+\begin{thebibliography}{99}
+\bibitem{englishDict} Houghton Mifflin Company. \emph{The American Heritage Dictionary of the English Language}, Fourth Edition, 2000.
+\bibitem{albertiiAnatomy} Prof. W. Alberti. \emph{The anatomy and physiology of the ear and hearing.}
+\bibitem{piconeFundamentals} Prof. Joseph Picone \emph{Fundamentals of speech recognition}
+\bibitem{olsonMusic} Olson Harry F. (1967) \emph{Music, Physics and Engineering}
+\bibitem{volkman} Stevens Stanly Smith, Volkman John, Newman Edwin B. (1937) \emph{A scale for the measurement of the psychological magnitude pitch Journal of the Acoustical Society of America}
+\bibitem{douglasCommunication} Douglas O'Shaughnessy (1987) \emph{Speech communication: human and machine.}
+\bibitem{zwicker} Zwicker E. (1961) \emph{Subdivision of the audible frequency range into critical bands.}
+\bibitem{melCepstrum} H.P. Combrinck and E.C. Botha \emph{On The Mel-scaled Cepstrum}
+\bibitem{welchFFT} Welch P. (1967) \emph{The use of fast Fourier Transform for the estimation of power spectra: A method based on time averaging over short, modified periodograms}
+\bibitem{smithDigital} Steven W. Smith \emph{The scientist and engineer's guide to digital signal processing.}
+\bibitem{} A. Pinsky \emph{Introduction to Fourier analysis and wavelets}
+\bibitem{} B.P. Bogert, M. J. R. Healy, J. W. Tukey \emph{The Quefrency Alanysis of Time Series for Echoes: Cepstrum, Psuedo-Autocovariance, Cross-cepstrum and Saphe Cracking }
+\bibitem{} Seyed Hamidreza Mohammadi, Hossein Sameti, Amirhossein Tavanaei, Ali Soltani-Farani \emph{Filter-bank design based on dependencies between frequency components and phonem characteristic}
+\bibitem{} Dr. James Glass, prof. Victor Zue \emph{Automatic Speech Recognition} MIT course.
+\bibitem{} Daniel Jurafsky, James H. Martin \emph{Speech and language processing}
+\bibitem{} B. Plannerer \emph{An Introduction to Speech Recognition }
+\bibitem{} Davis, Marmelstein (1980) \emph{Comparison of parametric representation of monosyllable word recognition in continously spoken sentences}
+\bibitem{} Ahmed N., Natarjan T., Rao K.R. (1974) \emph{Discrete Cosine Transform}
+\bibitem{} Syed Ali Khayam \emph{The Discrete Cosine Transform (DCT): Theory and Application} 
+\bibitem{} Crystal David \emph{Linguistic}
+\bibitem{} Chomsky N., Halle M. \emph{The sound pattern of English}
+\bibitem{} Jagodziński G. \emph{Gramatyka języka polskiego.}
+\bibitem{} J.L. Rodgers, W.A.Nicewander \emph{Thirteen ways to look at the correlation coefficient.}
+\bibitem{} Jae Myung \emph{Tutorial on maximum likelihood estimation}
+\bibitem{} Prof. A. Moore \emph{Clustering with Gaussian Mixtures}
+\bibitem{} Jeff A. Bilmes \emph{A Gentle Tutorial of the EM Algorithm and its Application to Parameter Estimation for Gaussian Mixture and Hidden Markov Models}
+\bibitem{} M. Karaś, M. Madejowa \emph{Słownik wymowy polskiej.}
+\bibitem{} John-Paul Hosom \emph{Speaker-Independent Phoneme Alignment Using Transition- Dependent States}
+\end{thebibliography}
 
 \end{document}
