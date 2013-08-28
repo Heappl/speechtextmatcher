@@ -1,8 +1,9 @@
 
 \documentclass[12pt,a4paper,english]{article}
-\usepackage{graphicx, babel, csquotes, multicol, amssymb, fullpage, amsmath}
+\usepackage{graphicx, csquotes, babel, multicol, multirow, amssymb, fullpage, amsmath, tabularx}
 \usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
+\inputencoding{utf8}
+\usepackage[T2A]{fontenc}
 \usepackage[table]{xcolor}
 \MakeOuterQuote{"}
 \begin{document}
@@ -863,13 +864,124 @@ For \textbf{503} speeches, with a pause longer than 300ms:
 If only longer pauses are allowed, then detected speeches contain more silence frames and consequently the total time is different, and in the end the estimated time might be just a bit more off. Another reason why it produces worse results might be related to the fact, that it also causes the speeches to be on average longer. This kind of random variables follow a rule, that they differ from an estimated value by square root factor, ergo longer parts, the worse estimations.
 
 \newpage
+\begin{center}
+    \section{Audio based alignment}
+\end {center}
+\subsection{Speech recognition}
+
+Audio based alignment is simplified problem of speech recognition. Usually in speech recognition the language consist of millions of words in different conjugations, which may create many different sentences. In audio alignment we expect only one text and only one sentence at the time. \newline
+
+Usually speech recognition is based on trained Hidden Markov Models with Gaussian Phoneme models, although successful systems rarely rely on single state phoneme model. \newline
+As I mentioned before (3.1) there are many different allophones of single phoneme. A variations are largely attributed to surrounding they are spoken in. For example in polish there are softening phonemes 'i' and 'j', that clearly change how preceding or succeeding phonemes are realized. At some contexts it may happen that certain phoneme will lose it voice are even get silent completely, at another they will be strengthened with additional voice, i.e.: 
+\begin{description}
+	\item[“staw płytki”] $\rightarrow$ “w” loses it voice and starts to remind a phoneme “f”
+	\item[“plac budowy”] $\rightarrow$ “c” gains additional voice and reminds a phoneme “dz”
+\end{description}
+And almost never one can cleanly separate two consecutive phones. \newline
+
+ In order to better model different realisations of phonemes, an audio modelling contains models of phonemes at different triphone contexts. 
+For every possible neighbourhood a given phoneme might appear, a separate Gaussian model is trained, for example a WSJ model from sphinx database contains 40 different phonemes and additional silence phoneme, that gives 68921 different triphones, however WSJ model contains over 110k elements,  because of additional information about location within a word. \newline
+
+It is not over yet, because transitioning from phoneme to phoneme should be modelled somehow as well. The obvious solution is to train a triple state HMM, which will better fit the changing phone. \newline
+That triples number of states. \newline
+
+This huge number of different models requires a lot of training data, which is on one hand not easy to come along with, on another requires a lot of time to train with. \newline
+Training data for speech recognition is one constant problem, which have to be dealt with. The problem is amplified, by the fact, that training samples should be small and very well described. That hardly can be done manually. \newline
+Another bad news is, that a model trained on news feeds, is expected to perform poorly as a spoken address recognition software. \newline
+
+\newpage
+
+Once we have our audio model, than speech recognition is an easy piece, isn't it? \newline
+Not really, since so many possible and often similar words make it a hard problem. Rarely a speech recognition software is based solely on audio model to recognize a sequence of phonemes. \newline
+Problem is, that the number of states is too huge in order to be processed exhaustively, even though we can use a Viterbi algorithm to find a best (most probable) sequence of states for given observation sequence and we keep results only for a present moment in time (a single frame), that still gives a huge number
+of kept states with calculated score. \newline
+
+The sphinx library deals with this problem by searching in a breadth first search manner (meaning that it will keep states only from a current moment) and to cut on number of states to process, a priority queue is used, which keeps only best scoring ones. \newline
+
+And this is the part of recognition software we would like to use for the alignment problem. \newline
+The difference from here is that, we do know what the text is spoken, while for recognition there is no such knowledge. \newline
+However let's dwell on this a little bit longer, so we can see what a huge simplification it makes. \newline
+
+Let's start with a simple example by using WSJ dictionary: \newline
+phoneme sequence “W AH N”, which  on it's own can be recognized as word “one” or “won” is also a prefix for 36 another different words and subsequence of total 117 different words. \newline
+There is a sequence “W AH N S EH L F”, which assigned to word “oneself”, however it may also be from the end of word “penguin” (“W AH N”) and beginning of word “cellphone” (“S EH L F”). \newline
+
+Sphinx library provides two ways of language modelling to tackle sucha ambiguity:
+\begin{itemize}
+    \item ngrams frequencies
+    \item language grammar
+\end{itemize}
+
+For simple languages, like a sequence of digits or language containing one long sequence (like in case of text alignment), it is advisable to use language grammar. \newline
+For general recognition software like Apple Siri, ngrams are necessary, although I am not convinced that they haven't used a sort of grammar for typical queries. \newline
+
+Ngrams (in wsj n is maximum 3) are a way to assign a probability to word sequences. In above example it is expected, that “oneself” is more probable to occur in real word, than the later case, although obviously we can't judge so easily, since the probability of choosing these particular word depends on a probability of whole sentence. \newline
+
+Anyway I think that's enough about speech recognition. \newline
+For our purposes we need “only” audio model and word to phoneme sequence dictionary, in order to efficiently  align text to speech. \newline
+
+\newpage
+\subsection{Differences between english, russian and polish phonetics}
+
+The sets of phonemes for any language differ slightly between publications and they differ even more between different audio models. For that reason I'm not going to introduce here established phonology for any language, however I'll try to match a phoneme set used by WSJ model for English, VoxForge model for Russian, Corpora and mine for Polish. \newline
+
+In the table below I collected phonemes from four used sets and analysed differences, that may cause problem to represent some words using given phonetics and in result may cause problems with alignment. The table is organized so the similar phonemes are next to each other. If there is not alternative in a language, than the row remains empty. \newline
+
+\newcommand{\strutA}[1]{% no space before strut
+\rule[0pt]{0pt}{#1}% put text approx mid strut
+}
+
+
+\fontsize{10pt}{12pt}\selectfont
+\begin{center}
+\begin{tabularx}{\linewidth}{| p{1cm} | p{1.2cm} | p{1cm} | p{1.1cm} | p{1.1cm} | p{1cm} | p{1.1cm} | p{4.9cm} |}
+\hline
+\rowcolor[gray]{0.8}
+English & example & Russian & example & Corpora Polish & Polish used by me & example & Notes on similarities
+\\ \hline
+
+AA & ad\underline{o}pt & a & \underline{а}рен\underline{а} & a & a & dwa &
+\multirow{3}{\linewidth}{The most different from this set is English „AE”, which also shows a similarity to Polish and Russian „e”} \strutA{2ex}
+\\ \cline{1-7}
+AE & \underline{a}ct & aa & \underline{а}кт &&&&  \strutA{2ex}
+\\ \cline{1-7}
+AH & \underline{a}cute &&&&&& \strutA{2ex}
+\\ \hline
+AW & all\underline{ow} &&& a\_ (ą) && tą & \multirow{2}{\linewidth}{There is no such a vowel in Russian however it can be substituted with „oo l”, similar for my Polish model with „o ł”}  \strutA{4ex}
+\\ \cline{1-7}
+OW & aer\underline{o} &&&&&& \strutA{4ex}
+\\ \hline
+AY & b\underline{i}ke &&&&&& Simulated with Russian and Polish „a j”
+\\ \hline
+B & \underline{b}ill & b & \underline{б}ыл & b & b & \underline{b}yć & Quite similar
+\\ \hline
+&& bb & де\underline{б}ет &&&& A softened version of „b”, a bit different, but Polish and English „b”  can also be slightly softened
+\\ \hline
+&& c & \underline{ц}вет & c & c & \underline{c}oś & In English it is something like \newline „T S”
+\\ \hline
+CH & jackovi\underline{ch} & ch & дево\underline{ч}ка & ci (ć) & ć & czci\underline{ć} & 
+\multirow{2}{\linewidth}{English „CH” is actually used for slavian words containing „c”, „ć”, „cz” like phonemes. Russian „ch” is similar to softened Polish „cz”, so it has to replace both „ć” and „cz”} \strutA{6ex}
+\\ \cline{1-7}
+&&&& cz & cz & \underline{cz}ego & \strutA{7ex}
+\\ \hline
+
+
+
+
+
+
+
+\end{tabularx}
+\end{center}
+
+\fontsize{12pt}{14pt}\selectfont
+\newpage
 
 \begin{center}
 \begin{tabular}{| p{8cm} | p{8cm} |}
 \hline
-\cellcolor[gray]{0.8}
+\rowcolor[gray]{0.8}
 synthesized texts &
-\cellcolor[gray]{0.8}
 Notes on erroneous parts in synthesized speech using words and phonemes initiated by pause based alignment
 \\ \hline
 "Rosja przedwojenna była wymarzoną areną dorobku dla ludzi tego typu zwłaszcza pochodzących z Królestwa" &
