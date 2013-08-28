@@ -21,7 +21,7 @@ public class MainPhonemeAlignerHavingWords
 		String labelsFile = args[1];
 		String outputFile = args[2];
 		
-		AudioLabel[] prepared = new AudacityLabelImporter(new TextImporter(labelsFile)).getLabels();
+		AudioLabel[] prepared = new AudacityLabelImporter(new TextImporter(labelsFile), 0.05).getLabels();
 		WaveImporter waveImporterForPowers = new WaveImporter(
 		        waveFile, "../phonemeAligner/config_nospeech_nomel.xml");
         WaveImporter waveImporterForAudioData = new WaveImporter(

@@ -43,7 +43,7 @@ public class MainLargeChunkPhonemeAlignment
 
         IterativePhonemeScorerTraining aligner =
             new IterativePhonemeScorerTraining(
-                Double.POSITIVE_INFINITY,
+                15,
                 prepared,
                 dataExtractor.getPowerData(),
                 new GraphemesToPolishPhonemesConverter(),

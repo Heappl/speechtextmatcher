@@ -61,8 +61,10 @@ public class MiddleToMiddleAudioSynthesizer
 		    for (AudioLabel wordPhoneme : wordPhonemeLabels) {
 	            if ((wordPhoneme.getEnd() <= wordPhoneme.getStart())
 	                || (wordPhoneme.getEnd() - wordPhoneme.getStart() > 1.0)
-	                || (wordPhoneme.getEnd() - wordPhoneme.getStart() < 0.0001))
+                    || (wordPhoneme.getEnd() - wordPhoneme.getStart() < 0.001)) {
 	                ok = false;
+	                System.err.println("ERROR: " + wordPhoneme);
+	            }
 		    }
 		    if (!ok) { wordPhonemeLabels.clear(); continue; }
             for (AudioLabel wordPhoneme : wordPhonemeLabels) {
@@ -345,9 +347,9 @@ public class MiddleToMiddleAudioSynthesizer
 			double previousMergePhonemeMiddle = previousMergePhonemeTime / 2.0;
 			int previousMergePhonemeMiddleIndex = (int)Math.round(previousMergePhonemeMiddle / previousFrameTime) + previousPhonemeStartIndex;
 			
-			int currentNeighSize = (int)Math.floor(currentMergePhonemeTime / currentFrameTime / 16.0);
-			int previousNeighSize = (int)Math.floor(previousMergePhonemeTime / previousFrameTime / 16.0);
-			int neigh = Math.min(currentNeighSize / frameSize, previousNeighSize / frameSize);
+			int currentNeighSize = (int)Math.floor(currentMergePhonemeTime / currentFrameTime / 8.0);
+			int previousNeighSize = (int)Math.floor(previousMergePhonemeTime / previousFrameTime / 8.0);
+			int neigh = Math.max(1, Math.min(currentNeighSize / frameSize, previousNeighSize / frameSize));
 			
 			int maxPass = Math.max(1, neigh / 8);
 			int diffSize = Math.max(1, maxPass / 8);
@@ -356,7 +358,7 @@ public class MiddleToMiddleAudioSynthesizer
 				for (int o = -maxPass; o < maxPass; ++o) {
 				    int previousStartIndex = (i + o) * frameSize + previousMergePhonemeMiddleIndex * frameSize;
     				double diff = prev.getScore();
-    				for (int f = -diffSize; f < diffSize; ++f) {
+    				for (int f = -diffSize; f <= diffSize; ++f) {
         				for (int j = 0; j < frameSize; ++j) {
         				    int currentIndex = currentStartIndex + f * frameSize + j;
         				    int previousIndex = previousStartIndex + f * frameSize + j;

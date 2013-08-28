@@ -62,6 +62,7 @@ public class BreadthSearchBestCutPhonemeAligner
             queue = nextQueue;
             if ((i + 1) % 1000 == 0)
                 System.err.println(i + " "  + queue.first().getScore() + " " + queue.last().getScore());
+            if (i > audio.size() / 40) break;
         }
         
         return queue.first().getBestAlignment(totalTime);

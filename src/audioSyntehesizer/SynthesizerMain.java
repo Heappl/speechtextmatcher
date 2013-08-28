@@ -33,7 +33,7 @@ public class SynthesizerMain {
 		String text = args[3];
 		String outputFile = args[4];
 		
-		AudioLabel[] prepared = new AudacityLabelImporter(new TextImporter(labelsFile)).getLabels();
+		AudioLabel[] prepared = new AudacityLabelImporter(new TextImporter(labelsFile), 0.03).getLabels();
 		AudioLabel[] phonemes = new AudacityLabelImporter(new TextImporter(phonemeLabelsFile)).getLabels();
 		AudioInputStream stream = AudioSystem.getAudioInputStream(new File(wavFile));
 		

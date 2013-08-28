@@ -78,7 +78,7 @@ public class MainTextToSpeechByGaussianMatcher
         BreadthSearchBestCutAligner aligner = new BreadthSearchBestCutAligner(
                 scorers,
                 new GraphemesToPolishPhonemesConverter(),
-                100);
+                1500);
         new AudacityLabelsExporter(labelsOutputPath).export(
                 aligner.align(text, extractor.getPowerData(), extractor.getTotalTime()));
         System.err.println("END");
