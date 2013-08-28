@@ -486,7 +486,7 @@ Expected-Maximization method is a technique for estimating parameters of any und
 For certain distributions, parameters, that maximize likelihood of the data, can be solved with analytic methods, i.e. calculated mean vector and variance are parameters to normal distribution, that do maximize the likelihood of observing the training data. \newline
 We can calculate a derivative of normal density function to show it:
 \begin{multline}
-    ln(\prod_{x in X} (\frac 1 {\sqrt{2\pi\sigma^2}} e^{\frac{-(x-\mu)^2}{2\sigma^2}}))d\mu  = \sum_{x \epsilon X}[\frac{-1} 2 ln(2\pi)-ln(\sigma)- \frac{(x-\mu)^2} {2 \sigma^2} ]d\mu = ... \\
+    ln(\prod_{x in X} (\frac 1 {\sqrt{2\pi\sigma^2}} e^{\frac{-(x-\mu)^2}{2\sigma^2}}))d\mu  = \sum_{x \in X}[\frac{-1} 2 ln(2\pi)-ln(\sigma)- \frac{(x-\mu)^2} {2 \sigma^2} ]d\mu = ... \\
     ...= \frac {-1} {2 \sigma^2} \sum_{x in X}{(x-\mu)^2}d\mu = \frac 1 {\sigma^2} \sum_{x in X}{(x-\mu)}=0 \iff \\
     \iff \sum_{x in X}{(x-\mu)}=0 \iff \mu = \frac 1 {|X|} \sum_{x in X}x
 \end{multline}
@@ -494,9 +494,9 @@ We can calculate a derivative of normal density function to show it:
 what is a definition of a mean. \newline 
 
 \begin{multline}
-    ln(\prod_{x \epsilon X} Pr(x | \sigma))d\sigma = \sum_{x \epsilon X}[\frac {-1} 2 ln(2\pi)-ln(\sigma)- \frac {(x-\mu)^2} {2 \sigma^2} ]d\sigma = ... \\
-    ...= \sum_{x \epsilon X}[\frac {-1} \sigma + (x-\mu)^2 \sigma^{-3}] = \frac {-1} {\sigma} \sum_{x \epsilon X}[1-(x-\mu)^2 \sigma^{-2}]=... \\
-    ...= 0 \iff \sigma^{-2} \sum_{x \epsilon X}(x-\mu)^2 - | X |=0 \iff \sigma^{-2} | X | = \sum_{x \epsilon X}(x-\mu)^2 \iff \sigma^2 = \frac 1 {|X|} \sum_{x \epsilon X}(x-\mu)^2
+    ln(\prod_{x in X} Pr(x | \sigma))d\sigma = \sum_{x in X}[\frac {-1} 2 ln(2\pi)-ln(\sigma)- \frac {(x-\mu)^2} {2 \sigma^2} ]d\sigma = ... \\
+    ...= \sum_{x in X}[\frac {-1} \sigma + (x-\mu)^2 \sigma^{-3}] = \frac {-1} {\sigma} \sum_{x in X}[1-(x-\mu)^2 \sigma^{-2}]=... \\
+    ...= 0 \iff \sigma^{-2} \sum_{x in X}(x-\mu)^2 - | X |=0 \iff \sigma^{-2} | X | = \sum_{x in X}(x-\mu)^2 \iff \sigma^2 = \frac 1 {|X|} \sum_{x in X}(x-\mu)^2
 \end{multline}
 
 what is a definition of variance and a standard deviation is a square root of variance. \newline
@@ -695,11 +695,172 @@ Firstly my algorithm worked with a spectrum of a given window. It processed the 
 \newpage
 
 Distance from a normal distribution showed me, that lower frequencies have more irregular histogram, which agrees with the consensus, that most important speech data are located at lower frequency bands. \newline 
-I also found out, that by increasing magnitude differences in favour of lower frequencies gave me better results, then decreasing them, what also agrees with above.
+I also found out, that by increasing magnitude differences in favour of lower frequencies gave me better results, then decreasing them, what also agrees with above. \newline
+
+After mingling with above ideas, my best working solution is to calculate average for the whole frequency spectrum (not only sum of magnitudes), without any transformation to initial values (except for sphinx's preemphasizer transformation).
+Next step is to calculate background averages from the frames considered background, which is all frames where each frequency power is below average, so the background frames set $B$ is:
+\begin{equation}
+    B = \{ F \in S \sum_{\sigma_i in F} sgn(max(0, \sigma_i - Ave_i)) = 0 \}
+\end{equation}
+where $S$ is a set of all frames in audio stream, and frame $F$ is a set of magnitudes of frequencies from the frame,
+and $Ave$ is an average of all frames: $Ave_i = \frac 1 {|S|} \sum_{F \in S} \sigma_{F, i}$
+Speech frames $A$ are all remainging frames: $A = S \setminus B$. \newline
+
+That is not enough though, because there are often frames inside a speech, which are quite low on volume. These are pauses between phonemes, or some frames of quiet talking (at the end of sentence usually), which didn't not passed the above filter. The granularity is just too big for the purpose of alignment algorithm. \newline
+
+To deal with this granularity I marked as speech all the frames, which didn't pass through filter, but where surrounded by frames, that did, as a speech as well.
+The reason for that, is to remove all the short pauses, which probably meant nothing and might even be an actual speech. My choice was to mark as a speech all pauses that were shorter than 200ms. \newline
+
+Theoretically filling holes is similar to the algorithm, which calculates vector of volume averages of couple of neighbouring frames, and then use this average in the above formula instead. This introduces a certain inertia for pauses or speeches, but at this point I need just a proper longer pause detection with abrupt endings as quickly as speech starts/ends. Although I must admit, that a certain inaccuracies are not so important for the paused based alignment, if only because the algorithm is quite inefficient and produces only approximated results.
+
+\newpage
+
+\subsection{Text split}
+
+Before we can continue with alignment, we still would like to have text split to sentences. It is necessary to have a certain knowledge about punctuation in a given language.  Many modern languages use similar punctuation symbols for marking sentence or sub-sentences,
+but we still need to know a given language alphabet. \newline
+
+This part is very simple. We treat all the alphabets characters as a part of speech, while every other character as punctuation mark, which separates parts of the text, and which may have some correlation with a pauses in a recording. Resulting chunks are those, that contain only characters from alphabet and blanks. \newline
+
+Couple of details are to be dealt with. Not only alphanumeric characters make a word, i.e. a `'` is also a character, that must be treated as part of speech character at this point, although in later phases it might be ignored. \newline
+
+Another is that, a sequence of white character might also be a separation. A title for example might not be separated by a dot mark, but only be a series of line breaks. Generally more than one line break is considered a pause indicator. \newline
+
+\newpage
+
+\subsection{Estimating time}
+
+The problem of matching chunks of text with extracted speeches is a problem of matching duration time of speech recording and
+an estimated time of the chunks. Before we can continue, we need to estimated the time it takes to say words from each chunk. \newline
+
+Given: \newline
+	 $S=\{[s_i, e_i]\}$	– time intervals, where $s_i$ is a time of beginning of i-th speech and $e_i$ its ending time  \newline
+	 $T = [[w_{1, 1}, ...], ..., [w_{n, i}, ....] ]$	– set of chunks, where each chunk is a word list \newline
+
+Let's rephrase this problem of estimating time it takes to say $[w_{i, 1}, ..., w_{i, l_i}]$:
+\begin {equation}
+    E(T_i) = \sum_{j=0}^{l_i} E(time \: to \: say \: w_{i, j})
+\end {equation}
+where $l_i$ is number of words in i-th chunk. \newline
+
+My proposition is to estimated a time of single word with a formula:
+\begin {equation}
+    E(time \: to \: say \: w) = \sum_{c \in w} 0.95 \mu_{char} + 0.05 \mu_{word}
+\end {equation}
+where  $\mu_{char}$ is an average time it takes to say a single character:
+\begin {equation}
+    \mu_{char} = \frac {number \: of \: nonspace \: characters \: in \: text} {\sum_i e_i - s_i}
+\end {equation}
+and $\mu_{word}$ is an average time it takes to say a single word:
+\begin {equation}
+    \mu_{word} = \frac {number \: of \: words \: in \: text} {\sum_i e_i - s_i}
+\end {equation}
+	
+Although I'm not completely certain in what way my algorithm benefits from the second element,
+since I haven't run conclusive tests, by my intuition is, that it reduces variance of estimated values. \newline
+The proportions above I derived from purely empirical observations, but there were too many variables to be
+too attached to this exact coefficients.
+
+\newpage
+
+\subsection{Alignment}
+
+The assignment problem tries to minimize the difference between speech time and estimated time of matched text chunk.
+If $A$ is a set of matched pairs of speech and text ($A = \{((s_i, e_i), t_i)\}$) then I want to minimize:
+\begin{equation}
+    argmax_A \sum_{((s_i, e_i), t) \in A} ((e_i - s_i) - E(time \: to \: say \: \: t))^2
+\end{equation}
+This problem is easily solvable with dynamic programming. \newline
+
+We iterate over speeches.
+At k-th iteration a vector of partial results are kept. The i-th element of vector contains a result of matching first k speeches and first i sentences.
+
+Initial values of the vector is matching of first speech part with first i chunks:
+               
+
+Next values are calculated based on the previous results:
+	
+
+Sum of estimated of text chunks would be quite consuming to calculate at each iteration, but it can be precomputed.
+Additionally a zero match was added as a way of skipping speech completely, as a way to add a speech to a text chunk from previous iteration. Note however, that it won't produce a result, where everything is matched to everything (what theoretically would give a result 0), because each iteration contributes to the score separately, so the previous adds a difference of matching speech (k-1)th and a certain number of chunks, and the skipping speech, will also produce a difference in a form of squared time of the speech.
+It does improve the algorithm though, because of some short speech leftovers, which actually are part of previously matched sentence.
+
+At the end we have a best time difference of the matching. To recreate a matching, one could iterate backwards over partial values, or as I did it, to store separately, when calculating values, indexes of previous results, that maximize the current ones.
+At end I traverse back through these indexes to produce a matching. Empty matching is considered to be merged with previous matching
+(i.e. two speeches $\iff$ text chunks).
 
 
 
+\newpage
 
+\subsection{Results}
+
+The efficiency of above method was tested versus a word alignment obtained from different methods in two ways:
+\begin{itemize}
+    \item for a given label from the output find words and they testing labels, \newline
+          merge the found testing labels times to produce total time of the text chunk, \newline
+          give some statistics about time differences
+    \item for a given label from the output find testing labels that are located within the time frame \newline
+          produce a text from found labels' words \newline
+          count the biggest word difference between the texts by formula below:
+          \begin{equation}
+               len(output\_chunk) + len(testing\_chunk) - 2 length(biggest\_subsequence)
+          \end{equation}
+          produce statistics about the word differences
+\end{itemize}
+
+For a testing recording of “Doktor Piotr” by Stefan Żeromski, which is 80 minutes long and consists 1886 sentences (or subsentences),
+the algorithm produced \textbf{730} labelled chunks. \newline
+
+The statistics are: \newline
+\begin{itemize}
+    \item time differences: \newline
+    \begin{itemize}
+        \item there were \textbf{370} chunks which time frame were within a \textbf{0.5s} difference, 
+        \item average time difference was \textbf{0.77s}
+        \item standard deviation was \textbf{0.84s}
+        \item maximum time difference was \textbf{11.21s}
+    \end{itemize}
+    \begin{center}
+        \includegraphics[scale=0.6]{length_based_results_better.jpg}
+    \end {center}
+    \item word differences:
+    \begin{itemize}
+        \item \textbf{393} chunks had \textbf{0} difference in words
+        \item \textbf{136} chunks where different by \textbf{1} word (missing or additional)
+        \item \textbf{48} different by \textbf{2} words
+        \item \textbf{56} with a difference over \textbf{5} words
+    \end{itemize}
+\end{itemize}
+
+The time statistics are showing a bit worse results, because word labels are more precise than chunk time frames. \newline
+
+The results are within expectations, after all it is very crude algorithm. It probably could be improved though, however it is hard without introducing much more knowledge about language and possibly some additional training data (i.e. time of phonemes). \newline
+
+This algorithm is a bit sensitive to a chunks created. If only the longer pauses are allowed, by increasing the holes filling factor from 200ms to 300ms in  speech detection algorithm, the results were considerably worse: \newline
+
+For \textbf{503} speeches, with a pause longer than 300ms:
+\begin{itemize}
+    \item time differences: \newline
+    \begin{itemize}
+        \item there were \textbf{154} chunks which time frame were within a \textbf{0.5s} difference, 
+        \item average time difference was \textbf{5.24s}
+        \item standard deviation was \textbf{5.23s}
+        \item maximum time difference was \textbf{37.9s}
+    \end{itemize}
+    \begin{center}
+        \includegraphics[scale=0.6]{length_based_results_worse.jpg}
+    \end {center}
+    \item word differences:
+    \begin{itemize}
+        \item \textbf{179} chunks had \textbf{0} difference in words
+        \item \textbf{54} chunks where different by \textbf{1} word (missing or additional)
+        \item \textbf{20} different by \textbf{2} words
+        \item \textbf{56} with a difference over \textbf{10} words
+    \end{itemize}
+\end{itemize}
+
+If only longer pauses are allowed, then detected speeches contain more silence frames and consequently the total time is different, and in the end the estimated time might be just a bit more off. Another reason why it produces worse results might be related to the fact, that it also causes the speeches to be on average longer. This kind of random variables follow a rule, that they differ from an estimated value by square root factor, ergo longer parts, the worse estimations.
 
 \newpage
 
