@@ -773,30 +773,34 @@ If $A$ is a set of matched pairs of speech and text ($A = \{((s_i, e_i), t_i)\}$
 \end{equation}
 This problem is easily solvable with dynamic programming. \newline
 
-We iterate over speeches.
-At k-th iteration a vector of partial results are kept. The i-th element of vector contains a result of matching first k speeches and first i sentences.
-
-Initial values of the vector is matching of first speech part with first i chunks:
+The algorithm iterates over speeches. \newline
+At $k$-th iteration a vector $R$ of partial results are kept. The $i$-th element of the vector contains a result of matching first $k$ speeches and first $i$ sentences. \newline
+Initial values of the vector is matching of first speech part with first $i$ text chunks:
+\begin{equation}
+    R(i) = ((e_0 - s_0) - \sum_{k = 0}^i E(time \: it \: takes \: to \: say \: \: t_i)^2
+\end{equation}
+where $s_j$ and $e_j$ is start and end time of $j$-th speech, \newline
+and $t_i$ is $i$-th text chunk. \newline
                
+The $k$-the iteration calculates next values from the formula:
+\begin{equation}
+    R(i) = argmax_{d in <0, i - 1>} [P(i-l) + [(e_k - s_k) - \sum_{j = i - l}^d E(time \: to \: say \: t_j)]^2 ]
+\end{equation}
+Estimated time it takes to say a text chunks $\{e_k, ..., e_{k+c}\}$ would be quite consuming to calculate at each iteration, but it can be precomputed. \newline
 
-Next values are calculated based on the previous results:
-	
-
-Sum of estimated of text chunks would be quite consuming to calculate at each iteration, but it can be precomputed.
-Additionally a zero match was added as a way of skipping speech completely, as a way to add a speech to a text chunk from previous iteration. Note however, that it won't produce a result, where everything is matched to everything (what theoretically would give a result 0), because each iteration contributes to the score separately, so the previous adds a difference of matching speech (k-1)th and a certain number of chunks, and the skipping speech, will also produce a difference in a form of squared time of the speech.
-It does improve the algorithm though, because of some short speech leftovers, which actually are part of previously matched sentence.
-
-At the end we have a best time difference of the matching. To recreate a matching, one could iterate backwards over partial values, or as I did it, to store separately, when calculating values, indexes of previous results, that maximize the current ones.
-At end I traverse back through these indexes to produce a matching. Empty matching is considered to be merged with previous matching
-(i.e. two speeches $\iff$ text chunks).
-
-
+Additionally a zero match was added as a way of adding a speech to a text chunk from previous iteration.  Note however, that it won't produce a result, where everything is matched to everything, what would have a minimal score equal to 0, since a time it takes to say whole text is a total time of all speeches. \newline
+However matching from each iteration contribute to the score separately, so the previous match adds a difference and skipped speech will also add it own difference (assuming it was $k$-th speech, than added score is equal to $(e_k - s_k)^2$). \newline
+It does improve the algorithm though, because of some short speech leftovers, which actually are part of previously matched sentence. \newline
 
 \newpage
+At the end of algorithm the $i$-th element in $R$ vector is equal to the best cumulative score of matching $i$ chunks and all speeches. Obviously if there are $n$ chunks, then the $n$-th element contains a score of best possible matching of all speeches and whole text. \newline
+
+To recreate the matching, one could iterate backwards over partial values, or as I did it, to keep additional vector which keeps track of chosen indexes ($d$ in(9)) from all iterations. To produce the best matching, the algorithm traverses back through these indexes and for $k$-th speech it assigns all chunks between current and previous index. Empty assignment (index haven't changed) is considered to be merged with previous matching (time frame of previous label is updated with current speech). \newline
+\newline
 
 \subsection{Results}
 
-The efficiency of above method was tested versus a word alignment obtained from different methods in two ways:
+The efficiency of above method was tested versus a word alignment (obtained from different methods) in two ways:
 \begin{itemize}
     \item for a given label from the output find words and they testing labels, \newline
           merge the found testing labels times to produce total time of the text chunk, \newline
@@ -807,13 +811,16 @@ The efficiency of above method was tested versus a word alignment obtained from 
           \begin{equation}
                len(output\_chunk) + len(testing\_chunk) - 2 length(biggest\_subsequence)
           \end{equation}
-          produce statistics about the word differences
+          give some statistics about the word differences
 \end{itemize}
+The testing recording is “Doktor Piotr” by Stefan Żeromski, which is 80 minutes long and consists \textbf{1886} sentences (or subsentences). \newline
 
-For a testing recording of “Doktor Piotr” by Stefan Żeromski, which is 80 minutes long and consists 1886 sentences (or subsentences),
-the algorithm produced \textbf{730} labelled chunks. \newline
+\newpage
 
-The statistics are: \newline
+The first statistics are calculated for a variation of algorithm, where the allowed size of holes (or pauses), in speech detection algorithm part,
+was set to \textbf{200ms}. This version produced \textbf{730} labels. \newline
+
+The statistics are:
 \begin{itemize}
     \item time differences: \newline
     \begin{itemize}
@@ -834,13 +841,8 @@ The statistics are: \newline
     \end{itemize}
 \end{itemize}
 
-The time statistics are showing a bit worse results, because word labels are more precise than chunk time frames. \newline
-
-The results are within expectations, after all it is very crude algorithm. It probably could be improved though, however it is hard without introducing much more knowledge about language and possibly some additional training data (i.e. time of phonemes). \newline
-
-This algorithm is a bit sensitive to a chunks created. If only the longer pauses are allowed, by increasing the holes filling factor from 200ms to 300ms in  speech detection algorithm, the results were considerably worse: \newline
-
-For \textbf{503} speeches, with a pause longer than 300ms:
+\newpage
+For \textbf{503} speeches, with a pause longer than \textbf{300ms}:
 \begin{itemize}
     \item time differences: \newline
     \begin{itemize}
@@ -861,7 +863,15 @@ For \textbf{503} speeches, with a pause longer than 300ms:
     \end{itemize}
 \end{itemize}
 
-If only longer pauses are allowed, then detected speeches contain more silence frames and consequently the total time is different, and in the end the estimated time might be just a bit more off. Another reason why it produces worse results might be related to the fact, that it also causes the speeches to be on average longer. This kind of random variables follow a rule, that they differ from an estimated value by square root factor, ergo longer parts, the worse estimations.
+\newpage
+\subsection{Conclusions}
+
+The time statistics are showing a bit worse results, because word labels are more precise than chunk time frames. \newline
+
+The results are within expectations, after all it is very crude algorithm. It probably could be improved though, however it is hard without introducing much more knowledge about language and possibly some additional training data (i.e. time of phonemes). \newline
+
+This algorithm is a bit sensitive to a chunks created. If only the longer pauses are allowed, by increasing the holes filling factor from 200ms to 300ms in  speech detection algorithm, the results were considerably worse. \newline
+In this case detected speeches contained more silence frames and consequently the total time is different, and the estimated times might be a bit more wrong. Another reason why it produces worse results might be related to the fact, that it also causes the speeches to be on average longer. This kind of random variables follow a rule, that they differ from an estimated value by square root factor, ergo longer parts, worse estimations.
 
 \newpage
 \begin{center}
