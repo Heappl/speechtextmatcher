@@ -1110,6 +1110,7 @@ ZH & vi\underline{s}ual & zh & \underline{ж}аба & rz (ż) & ż & \underline{
 \\ \hline
 \end{tabularx}
 \end{center}
+\fontsize{12pt}{14pt}\selectfont
 
 I can try to draw some conclusions from the table alone. \newline
 
@@ -1127,14 +1128,100 @@ I would like to propose a way of converting grapheme sequences into phonetic des
 Nevertheless it would still be applicable only to problems which are easier than speech recognition, but only because it is a hard problem, which tries to get as much accuracy from sub-problems as it is only possible. \newline
 
 Take a look at English  word “one” and “tone”. The differ with character, but a phonectics are: “W AH N”  and “T OW N”.  \newline
-It doesn't seem to be trivial, but for Polish language it might be easy enough to create such a grammar, that creates such a dicitionary with good enough accurracy.
+It doesn't seem to be trivial, and actually it might be necessary to study in more detail a language to find quite accurate grammar. However for Polish it might be easy enough to create such a grammar, that will give us enough accuracy to perform alignment task. \newline
 
-We need at least three of such a grammars, converting to English, Russian and Polish phonemes.
-
-
+We need at least three of such a grammars, converting to English, Russian and Polish phonemes. \newline
  Here are example conversions:
 
-\fontsize{12pt}{14pt}\selectfont
+\begin{center}
+\begin{tabular}{| p{3.5cm} | p{3.5cm} | p{3.5cm} | p{3.3cm} |}
+\hline
+\rowcolor[gray]{0.8}
+Character sequence & English phoneme sequence & Russian phoneme sequence & Polish phoneme sequence
+\\ \hline
+a & AA & aa & a
+\\ \hline
+ą & AW & oo l & o ł
+\\ \hline
+b & B & b & b
+\\ \hline
+c & T S & c & c
+\\ \hline
+ci & CH IH & ch ii & ć i
+\\ \hline
+cia & CH Y AA & ch aa & ć j a 
+\\ \hline
+trz & T SH & t sh & t sz
+\\ \hline
+dż & JH & d zh & d ż
+\\ \hline
+dź & JH & d zh & d ź
+\\ \hline
+ch & HH & h & h
+\\ \hline
+h & HH & h & h
+\\ \hline
+ij & IY & --- & ---
+\\ \hline
+ó & UH & u & u
+\\ \hline
+rz & ZH & zh & ż
+\\ \hline
+ł & W & l & ł
+\\ \hline
+dzia & JH Y AA & d zz aa & d ź j a
+\\ \hline
+ź & ZH & zh & ź
+\\ \hline
+ś & SH & sh & ś
+\\ \hline
+\end{tabular}
+\end{center}
+
+\newpage
+
+The conversion table looks similar to description of lexer tokens and in general it is what we do here. We convert word into tokens standing for a phoneme sequence. It might be a good idea to use regular expression in the grammar, however I haven't found a need for these, hence my rules convert a character sequence only. \newline
+
+My rules were able to produce a set of possible phoneme representations, simply by adding a set of phoneme sequences to the right side of the rule. These however didn't prove to be quite beneficial, and after a short time experimenting with it, I reduced number of sets dramatically. After awhile I actually used a different variants only for the word alignment and only when I used sphinx with foreign audio model. \newline
+
+
+The algorithm looks as follows:
+\begin{itemize}
+    \item variables:
+    \begin{itemize}
+        \item $\bold{S}$ - a set of all rules in the grammar
+        \item $\bold{P}$ - a set of potential candidates
+        \item $\bold{c}$ - longest matched candidate so far
+        \item $\bold{R}$ - output set of phoneme sequences
+    \end{itemize}
+    \item at the start we have:
+    \begin{itemize}
+        \item $P = S$
+        \item $c$ is unset
+    \end{itemize}
+    \item iterate over a character sequence,
+    \begin{itemize}
+        \item remove all candidates from $P$, that will never be a match after adding current character,
+        \item if exists such $p \in P$, that it is currently matched, set $c$ with $p$
+        \item if $P$ is empty
+        \begin{itemize}
+            \item for each $s$ phoneme sequence in $c$:
+            \begin{itemize}
+                \item create $R_s$ by adding $s$ to each element of $R$
+            \end{itemize}
+            \item set new output $R = \cup_s R_s$ 
+            \item new set of potential candidates is $P=S$
+            \item move iteration pointer to the end of matched sequence $c$ 
+        \end{itemize}
+    \end{itemize}
+
+\end{itemize}
+
+I would leave here an open question if it is possible to create such a grammar for more accurate dictionaries.It might be, since phonemes are the effect of how comfortable it is to say a given sequence of phones and people are not really able to remember too complex conversion. It might be possible, that the grammar would need take into account some rare oddities, like word “one”, but there is definitely a finite number of such. In order to find such a grammar, probably a study on existing and trained dictionaries should be done, but this is out of the scope of this project.
+
+\newpage
+\subsection{Audio model alignment and results.}
+
 \newpage
 
 \begin{center}
