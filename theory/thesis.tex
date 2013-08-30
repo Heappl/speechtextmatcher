@@ -1222,7 +1222,74 @@ I would leave here an open question if it is possible to create such a grammar f
 \newpage
 \subsection{Audio model alignment and results.}
 
+This part is relatively easy, because sphinx library already support word alignment using any audio model. It requires only a phonetic dictionary, which we can create using conversion grammar from previous chapter.  Whole conversion works similar to recognizing word, the same breadth first search algorithm with queue of best results is used, except that a HMM for whole language is created from simple grammar, which allows only one big sequence of words. \newline
+
+We would like to test word alignment using English (WSJ) model and Russian (VoxForge) and compare it to some manually aligned sample. \newline
+
+For my testing recording I used a 5 minute and 20 seconds of audiobook “Doktor Piotr” by Stefan Żeromski and 16 minutes and 20 seconds of audiobook “Boże Narodzenie” by Maria Dąbrowska. \newline
+They were aligned by two different, but generally normal people (no experts) with purpose to make alignment as accurately as possible without selecting too much or too little. However while the person aligning “Doktor Piotr” considered overlapping to be forbidden, the person aligning “Boże Narodzenie” didn't have this presumption. This small fact changes statistics a bit especially for smaller time differences. \newline
+
+Another difference between those texts, is that I have never seen any mistake in text for “Doktor Piotr”, at least in those first 5 minutes, but I've seen wrong words in the “Boże Narodzenie”, where the reader has replaced them with something different, or the text was incorrect, nevertheless there are some discrepancies. \newline
+
 \newpage
+
+With English model I haven't got too much luck. The problem with the algorithm for word alignment is that once it goes wrong, then it never goes back on track again. With English model after \textbf{38} seconds of “Doktor Piotr” it incorrectly assigned 3 seconds to word “części” after \textbf{62} words and it never recovered. For “Boże Narodzenie” it has gone wrong after \textbf{257} seconds on word “czarownicach” after \textbf{503} words. \newline
+
+The statistics for “Boże Narodzenie” however shows, that before it goes bad it actually aligns first \textbf{503} words quite nicely:
+\begin{itemize}
+    \item Maximum difference (start or end): 			\textbf{0.559s}
+    \item Maximum difference (start or end), if label was to short at one end: 			\textbf{0.559s}
+    \item Average difference  (start or end):			\textbf{0.032s}
+    \item Error counts depending on time thresholds:
+    \begin{center}
+        \includegraphics[scale=0.6]{boze_narodzenie_word_english_results.jpg}
+    \end{center}
+\end{itemize}
+
+It seems that there weren't any substantial errors in the matching, although apparently the English audio model has some trouble with phoneme “cz”, which I'll remind was replaced by English “T SH”, which sounds more softened, than actual pronunciation. It is hard to figure out some other way of representing this one, and even though it looks like it could be used, some more elaborate method should be invented. Usually when word goes bad, the algorithm assigns too long selection to it, so maybe checking the time if it goes wrong and the to try some kind of recovery? I think it is possible, but I haven't explored this in more details. \newline
+
+\newpage
+
+I also tried Russian model, which haven't got problems as above and I could have generate statistics for whole alignment: \newline
+
+The “Boże Narodzenie” statistics are:
+\begin{itemize}
+    \item Total number of words:				\textbf{1779}
+    \item Maximum difference (start or end): 			\textbf{2.451s}
+    \item Maximum difference (start or end), if label was to short at one end: 			\textbf{0.543s}
+    \item Average difference  (start or end):			\textbf{0.016s}
+\end{itemize}
+The error counts regarding different time thresholds:
+\begin{center}
+    \includegraphics[scale=0.7]{boze_narodzenie_word_russian_results.jpg}
+\end{center}
+
+\newpage
+
+The statistics for “Doktor Piotr” sample are:
+\begin{itemize}
+    \item Total number of words				\textbf{585}
+    \item Maximum difference (start or end): 			\textbf{1.354s}
+    \item Maximum difference (start or end), if label was to short at one end: 			\textbf{0.534s}
+    \item Average difference  (start or end):			\textbf{0.033s}
+\end{itemize}
+
+The error counts regarding different time thresholds:
+\begin{center}
+    \includegraphics[scale=0.7]{doktor_piotr_word_russian_results.jpg}
+\end{center}
+
+\newpage
+Analysing the above statistics it can be noticed, that even if English model didn't go wrong, it still seems to perform worse, than Russian model. The average difference is twice bigger than for the former.  Also the counts of errors in relation to total number of aligned words shows, that Russian models outperforms the English one, what is quite understandable, since we knew apriori, that Russian is much more similar to Polish. \newline
+
+It is also noticeable, that they perform a bit differently. While English model finds borders of the word quite well, except for spectacular failures of course, the Russian on other hand frequently happens to include a pause after the word. This is a bit problematic for many different applications, except maybe for training, which can deal with that. Anyway since for English, the algorithm failed to finish the alignment, it may have happened, that it would show similar behaviour in later parts of the book. \newline
+
+The additional pause added to a word label isn't completely bad, since it means, that we are quite sure, that given selection contains an assigned word, and that there is very little total misses. Direct observation of collected data supported that conclusion. There were very few total misses and only related to alignment conjunctives (“w” especially).\newline
+From autopsy of collected data we also see, that the biggest mismatches were committed, when accounting a silence as a part of word. \newline
+
+One could try to further improve above method, at least by meddling with a phoneme conversions or maybe even training dictionary from a corpus, to get a better phoneme representation. I can't be sure at this point how big impact has the simple conversion grammar on results, although it doesn't seem to be the most promising room for improvement. \newline
+
+My final conclusion is that, regardless of some mismatches, it is a quite nice method for word alignment, especially for the purpose of further improvements in speech recognition systems and audio model trainings. 
 
 \begin{center}
 \begin{tabular}{| p{8cm} | p{8cm} |}
