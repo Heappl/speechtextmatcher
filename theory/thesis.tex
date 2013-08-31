@@ -26,6 +26,21 @@ The purpose of this final master degree project was to experiment with various a
 \newpage
 \section{Introduction}
 
+In two first chapters I would like to present a theory behind speech signal processing and speech recognition,
+that is well known and understood, and is mentioned in many different papers regarding speech related problems. \newline
+
+The chapter 4 is exploring a simple approach with minimal knowledge, that produces very crude results. The minum knowledge here is enough reason to bring it up, but I also found some another application for this imperfect solution. \newline
+
+Next two chapters are exploring a possibility of using audio models from foreign languages to achieve alignment with satisfying accuracy.
+The keynote of this part of thesis is a study of similarities between languages and their phonetics. \newline
+
+The chapter 7 combines conclusions and knowledge of previous chapters to study what can be done without any trained models and what knowledge is enough to align text for practical applications. \newline
+
+In the end I'm trying to show a small application of all presented solutions and show the results in more practical manner. \newline
+
+I try to approach this topic with a hackish scientific curiosity. The problem is presented, but I try to check what can be done if I redefine it in various configurations. I don't focus purely on results, because they are not as interesting as exploration of the area just to see what is there.
+
+
 \newpage
 \begin{center}
     \section{Speech signal}
@@ -1879,16 +1894,46 @@ Generally the created speeches were comprehensible and the meaning could be gras
 \end {center}
 \setcounter{equation}{0}
 
-TODO
-TODO
-TODO
-TODO
-TODO
-TODO
-TODO
-TODO
-TODO
-TODO
+I believe that I managed to show in this thesis, that word alignment can be done without much apriori knowledge.
+My algorithm was able to return a decent alignment for input audio file and recorded text with only knowledge about:
+\begin{enumerate}
+    \item punctuation marks and their relationship to pauses
+    \item a bit of knowledge about relationship between graphemes and phonemes (conversions grammars)
+    \item a human anatomy and capabilities, especially about speech frequency ranges
+    \item assumption that the input text has a high accuracy
+\end{enumerate}
+It would require further studies, but I believe it is possible to even further reduce necessary knowledge.
+\begin{description}
+    \item[Ad.1] this relationship might be unimportant, if we had large enough database and that may mean only a couple of hours of recordings, \newline
+    the length based alignment might be ok even with character by character matching, and that would mean, that it is possible to learn, that certain characters are actually punctuation marks (repeatedly are assigned to silences?)
+    \item[Ad.2] using actual graphemes instead of my conversions reduces the accuracy of the models, but there is no reason why using only graphemes wouldn't be enough
+    \item[Ad.3] this is almost definitely unnecessary, since the only reason I used it in the first place, was not because it increases the accuracy, but because it improves the performance, but working with bigger frequency set should be possible and some perfomance can be regained i.e. by measuring distance from normal distribution and by merging close frequencies
+    \item[Ad.4] obviously there exists a certain threshold where it would be impossible to train anything, but even in the situation where we would have couple of recordings and many texts without knowing which are which, it might be possible to find a matching, but it seems like a hard problem
+\end{description}
+
+\newpage
+
+The future work could focus on improving above algorithms and creating a system, that is able to align single text or a set of them with much higher accuracy.
+Promising improvements include:
+\begin{itemize}
+    \item bimproving the above algorithm by rerunning speech alignement with imperfect model
+    \item combining model from couple of separete texts
+\end{itemize}
+Also it might be interesting to study if it is possible to perform such a alignment in more noisy environments especially for songs and crowd recordings. \newline
+Even more intersting if it can be done for recordings with poor quality, like phone calls etc. These might be extra hard not only because of poor signal quality, but also because people's diction in daily situation is not very good and the flow of the text shows a lot of irregularities with different interruptions (people interrupt each other, sometimes thay wait for other to get back, etc). \newline
+These are quite hard situations even for well prepared systems. \newline
+
+One application of such a system would be automatic training for any language recogniton software with very little human interference. Currently the top speech recognition software is being developed mainly for English, while hundreds of other languages attracts much less attention. Unless English will become the world's official language and all of people will be able to speak English with similar accent, the need for such system is quite obvious. \newline
+If it would be possible to generate a speech recognition software easily for any language, then a majority of people wouldn't be excluded from using certain technologies (SIRI, GoogleGlasses, etc). \newline
+
+I also believe that by studying how computers can gain certain knowledge may prove to be beneficial in understanding how people learn, and that is not only useful, but purely interesting. \newline
+I haven't exhausted the topic even in a slightest, since it is just a part of larger question: how one can learn a language without external help. How human infants learn to talk, and how computers can mimick (or not) to learn language as well. \newline
+I think, that answering this question with great detail, may improve our solutions for human-computer interactions and others. \newline
+However many there are applications, a pure exploration is always enough reason to study a question. If it was asked, let's try answer it. \newline
+
+Each of results brought up in this thesis and whole project with all mentioned algorithms are available for git checkouts from: \newline
+https://github.com/Heappl/speechtextmatcher or \newline
+https://bitbucket.org/Heappl/speechtextmatcher.
 
 \newpage
 \begin{center}
