@@ -1539,6 +1539,170 @@ This is not good, although a small amendment, can be introduced to counter the e
 The problem also showed in the average time difference, which is up to 3 times bigger than for alignment with Russian audio model. Let's not forget though, that these were trained from only 70 minutes long and 16 minutes long recordings, while the Russian one was trained from much larger database.
 
 \newpage
+\begin{center}
+    \section{Testing alignment with synthesizer}
+\end {center}
+\setcounter{equation}{0}
+
+What do we need phoneme alignment for? For training purposes it is not needed really, since a word or sentence level tagging is great enough. \newline
+There is one application, that is widely used: from train announcements through automatic reading to  blind people support systems. It is a speech synthesizer, and such, that not only can be easily understood, but also sounds human alike. People tend to dislike artificial things that resemble humans to closely, but not completely. The automatic announcement systems can't be creepy or people will feel uneasy around it and may not want to hear it at all. Personally I hate synthesized audio books, which are just so unpleasant to listen to. \newline
+
+It is nearly impossible to record all possible words at all possible forms to create well sounding synthesizer even for quite small announcement systems. An obvious alternative is to use a proper phoneme alignment to extract and combine parts from completely unrelated sentences, to produce a new form of or totally new word. \newline \newline
+
+\subsection{Testing application of a synthesizer}
+
+Except for uncountable possible applications of synthesizer, we can firstly use it as an additional way for testing our alignments, especially phoneme alignment. Dry statistics are not necessary the most intuitive way to check how our software performs and in the case of phonemes, it may actually be a much better testing ground. People don't agree too well what part of recording constitutes for a phoneme, if only because a single phone is barely perceivable by a human, so naturally such a manual alignment must escape to alternatives method of trying to find a part of word, which doesn't sound like it should. \newline
+It is a similar technique to synthesizing words with an audio assigned to phonemes, but instead of doing this manually, we can try to this automatically. \newline
+
+Testing is relatively straightforward and requires a good ear and a bit of time. We synthesize some sentences which may contain some of interesting phonemes and the we check if doesn't sound odd or if it is even understandable. 
+
+\newpage
+\subsection{Synthesizing speech with phoneme alignment}
+Speech synthesizing can be simple and hard depending on what we actually want to get in the end and how much can we invest into preparation of audio files. \newline
+
+On one end we have an easy problem of combining spoken words and phrases into sentences and the only thing we need to do, is match a silence part together. \newline
+On the other we have a complete synthesizer, which don't have any prepared audio data and tries to produce the sound signal on it is own. It is doable, but currently all such a synthesizers have very little in common with a human speech and sound very robotic. Synthesizing a human like speech this way at this moment is completely outside our capabilities, but we can't disprove, that it won't be possible someday, after all in theory it is “only” a matter of simulating human respiration organs. \newline
+
+Current top performing synthesizers are settling somewhere at the middle. Although for announcement system (i.e. in trains) it looks like it never synthesizes single word, but all are already recorded and it only combines them into larger statements. It might be feasible in this case, but most of the time it is impractical, because of the number of words needed to be recorded by a living, breathing and wanting to be paid human. Recording of million of words would take around 7 weeks of non-stop work assuming, that recording of one word would take only a second. And that is nearly not enough, especially for languages where conjugation is much more complex than in English. \newline
+
+The solution is to use much smaller recording set and use it to create/synthesize words, that don't exist in the set. \newline
+
+I experimented with two algorithms for word synthesizing. First is a bit better for testing purposes of phoneme alignment, while the second produces better results. Both algorithms used as an input audio recording tagged with phonemes. \newline
+
+
+Both algorithms have a common part of choosing word candidates and merging them altogether. The only difference is a part of creating candidate when the word doesn't exist in the input text. \newline
+
+In the common part we use a function, that scores a merging of two candidates $c_k$ and $c_{k+1}$ for $k$-th word and ($k+1$)-th word. \newline
+The score is an euclidean difference between a small number of sequential frames from the ending of $c_k$ and the beginning of $c_{k+1}$. \newline
+The beginning is a prefix of any $c_i$, which has a length not greater than a fixed fraction of $|c_i|$. \newline
+Similarly the ending is a suffix of any $c_i$, which has a length not greater than the same fixed fraction of $c_i$. 
+
+\newpage
+
+Synthesizing algorithm:
+\begin{enumerate}
+    \item For each word in the text:
+        \begin{enumerate}
+            \item extract all parts of recording, that are tagged with the word
+            \item if the extracted set is empty, then synthesize the word.
+        \end{enumerate}
+    \item Add between words a silence set, which are untagged parts of recording, \newline
+          choose only the ones that satisfy durations constraints
+    \item Choose a best sequence of audio streams using dynamic programming as below:
+        \begin{enumerate}
+            \item partial result array $R_0$ is initialized with $\{0\}$
+            \item iterate over word sequence $\{w_1, ..., w_n\}$:
+                \begin{enumerate}
+                    \item entry data for $k+1$-th iteration is $R_k = \{s_1, ..., s_{|C_{w_k}|}\}$,
+                    where $C_{w_k}$ is set of candidates for $k$-th word,
+                    and $s_i$ is a score of best scoring merged stream ending with a $i$-th candidate
+                    \item next score set $\{s_1', ..., s_{|C_{w_{k+1}}'|}\}$ is given by a formula:
+                    \begin{equation}
+                        s_i' = argmin_{j \in \{1,...,|C_{w_k}|\}} (s_j + score(j, i))
+                    \end{equation}
+                \end{enumerate}
+            \item recreate best scoring sequence either from partial scores or with additional data stored in forward run
+        \end{enumerate}
+    \item Merge calculated sequence into one audio stream.
+\end{enumerate}
+
+\newpage
+
+\subsubsection{Simple end to end synthesizer}
+
+Actually this algorithm skips a little bit the part with synthesizing an audio stream for a given word.
+The 1b part of above algorithms is changed to this:
+
+\begin{enumerate}
+\item
+    \begin{enumerate}
+        \setcounter{enumii}{1}
+        \item if the extracted set is empty then:
+        \begin{enumerate}
+            \item convert word into sequence of phonemes
+            \item for each phoneme
+            \begin{enumerate}
+                \item extract from the set of recordings parts, that are tagged with the phoneme
+                \item add the set as a candidate set with phoneme as new word
+            \end{enumerate}
+        \end{enumerate}
+    \end{enumerate}
+\end{enumerate}
+
+In the end a word, that was not found in the input text, is synthesized by combining extracted phoneme parts. \newline
+It is calculated together with other words (or their phonemes) and it may not be optimal for each word, but whole sentence should sound ok. \newline
+\newline
+
+This algorithm is a bit better for checking correctness of phoneme alignment, because it combines phoneme signal end to end, so if something is wrong it should be immediately heard in the output stream. \newline
+For the same reason it will have a poorer quality, because even if the aligner is perfect, the boundary frames might have some sound artefacts caused by preceding or succeeding phoneme, i.e. it is quite common, that the last vowel of the sentences changes to a breathing sound, when a speaker is exhaling or breathing in after longer sentence, and that is quite hard to separate, without actually training for recognizing breathing sounds, but to train them, you need a text with marked occurrences of such. \newline
+\newline
+
+The resulting audio contained quite some of such a artefacts and sometimes a bit additional silence here and there. The phonemes seemed to be more or less in order, but the word was a bit hard to understand, because the flow was kind of odd and very unnatural. Clearly it isn't a good synthesizer.
+
+\newpage
+\subsubsection{Middle to middle synthesizer}
+
+In this algorithm each non-existing word was synthesized separately resulting with only one candidate for each word to be combined in the last phase of common part. \newline
+
+The input to the algorithm is a phoneme alignment of the recording:
+\begin{equation}
+    L = \{ W_1, W_2, ..., W_n \}
+\end{equation}
+ where element $W_i$ is a phoneme sequence $\{p_{w_i, 1}, ..., p_{w_i, |w_i|}\}$ created from word $w_i$,
+ accompanied with the assignment function $f$, that for each $p_{w_i, j}$ returns a unique (regarding pair for indexes $(w_i, j)$ and not actual phoneme) part of audio stream, i.e. $\{f_k, ..., f_{k+m}\}$. \newline
+
+The algorithm first looks for candidates to be merged into a synthesized stream:
+\begin{itemize}
+    \item convert word to phoneme sequence $\{\rho_1, ..., \rho_n\}$
+    \item for each $0 \leq i \leq n$ start with an empty set $S_i$:
+    \begin{itemize}
+        \item for each $W_k \in L$ and for each $0 \leq j \leq |w_k|$ find a maximum value of $m$, \newline
+              where $j+m < |w_k|$ and $\forall_{z \in <j, j+m>} p_{w_k, z} = \rho_{i+z-j}$,
+        \item if $m > 2$ add a sequence $\{p_{w_k, j}, ..., p_{w_k, j + m}\}$ to set $S_i$
+    \end{itemize}
+    \item if $S_i=\emptyset$, then repeat second step, but now add a sequence if $m>1$
+\end{itemize}
+
+An element $S_i$ from the sequence of candidate sets $\{S_1,...,S_n\}$ resulted from above procedure, has the property, that each of it's elements are a subsequences of phoneme representation of the synthesized word, and all of them start with a phoneme $\rho_i$. \newline
+
+It is possible, that one of such a candidate set would be empty, if there were no such a subsequence, but it is not quite likely, that in larger file it will happen. In this case we could fall back to some variation of this method and the first one, but a preferred subsequences of length of at least 3 are quite common.\newline
+
+The next part of algorithm has to choose which of them should be merged and at which frame they are to be combined. \newline
+The algorithm once again uses a dynamic programming technique in quite similar manner to the common part, the main difference is in the scoring function.
+
+\newpage
+
+It iterates over the candidates: 
+The k-th iteration processes the set ,
+at the beginning of iteration (k+1)-th for each element it keeps a best scoring synthesized stream, that it phoneme representation ends with a sequence . 
+
+The next iteration results are obtained by calculating best scoring synthesized stream for each element , as follows:
+
+A score between candidates and is calculated by finding a closest frame (by Euclidean distance) of the second phoneme in and a first phoneme , which should correspond to the same .
+
+If the second phoneme from  has assigned consecutive frames from a to b: ,
+and the first phoneme from has assigned frame from c to d: ,
+then a score of combining those two sequences is ,
+where is a constant chosen based on empirical experiments.
+
+A picture shows intervals from two sequences, for which a distance is calculated, and if a closest frames were chosen as the arrow indicates, how a resulting stream would look like:
+
+\newpage
+\subsection{Results and conclusions}
+
+How does it work? It is hard create automatic test for speech synthesizing. Theoretically I could rerun word alignment to see how it would perform for synthesized speech, however the alignment works even if there are occasional mismatches between text and speech, so it doesn't really gives much, except maybe checks if there are no total misses. It poses a certain challenge to create such a test, the challenge, that I'm not necessary willing to take, since I am a bit more optimistic about total misses, especially after looking at statistics from previous chapters and in the end, the human inspection is necessary anyway to check how it actually performs.
+
+My idea of test is to try to synthesize various texts more and less randomly chosen and see for myself how it performs and where it behaves incorrectly.
+
+A recording used for synthesizing is a full text of “Doktor Piotr” which contains an hour and 22 minutes of speech. The phonemes are aligned by training model from initial word alignment obtained using method from chapter 7, that doesn't need external audio model, but trains it itself using initial time and pause based alignment.
+
+I chose couple of unrelated texts, which contain couple of tongue twisters, a part of epic poem “Pan Tadeusz”, a part of novel “Przedwiosnie”, and couple sentences from cultural column in “Politika” weekly magazine.
+
+
+The first algorithm shows quite substantial flaws in phoneme alignment. Apparently a lot of phonemes has additional trailing frames from a succeeding phoneme, what renders the created speech, to be incomprehensible, although closer inspection shows, that actual phonemes are correct, just not perfectly aligned. And it doesn't matter if the model was trained from the word labelling obtained using Russian audio model or Polish trained from initial pause based alignment. It shows, that an alignment with more perfection is needed for this kind algorithm.
+
+On the other hand, then second algorithm deals with this problem by combining phonemes middle to middle, so no ending ever is included. 
+
 
 \begin{center}
 \begin{tabular}{| p{8cm} | p{8cm} |}
@@ -1581,6 +1745,14 @@ closer inspections showed, that „się” was included as whole, but was badly 
 - „ozdobie” - first „o” is missing, second sounds like „ą” \newline
 - „tobie” - short „e”
 \\ \hline
+"Panno święta co Jasnej bronisz Częstochowy I w Ostrej świecisz Bramie Ty co gród zamkowy Nowogródzki ochraniasz z jego wiernym ludem" &
+- „świecisz” - „ś” sounds weird like "sz" through teeth, \newline
+- „co” - hearable „t” at end, \newline
+- „gród” - missing „g”, \newline
+- „nowogródzki” - extra „na” at the beginnings and „dz” sounds like „jz”, \newline
+- „ochraniasz” - first „o” is actually „w”, \newline
+- „wiernym” - quite bad, at the beginning there is extra „pły”, and there is missing „r” making it completely unrecognizeable
+\\ \hline
 \end{tabular}
 \end{center}
 
@@ -1593,14 +1765,6 @@ closer inspections showed, that „się” was included as whole, but was badly 
 synthesized texts &
 \cellcolor[gray]{0.8}
 Notes on erroneous parts in synthesized speech using words and phonemes initiated by pause based alignment
-\\ \hline
-"Panno święta co Jasnej bronisz Częstochowy I w Ostrej świecisz Bramie Ty co gród zamkowy Nowogródzki ochraniasz z jego wiernym ludem" &
-- „świecisz” - „ś” sounds weird like "sz" through teeth, \newline
-- „co” - hearable „t” at end, \newline
-- „gród” - missing „g”, \newline
-- „nowogródzki” - extra „na” at the beginnings and „dz” sounds like „jz”, \newline
-- „ochraniasz” - first „o” is actually „w”, \newline
-- „wiernym” - quite bad, at the beginning there is extra „pły”, and there is missing „r” making it completely unrecognizeable
 \\ \hline
 "Jak mnie dziecko do zdrowia powróciłaś cudem Gdy od płaczącej matki, pod Twoją opiekę Ofiarowany martwą podniosłem powiekę I zaraz mogłem pieszo do Twych świątyń progu Iść za wrócone życie podziękować Bogu Tak nas powrócisz cudem na Ojczyzny łono" &
 - „mnie” - extra „u” at the beginning, \newline
@@ -1627,19 +1791,6 @@ Notes on erroneous parts in synthesized speech using words and phonemes initiate
 \\ \hline
 "Za górami za lasami znajduję się wysoka wieża strzeżona przez smoka" &
 \\ \hline
-\end{tabular}
-\end{center}
-
-\newpage
-
-\begin{center}
-\begin{tabular}{| p{8cm} | p{8cm} |}
-\hline
-\cellcolor[gray]{0.8}
-synthesized texts &
-\cellcolor[gray]{0.8}
-Notes on erroneous parts in synthesized speech using words and phonemes initiated by pause based alignment
-\\ \hline
 "Maksymalistyczny egzystencjalny program Mrożka polegał właśnie na stawianiu świata pod znakiem zapytania w świetle jak najbardziej trzeźwych zarzutów o jego niewystarczalność" &
 - „maksymalistyczny” - first „m” is actually an „s”, extra „lny” at the end, \newline
 - „mrożka” - „first „m” is actually „z”, \newline
@@ -1654,7 +1805,19 @@ Notes on erroneous parts in synthesized speech using words and phonemes initiate
 - „ mierzwy” - missing „y”, \newline
 - „jaką” - a bit distorted and unrecognizeable, \newline
 - „ideały” - „i” is replaced by „u” and extra „j” between „e” and „a”
+\\ \hline
+\end{tabular}
+\end{center}
 
+\newpage
+
+\begin{center}
+\begin{tabular}{| p{8cm} | p{8cm} |}
+\hline
+\cellcolor[gray]{0.8}
+synthesized texts &
+\cellcolor[gray]{0.8}
+Notes on erroneous parts in synthesized speech using words and phonemes initiated by pause based alignment
 \\ \hline
 "Pomimo języka groteski którym tak chętnie się posługiwał był przede wszystkim piewcą głębi sztuki jej ocalającego kontemplacyjnego wymiaru" &
 - „pomimo” - some artefact in ending „o”, \newline
@@ -1670,6 +1833,36 @@ Notes on erroneous parts in synthesized speech using words and phonemes initiate
 \\ \hline
 \end{tabular}
 \end{center}
+
+Synthesizer results is showing us what kind of mistakes the phoneme aligner makes and what exactly the percentages presented in previous chapter mean. 
+It appears, that the word alignment is not perfect and sometimes it is off by selecting too much, although it doesn't seem, that it happens too often. Much more common mistake is assigning too little to the word label, what results with missing phonemes, although this might be case on any word misalignment, where phoneme alignment just couldn't find correct tagging. 
+
+The most obvious conclusion is that, this kind precision is not enough for the perfect speech creation, although only 3 words among the synthesized sentenced were actually not recognizable, among there was one, where it actually changed meaning.
+
+Not every error in above table is a result of misalignment, some are outcome of the compactness of conversion grammar or plainly because of incorrect phoneme conversion. After all there is no guarantee, that conversion will produce a correct phoneme description.
+
+Also the synthesizer is not perfect and could be improved in many various ways, especially by improving the score of combining to consecutive words/phones to consider the whole similarity, so there are no sudden changes in volume or timbre. The main purpose of the simple synthesizer here is to check how phoneme alignment works, so these improvements are a bit out of scope of this thesis.
+
+Generally the created speeches were comprehensible and the meaning could be grasped quite easily. The effect seems to agree with brought up statistics for word and phoneme alignment. It is ok, but not perfect.
+
+
+\newpage
+\begin{center}
+    \section{Summary and conclusions}
+\end {center}
+\setcounter{equation}{0}
+
+TODO
+TODO
+TODO
+TODO
+TODO
+TODO
+TODO
+TODO
+TODO
+TODO
+
 \newpage
 \begin{center}
     \section{Bibliography}
