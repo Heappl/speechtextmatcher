@@ -1672,20 +1672,47 @@ The algorithm once again uses a dynamic programming technique in quite similar m
 
 \newpage
 
-It iterates over the candidates: 
-The k-th iteration processes the set ,
-at the beginning of iteration (k+1)-th for each element it keeps a best scoring synthesized stream, that it phoneme representation ends with a sequence . 
+The algorithm iterates over the candidates $\{S_1, ..., S_n\}$. \newline
+The k-th iteration processes the set $S_{k+1} = \{s_1, ..., s_l\}$. \newline
+At the beginning of iteration ($k+1$)-th for each element $s_i \in S_k$ the algortithm keeps a best scoring synthesized stream, for which a phoneme representation ends with a sequence $s_i$. \newline
 
-The next iteration results are obtained by calculating best scoring synthesized stream for each element , as follows:
+The next iteration results are obtained by calculating best scoring synthesized stream for each element $s_j' \in S_{k+1}$, as follows. \newline
 
-A score between candidates and is calculated by finding a closest frame (by Euclidean distance) of the second phoneme in and a first phoneme , which should correspond to the same .
+A score between candidates $s_i$ and $s_j'$ is calculated by finding a closest frame (by Euclidean distance) of the second phoneme in $s_i$ and a first phoneme in $s_j'$, which should correspond to the same $\rho_{k+1}$. \newline
 
-If the second phoneme from  has assigned consecutive frames from a to b: ,
-and the first phoneme from has assigned frame from c to d: ,
-then a score of combining those two sequences is ,
-where is a constant chosen based on empirical experiments.
+If the second phoneme from $s_i$ has assigned consecutive frames from $a$ to $b$: $\{f_a, ..., f_b\}$, \newline
+and the first phoneme from $s_j$h as assigned frames from $c$ to $d$: $\{f_c, ..., f_d\}$, \newline
+then a score of combining those two sequences is:
+\begin{equation}
+    argmax_{x \in <\frac {(a + b)} 2 - \frac {|a - b|} \delta, \frac {(a + b)} 2 + \frac {|a - b|} \delta>, y \in <\frac {(c + d)} 2 - \frac {|c - d|} \delta, \frac {(c + d)} 2 + \frac {|c - d|} \delta>}(dist(f_x, f_y))
+\end{equation}
+where $\delta$ is a constant chosen based on empirical experiments. \newline
 
 A picture shows intervals from two sequences, for which a distance is calculated, and if a closest frames were chosen as the arrow indicates, how a resulting stream would look like:
+
+\begin{minipage}[0,0]{15cm}
+    \includegraphics[scale=0.5]{audio_merging.jpg}
+\end{minipage}
+\begin{minipage}[15cm,0]{4cm}
+$s_i$
+\newline
+\newline
+\newline
+\newline
+\newline
+\newline
+$s_j'$
+\newline
+\newline
+\newline
+\newline
+\newline
+\newline
+\newline
+\newline
+output 
+\end{minipage}
+At the end a best scoring stream is returned as a resulting synthesized audio for input word.
 
 \newpage
 \subsection{Results and conclusions}
