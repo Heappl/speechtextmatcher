@@ -1717,18 +1717,18 @@ At the end a best scoring stream is returned as a resulting synthesized audio fo
 \newpage
 \subsection{Results and conclusions}
 
-How does it work? It is hard create automatic test for speech synthesizing. Theoretically I could rerun word alignment to see how it would perform for synthesized speech, however the alignment works even if there are occasional mismatches between text and speech, so it doesn't really gives much, except maybe checks if there are no total misses. It poses a certain challenge to create such a test, the challenge, that I'm not necessary willing to take, since I am a bit more optimistic about total misses, especially after looking at statistics from previous chapters and in the end, the human inspection is necessary anyway to check how it actually performs.
+How does it work? It is hard create automatic test for speech synthesizing. Theoretically I could rerun word alignment to see how it would perform for synthesized speech, however the alignment works even if there are occasional mismatches between text and speech, so it doesn't really gives much, except maybe checks if there are no total misses. It poses a certain challenge to create such a test, the challenge, that I'm not necessary willing to take, since I am a bit more optimistic about total misses, especially after looking at statistics from previous chapters and in the end, the human inspection is necessary anyway to check how it actually performs. \newline
 
-My idea of test is to try to synthesize various texts more and less randomly chosen and see for myself how it performs and where it behaves incorrectly.
+My idea of test is to try to synthesize various texts more and less randomly chosen and see for myself how it performs and where it behaves incorrectly. \newline
 
-A recording used for synthesizing is a full text of “Doktor Piotr” which contains an hour and 22 minutes of speech. The phonemes are aligned by training model from initial word alignment obtained using method from chapter 7, that doesn't need external audio model, but trains it itself using initial time and pause based alignment.
+A recording used for synthesizing is a full text of “Doktor Piotr” which contains an hour and 22 minutes of speech. The phonemes are aligned by training model from initial word alignment obtained using method from chapter 7, that doesn't need external audio model, but trains it itself using initially time and pause based alignment. \newline
 
-I chose couple of unrelated texts, which contain couple of tongue twisters, a part of epic poem “Pan Tadeusz”, a part of novel “Przedwiosnie”, and couple sentences from cultural column in “Politika” weekly magazine.
+I chose couple of unrelated texts, which contain some of tongue twisters, a part of epic poem “Pan Tadeusz”, a part of novel “Przedwiosnie”, and couple sentences from cultural column in “Politika” weekly magazine. \newline
+\newline
 
+The first algorithm shows quite substantial flaws in phoneme alignment. Apparently a lot of phonemes has additional trailing frames from a succeeding phoneme, what renders the created speech, to be incomprehensible, although closer inspection shows, that actual phonemes are correct, just not perfectly aligned. And it doesn't matter if the model was trained from the word labelling obtained using Russian audio model or Polish trained from initial pause based alignment. It shows, that an alignment with more perfection is needed for this kind algorithm. \newline
 
-The first algorithm shows quite substantial flaws in phoneme alignment. Apparently a lot of phonemes has additional trailing frames from a succeeding phoneme, what renders the created speech, to be incomprehensible, although closer inspection shows, that actual phonemes are correct, just not perfectly aligned. And it doesn't matter if the model was trained from the word labelling obtained using Russian audio model or Polish trained from initial pause based alignment. It shows, that an alignment with more perfection is needed for this kind algorithm.
-
-On the other hand, then second algorithm deals with this problem by combining phonemes middle to middle, so no ending ever is included. 
+The second algorithm deals with this problem by combining phonemes middle to middle, so no ending is ever included. 
 
 
 \begin{center}
@@ -1861,14 +1861,14 @@ Notes on erroneous parts in synthesized speech using words and phonemes initiate
 \end{tabular}
 \end{center}
 
-Synthesizer results is showing us what kind of mistakes the phoneme aligner makes and what exactly the percentages presented in previous chapter mean. 
-It appears, that the word alignment is not perfect and sometimes it is off by selecting too much, although it doesn't seem, that it happens too often. Much more common mistake is assigning too little to the word label, what results with missing phonemes, although this might be case on any word misalignment, where phoneme alignment just couldn't find correct tagging. 
+Synthesizer results are showing us what kind of mistakes the phoneme aligner makes and what exactly the percentages presented in previous chapter mean. \newline
+It appears, that the word alignment is not perfect and sometimes it is off by selecting too much, although it doesn't seem to happen too often. Much more common mistake is assigning too little to the word label, what results with missing phonemes, although this might be case on any word misalignment, where phoneme alignment just couldn't find correct tagging. \newline
 
-The most obvious conclusion is that, this kind precision is not enough for the perfect speech creation, although only 3 words among the synthesized sentenced were actually not recognizable, among there was one, where it actually changed meaning.
+The most obvious conclusion is that, this kind precision is not enough for the perfect speech creation, although only 3 words among the synthesized sentenced were actually not recognizable, and among them, there was one, where it actually changed it meaning. \newline
 
-Not every error in above table is a result of misalignment, some are outcome of the compactness of conversion grammar or plainly because of incorrect phoneme conversion. After all there is no guarantee, that conversion will produce a correct phoneme description.
+Not every error in above table is a result of misalignment, some are outcome of the compactness of conversion grammar or plainly because of incorrect phoneme conversion. After all there is no guarantee, that conversion will produce a correct phoneme description. \newline
 
-Also the synthesizer is not perfect and could be improved in many various ways, especially by improving the score of combining to consecutive words/phones to consider the whole similarity, so there are no sudden changes in volume or timbre. The main purpose of the simple synthesizer here is to check how phoneme alignment works, so these improvements are a bit out of scope of this thesis.
+Also the synthesizer is not perfect and could be improved in many various ways, especially by improving the score of combining two consecutive words/phones to consider the whole similarity, so there are no sudden changes in volume or timbre. The main purpose of the simple synthesizer here is to check how phoneme alignment works, so these improvements are a bit out of scope of this thesis. \newline
 
 Generally the created speeches were comprehensible and the meaning could be grasped quite easily. The effect seems to agree with brought up statistics for word and phoneme alignment. It is ok, but not perfect.
 
