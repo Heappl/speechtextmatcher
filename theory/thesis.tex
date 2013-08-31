@@ -1426,6 +1426,119 @@ Considering the fact, that we haven't use a specifically trained audio model for
 Actually according to [28], it is possible to obtain a phoneme alignment within error of 0.02s with accuracy over 90\%. I am not near this, but consider this method as an entry point for more elaborate training and aligning methods. \newline
 The important thing to remember is, that it was possible using only Russian audio model and conversion grammar, which contained only 158 rules. 
 
+\newpage
+\begin{center}
+    \section{Training audio from large audio files}
+\end {center}
+\setcounter{equation}{0}
+
+In this chapter I'll try to answer a question if it is possible to use audio recordings, that are 20 minutes to several hours long, with only exact recored text of the speech and yet being able to train a model from a given audio, that would be good enough for text alignment purposes, if only for recordings of very good quality, like audio books. \newline \newline
+
+\subsection{Using imperfect large chunk alignment as a training database}
+
+In the chapter 4 I described a method, that finds larger chunks of speech and matches parts of text to them, based on punctuation marks and pauses. As we have seen in the results, the output was quite inaccurate, however around 54\% of the chunks had been correctly identified, and around another 25\% had been nearly correct (less than 3 words difference). That doesn't seem to be good enough, but maybe we could train a model from it anyway. \newline
+
+First of all as I mentioned before, training audio model from a large chunks requires quite a lot of time, because of complexity $\Theta(nm)$, where $n$ is a number of phonemes and $m$ is the size of audio chunk, what is more or less quadratic in relation to a number of characters in a chunk. \newline
+Secondly we would expect, that longer streams might reduce our chance for a proper convergence of phonemes, but maybe not nearly as much as incorrectly assigned ones. \newline
+
+Because of that I chose only chunks, that are shorter than a given constime time threshold. This value is problematic to choose automatically, because shorter texts, may require to use all of them in order to be able to train good enough model.For the longer texts may it may be enough to use only a few seconds short ones.
+In any case a certain amount of training data is required. It is hard to believe, that it would be possible to train anything from a 10 second sentence. \newline
+
+For the chosen chunks the algorithm converts assigned text to a phoneme sequence and between any two words additional silence phoneme is inserted, and at the beginning and at the end of the block. \newline
+Once we do this, we have quite a similar set up as in chapter 6 when I wanted to train phoneme models having word alignment. At this point I haven't changed anything and the algorithm proceeds in the same manner. \newline
+Just as before initial distributions are trained from the same crude assignment and as before the training uses a variation of EM algorithm, where estimation step is an alignment of phonemes and maximization step uses assigned frames to train the next generation of distributions. \newline
+
+The only problem with this approach is, that the aligned chunks may be quite long (several tens of seconds) and this increases the runtime of the algorithm quite substantially, so a proper upper time threshold should be chosen. Anyway it is still a better way, than perforimg the task manually.
+
+
+\newpage
+\subsection{Word alignment with imperfect model}
+
+This part has the closest resemblance to the speech recognition. Because we need to align a text that will be converted to many thousands of phonemes, it is infeasible to calculate a proper best sequence alignment. At each frame of audio, we would have to calculate a best sequence ending with each phoneme and since there are an order more frames than states, it would be just too many operations to complete the task in a reasonable time. \newline
+
+I have visited this kind of problem before in chapter 5: an explosion of the number of states in speech recognition. The solution there was to cut on number of states by keeping a fixed size priority queue with a best scoring sequences only. In our case it should behave at least as well. \newline
+
+The alignment is performed on a whole text at once. At first it is converted to a phoneme sequence $P = \{p_i, ..., p_n\}$, with additional “sil” phonemes at the beginning, at the end and between each two consecutive words. \newline
+
+A state $s_i$ is a phoneme at given position $i$ in $P$ sequence and a normal distribution $N(\theta_{p_i})$,
+and can be seen as a duple: $s_i = (p_i, N(\theta_{p_i}))$, where $\theta_{p_i}$ are parameters of normal distribution trained for a phoneme $p_i$. \newline
+Each two states are $s_i \neq s_j \iff i \neq j$, although two phonemes and their models might be equal to each other. \newline
+
+Queue at my algorithm contains a fixed number $N$ of best scoring sequences ending at $N$ states. \newline
+In other words for each state $s_i$ at most one sequence is kept in a queue only and only if there are no more than $N-1$ states, for which best performing sequences ending at the states have worse score than a best score of all sequences ending at the state $s_i$. \newline
+Even simpler my queue is a map with $N$ elements, where keys are states and values are sequences, which got the best score for a state being a key so far. \newline
+Each sequence added to a queue may:
+\begin{itemize}
+    \item not be stored if all scores in map are greater than added sequence score
+    \item may replace a value of the same state if previous sequence had worse score
+    \item may be added as new element in the map, but if number of entries in a map is bigger than $N$, then a worse scoring sequence is removed with it's key (state)
+\end{itemize}
+This particular implementation performed noticeable better than the one, where I just remembered best scoring sequences regardless of ending state. \newline
+
+The initial value in queue is an empty sequence ending with state $(p_1, N(\theta_{p_1}))$
+
+\newpage
+
+The algorithm iterates sequentially over frames in the audio stream. \newline
+At the beginning of iteration $k+1$ we have a partial result of best scoring sequences in the queue, for the first $k$ frames. \newline
+From a sequence $S$, its ending state $(s_i, N(\theta_{p_i}))$ and it's score $\phi_S$ two new sequences can be produced at iteration $k+1$. 
+\begin{itemize}
+    \item $S'$ with ending state $(s_i, N(\theta_{p_i}))$ and score $\phi_S + N(\theta_{p_i})(f_k)$
+    \item $S''$ with ending state $(s_{i+1}, N(\theta_{p_{i+1}}))$ and score $\phi_S+N(\theta_{p_{i+1}})(f_k)$
+\end{itemize}
+For each sequence in queue produced by $k$-th iteration we create two new sequences as above and add them to a new queue, that will be a result of the current iteration. \newline
+
+At the end of audio stream, we choose a best sequence, which then has to be converted into a phoneme alignment, which in the next phase has to be converted into a word alignment. \newline
+
+Notice that it is highly unlikely that we will be having some sequences in the queue, that will be ending with a state that is far from a state that should be assigned to a current frame, or at least this is an idea behind the algorithm. Since all states from the queue have indexes greater than a certain $k$, it might be possible, that there exists a common prefix among all sequences in the queue. If this is the case, than it would be possible to convert this common prefix to word labels, even though we haven't processed whole stream. Since we will never change our mind about this prefix, then this action can be considered as a sentence recognition. \newline
+Obviously in general speech recognition problem, we would have to add some additional probabilities of observing a given sequence of words into the algorithm, but the idea would be similar.
+
+\newpage
+
+\subsection{Results}
+Let's see how word alignment performs bearing in mind results from chapter 5, where I used prepared audio models from other languages. \newline
+
+The statistics for sample of “Doktor Piotr” are: \newline
+\begin{itemize}
+    \item Total number of words				\textbf{585}
+    \item Maximum difference (start or end): 			\textbf{0.422s}
+    \item Maximum difference (start or end), if label was to short at one end: 			\textbf{0.371s}
+    \item Average difference  (start or end):			\textbf{0.044s}
+\end{itemize}
+The error counts regarding different time thresholds:
+\begin{center}
+    \includegraphics[scale=0.6]{doktor_piotr_length_based_counts.jpg}
+\end{center}
+Dropping to 0 at 0.5 second difference, while getting to 99\% of correct tags for error of 300ms.
+
+\newpage
+The “Boże Narodzenie” statistics are: \newline
+\begin{itemize}
+    \item Total number of words				\textbf{1779}
+    \item Maximum difference (start or end): 			\textbf{0.606s}
+    \item Maximum difference (start or end), if label was to short at one end: 			\textbf{0.605s}
+    \item Average difference  (start or end):			\textbf{0.046s}
+\end{itemize}
+The error counts regarding different time thresholds:
+\begin{center}
+    \includegraphics[scale=0.6]{boze_narodzenie_length_based_counts.jpg}
+\end{center}
+Dropping to 0 at 1 second difference, while exceeding 98\% of correct tags for error of 300ms.
+
+\newpage
+\subsection{Conclusions}
+
+Firstly without diving into detailed analysis, the alignment without using any prepared audio model was able to align text with the word granularity and with a precision, that was not instinctively suspected. \newline
+The best news is that, the algorithm was able to train quite accurate model for Polish language, for a single person with only 16 minutes of recording, that it could have been used to for alignment purposes. \newline
+
+There are another good news, because it doesn't show a similar behaviour as alignment with Russian audio model, where the algorithm happened to assign quite long pauses to word labels.
+It also seems, that the error counts drop much more quickly as the time of error threshold increases. It is hard to say how much the problem with silences impacts these difference, but one conclusion, that can be drawn for this, is that our alignment doesn't have too many total misses, although it may happen, that the algorithm frequently assigns too short part of the stream to words. \newline
+
+The inspection of labellings shows, where the count of erroneous labels for small time thresholds comes from. It appears, that this approach does indeed suffer from an opposite problem to the one with extra silence parts. Apparently it often shortens ending of word labels. It is visible from count statistics as well, as a yellow bar indicating ends of word alignment is much higher than the red one for beginnings.
+This is not good, although a small amendment, can be introduced to counter the effect, by adding a small constant time to the end of each label. \newline
+The problem also showed in the average time difference, which is up to 3 times bigger than for alignment with Russian audio model. Let's not forget though, that these were trained from only 70 minutes long and 16 minutes long recordings, while the Russian one was trained from much larger database.
+
+\newpage
 
 \begin{center}
 \begin{tabular}{| p{8cm} | p{8cm} |}
