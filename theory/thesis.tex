@@ -1291,6 +1291,142 @@ One could try to further improve above method, at least by meddling with a phone
 
 My final conclusion is that, regardless of some mismatches, it is a quite nice method for word alignment, especially for the purpose of further improvements in speech recognition systems and audio model trainings. 
 
+\newpage
+\begin{center}
+    \section{Phoneme alignment}
+\end {center}
+\setcounter{equation}{0}
+
+\subsection{Using foreign audio model}
+
+I would like to use a trained Russian audio model (VoxForge) to align a selection of audio stream for each phoneme. \newline
+Having aligned words, I would like to do it per word basis. \newline
+
+Audio model is a trained Hidden Markov Model for each phoneme in a context of neighbouring phonemes or for all occurences of the phoneme with no context. Each HMM contains three states with transition table and probabilities of each transition as well as a set of normal distribution at each state, to calculate emission probability of observations (audio frames). \newline
+By merging together phoneme models we get a HMM for whole input text. Of course before first we need convert this text to sequence of phonemes and then to sequence of HMMs, but this can be acchieve similarly as in chapter 5. \newline
+
+Having HMM we can calculate the best possible sequence of states (using Viterbi algorithm) and all audio frames assigned to states from a single phoneme HMM should form together a single allophone of the phoneme. After that it just matter of calculating initial and ending time for each such a phone to produce an alignment. \newline
+
+In my experiments I tried to do exactly this, however I've noticed that:
+\begin{itemize}
+    \item firstly, a transition score is absolutely meaningless for the alignment problem,
+    \item secondly, only main phoneme is really important, and enter and exit state only produce a noise, which doesn't help substantially in solving my problem. It might be because, the model was Russian and it wasn't well fit for Polish speech.
+\end{itemize}
+In the end my algorithm used only main state without any transition probabilities. \newline
+
+The Gaussian distributions were extracted using sphinx library in a form of SenomeScorer objects, which is able to calculate score for given observation. A best sequence was found using a Viterbi like dynamic programming algorithm, which was all too similar to many other DP algorithms in this project. \newline
+
+At each iteration I processed a single audio frame.\newline
+The entry data for iteration $k+1$ is a partial solution array $R_k$. At the index $i$ in array $R_k$ a score of most probable seqeunce of $i$ states observing $k$ audio frame is stored. The output of$k+1$-th is $R_{k+1}$. \newline 
+
+The next values of solution array $R$ are calculated from a formula:
+\begin{equation}
+    R_{k+1, i} = argmax_j (R_j + \sigma_i(k+1))
+\end{equation}
+where $\sigma_i(k+1)$ is a log likelihood of emitting $k+1$-th audio frame by state $i$. \newline
+This is a general Viterbi algorithm, but in my case there were only two outgoing states for each state in a HMM, so actual formula is:
+\begin{equation}
+    R_{k+1, i} = max(R_{i-1}, R_{i}) + \sigma_i(k+1)
+\end{equation}
+
+\newpage
+This algorithm can be used with any scorers, so let's try to train the Gaussian distributions ourselves.
+
+\subsection{Training phoneme distribution using word alignment}
+
+Again I assume, that I already have word alignment (from chapter 5) and I would like to use it as my input training data. The data have very nice granularity,
+and i.e. the sphinx training software can use a data, which is larger then that, although it is advised, that it will be small and accurately described (i.e including information silences). \newline
+From chapter 5 we could see, that my data was not as accurately described, since the initial word alignment can be wrong by including in a selection quite long pauses, which my algorithm can't know about in advance. \newline
+
+Training algorithm is a variation of EM algorithm and consists two steps:
+\begin{itemize}
+    \item \textbf{expectation step} – alignment of phonemes given previously trained distribution and using an algorithm from 6.1 for each word separately
+    \item \textbf{maximization step} – calculating normal distribution for each phoneme from assigned observations obtained by expectation step
+\end{itemize}
+
+Phoneme representation of a given word was once again created using our conversion grammar with a small twist, that this time I'm not going to use Russian ones, but a set of Polish phonemes, refined in a series of experiments and described in chapter 5. \newline
+In order to tackle with a problem of unexpected pauses, a silence phoneme (“sil”) was added at the beginning and at the end of each word phoneme sequence. \newline
+
+Initial distributions are calculated from an initial simple selection of phoneme observations. For each word, it's phoneme sequence $\{p_1, ..., p_k\}$ and aligned audio sequence $\{f_1, ..., f_n\}$, a frame $f_j$ was assigned to phoneme $p_i$ if and only if $ (i - 1) \frac n k < j <= i \frac n k$.\newline
+
+A total likelihood is calculated. When it converges below given threshold, then algorithm terminates and phoneme models are saved. \newline
+
+Note that, the alignment algorithm has a complexity of $\Theta(nm)$, where $n$ is a number of states and $m$ is the number of audio frames. The size of the chunks we want to align or more important the number of phonemes in a given chunk, has a great impact on the total time of execution. Extracting words might really improve the time of audio model training for any variation of above method.
+
+\newpage
+\subsection{Results}
+
+Tests are performed using Corpora corpus, which contains audio recordings of digits, names and some unusual sentences for tens of different speakers. \newline
+My testing speech is created by merging all the files in random order for one speaker. The phoneme alignment is prepared by changing times of the labels from the recording put in $i$-th place by a total time of all recordings from first $i-1$ places. \newline
+
+Merged recording contains a 7 minutes and 26 second of audio data, a total of \textbf{843} spoken words and \textbf{3611} phoneme labels. \newline
+The Corpora phonetics differ a bit from what I used in Polish model and definitely differs from Russian phonemes. In order to compare the alingments the I had to convert phonemes to the same set. Most of the time it was relatively easy and I just converted a Corpora phoneme to the one used by me. However there were certain cases where it was not easy.\newline
+A sample of needed changes: \newline
+\begin{itemize}
+    \item in my Polish models after soften consonant (like “nie”) I added additional “j” phoneme (resulting with “ń j e”) and Corpora didn't always have anything there, \newline
+    the additional phoneme was ignored in the matching
+    \item similarly in Russian conversion I never added additional phoneme (resulting with “nn e”), and Corpora sometimes had “i” phoneme in similar situations, \newline
+    as above the additional phoneme was ignored
+    \item Corpora used actual phonetics replacing soften versions of i.e. “z”, “zh” with alternatives (“s”, “sz”) and vice-versa (hardening), \newline
+    the phonemes were considered similar and were matched against each other
+    \item Corpora had separate phoneme for “ą”, “ę”, “dz”, “dż” like and I always split them into more phonemes, \newline
+    the phonemes were merged into one and the merged was matched against testing label
+    \item Corpora used a “?” symbol to indicate unrecognizable phonemes, which I actually found out from other recordings, \newline
+    this one was replace with appropriate phonemes
+    \item in one case few phonemes were merged into one shortened version, as speaker joined two words into one, \newline
+    as above it was replaced with real phonemes and matched against
+\newpage
+\end{itemize}
+Resulting matching was checked manually after the changes. \newline
+
+Each matched phoneme had starting and ending time. Statistics produced about matching times agreement include an average start and end time difference, a maximum time difference and number of pairs of labels where time frame agreed with a certain error.
+
+\newpage
+Phoneme alignment using Russian audio model. \newline
+A resulting match contained \textbf{3570} of pairs.
+\begin{center}
+    \includegraphics[scale=0.4]{corpora_phoneme_russian_results.jpg}
+\end{center}
+\begin{center}
+    \includegraphics[scale=0.4]{corpora_phoneme_russian_counts.jpg}
+\end{center}
+
+\begin{itemize}
+    \item Average start difference: \textbf{ 0.0571s}
+    \item Average end difference: \textbf{0.0574s}
+    \item Maximum time difference:\textbf{0.516s}
+\end{itemize}
+
+The results are not perfect at least, however one can see, that maximum time difference is around half a second, which at least tell us, that word alignment is with quite a nice accuracy. \newline
+It was hard to expect anything better, after all the actual phonetics are different yet there was still a nice alignment for nearly 70\% of phonemes.
+
+\newpage
+
+Statistics for phoneme alignment using trained Gaussian models from aligned words.
+A matching phonemes contained \textbf{3611} pairs.
+\begin{center}
+    \includegraphics[scale=0.55]{corpora_phoneme_trained_results.jpg}
+\end{center}
+\begin{center}
+    \includegraphics[scale=0.55]{corpora_phoneme_trained_counts.jpg}
+\end{center}
+\begin{itemize}
+    \item Average start difference: \textbf{0.02402s}
+    \item Average end difference: \textbf{0.02439s}
+    \item Maximum time difference:\textbf{0.5131s}
+\end{itemize}
+
+\newpage
+
+The average difference is down by 58\% and while using Russian audio model only 40\% of pairs agreed on both ends with a 0.05 second of error, a trained model could agree on 83\% of pairs, while getting to 95\% within an error of 0.1 second. \newline
+
+Strangely the maximum stayed the same, what actually can indicate, that the word alignment, done using Russian audio model, might be a culprit here. \newline
+
+Considering the fact, that we haven't use a specifically trained audio model for Polish language and we didn't have any knowledge of actual phoneme representation, then results are really good, although probably when using a better trained model, the percentages might be much better. \newline
+Actually according to [28], it is possible to obtain a phoneme alignment within error of 0.02s with accuracy over 90\%. I am not near this, but consider this method as an entry point for more elaborate training and aligning methods. \newline
+The important thing to remember is, that it was possible using only Russian audio model and conversion grammar, which contained only 158 rules. 
+
+
 \begin{center}
 \begin{tabular}{| p{8cm} | p{8cm} |}
 \hline
