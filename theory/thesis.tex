@@ -1,6 +1,6 @@
 
 \documentclass[12pt,a4paper,english]{article}
-\usepackage{graphicx, csquotes, babel, multicol, multirow, amssymb, fullpage, amsmath, tabularx}
+\usepackage{graphicx, csquotes, babel, multicol, multirow, amssymb, fullpage, amsmath, tabularx, caption}
 \usepackage[utf8]{inputenc}
 \inputencoding{utf8}
 \usepackage[T2A]{fontenc}
@@ -56,9 +56,11 @@ Each of these cell is excited by different frequency of mechanical wave of inter
 
 Humans can hear frequencies, that begins as low as 12Hz (under laboratory conditions) to 20kHz (for adults usually much lower). However speech range is a little bit smaller than that [3]: \newline
 
-\begin{center}
+\begin{figure}[hb]
+    \centering
     \includegraphics[scale=0.5]{speech_range.jpg}
-\end {center}
+    \caption[]{Speech range from [3] \emph{Fundamentals of speech recognition}}
+\end{figure}
 
 
 \newpage
@@ -74,9 +76,11 @@ One popular is mel scale, where mel comes from melody: [6] \newline
 \end{equation}
 	
 What looks like that:
-\begin{center}
+\begin{figure}[hb]
+    \centering
     \includegraphics[scale=0.3]{mel_scale.jpg}
-\end {center}
+    \caption[]{Mel scale from http://en.wikipedia.org/wiki/Mel\_scale}
+\end{figure}
 
 Another popular formula of so called bark scale, which is based on perception of loudness of the sound and proposed by Eberhard Zwicker in 1961. [7] \newline
 \begin{equation}
@@ -120,9 +124,11 @@ So far we haven't found any use in the speech recognition for phase part of the 
 
 \newpage
 A sample conversion:
-\begin{center}
+\begin{figure}[hb]
+    \centering
     \includegraphics[scale=0.3]{sample_dft_conversion.jpg}
-\end {center}
+    \caption[]{Example of Discrete Fourier Transform from brokensymmetry.typepad.com}
+\end{figure}
 
 What size of the window should we use? First we have to notice, that in order to capture certain frequency, the window needs to be large enough. We would like to examine signals of frequency ranged from 100Hz (see speech frequencies ranges in chapter 2.1), which is a period of 100th of the second, so a 10millisecond window would be our bottom limit. \newline
 
@@ -131,20 +137,26 @@ Also windows with abrupt signal discontinuities may cause result with spectral a
    w_j = 0.54 - 0.46 cos(\frac{2 \pi j}{W - 1}) 
 \end{equation}
 Which's plot is:
-\begin{center}
-    \includegraphics[scale=0.3]{hamming_window.jpg}
-\end {center}
-
-Note that it emphasises values in the middle of the window, so our actual windows should overlap to cover whole time domain. For example by shifting a window by a percentage of it actual width:
-\begin{center}
-    \includegraphics[scale=0.3]{window_shifting.jpg}
-\end {center}
+\begin{figure}[hb]
+    \centering
+    \includegraphics[scale=0.5]{hamming_window.jpg}
+    \caption[]{Hamming window example from sphinx4 javadoc}
+\end{figure}
 
 \newpage
+Note that it emphasises values in the middle of the window, so our actual windows should overlap to cover whole time domain. For example by shifting a window by a percentage of it actual width:
+\begin{figure}[hb]
+    \centering
+    \includegraphics[scale=0.3]{window_shifting.jpg}
+    \caption[]{Window shifting example from sphinx4 javadoc}
+\end{figure}
+
 A human speech signal in frequency and time domain: [3]
-\begin{center}
-    \includegraphics[scale=0.8]{speech_spectrogram.jpg}
-\end {center}
+\begin{figure}[hb]
+    \centering
+    \includegraphics[scale=0.5]{speech_spectrogram.jpg}
+    \caption[]{Example speech signal from [3] \emph{Fundamentals of speech recognition}}
+\end{figure}
 
 \newpage
 \subsection{Cepstrum}
@@ -154,9 +166,11 @@ A cepstrum of the signal gives us this additional information. \newline
 
 The word is derived by reordering characters in the word spectrum to indicate switch of domains, similarly as word 'quefrency'. The cepstrum operates in the domain of time and the basic intuition is, that it reveals a rate of change in the different spectrum bands. 
 For example a cepstrum of an echoed signal in the picture below shows clearly a three 'quefrencies' of the echo of the signal. [12]
-\begin{center}
+\begin{figure}[hb]
+    \centering
     \includegraphics[scale=0.4]{echo_cepstrum.jpg}
-\end {center}
+    \caption[]{Cepstrum of signal with echo from [12] \emph{The Quefrency Alanysis of Time Series for Echoes}}
+\end{figure}
 
 
 Cepstrum definition is: "Inverse Fourier transform of the logarithm of the magnitude of the Fourier transform" or:
@@ -178,7 +192,7 @@ In speech related problems a power cepstrum is usually used and I haven't see an
 This is a typical cepstrum sequence of the vowel [3] computed every 10ms. \newline
 
 \begin{minipage}[-100,0]{5cm}
-\includegraphics[width=5cm,height=21cm]{vowel_cepstrum.jpg}
+    \includegraphics[width=5cm,height=19cm]{vowel_cepstrum.jpg}
 \end{minipage}
 \begin{minipage}[5cm,0]{9cm}
 
@@ -213,6 +227,10 @@ Which on it's own can be seen as way of separating signals, since it is more eas
 In the example with echo, we could have used the cepstrum to separate echoed signal from initial signal, and it might be used to filter out an audio feedback.
 
 \end{minipage}
+\newline
+\newline
+\captionof{figure}{Example phonemes cepstra from [3] \emph{Fundamentals of speech recognition}}
+\label{fig:fig1}
 
 \newpage
 \subsection{Sphinx frontend}
@@ -288,9 +306,11 @@ The filters are chosen, so the result would simulate a mel-scale given by the fo
 \end{equation}
 
 The given filters should look like in the picture:
-\begin{center}
+\begin{figure}[hb]
+    \centering
     \includegraphics[scale=0.4]{mel_filters.jpg}
-\end {center}
+    \caption[]{Melody filters from [3] \emph{Fundamentals of speech recognition}}
+\end{figure}
 
 Not all frequencies are covered by the filters.
 The chosen range of frequencies may differ for various audio encodings,
@@ -327,9 +347,11 @@ by adding additional information about changes in the cepstrum data. \newline
 
 For the initial cepstrum data it adds additionally twice the size vector with first and second order
 differences, calculated as shown in the picture:
-\begin{center}
+\begin{figure}[hb]
+    \centering
     \includegraphics[scale=0.6]{deltas_calc.jpg}
-\end {center}
+    \caption[]{Deltas explanation from sphin4 javadoc}
+\end{figure}
 
 \newpage
 \begin{center}
@@ -352,10 +374,12 @@ Phonemes are very important in the computational language modelling, either in s
 
 \newpage
 Some of English phonemes and example phones:
-\begin{center}
-    \includegraphics[height=11cm, width=16cm]{example_phones_1.jpg}
-    \includegraphics[height=11cm, width=16cm]{example_phones_2.jpg}
-\end {center}
+\begin{figure}[hb]
+    \centering
+    \includegraphics[height=8.7cm, width=13cm]{example_phones_1.jpg}
+    \includegraphics[height=8.7cm, width=13cm]{example_phones_2.jpg}
+    \caption[]{Example phones from [3] \emph{Fundamentals of speech recognition}}
+\end{figure}
 
 \newpage
 \subsection{Audio distances}
