@@ -8,14 +8,14 @@
 \MakeOuterQuote{"}
 \begin{document}
 
-\title{Analysis of knowledge requirements for text alignment problem}
+\title{Analysis of knowledge requirements for speech and text alignment problem}
 \author{Bartosz Kalińczuk}
 \date{\today}
 \maketitle
 
 \newpage
 \begin{abstract}
-The purpose of this final master degree project was to experiment with various algorithms for speech and text alignment either with granularity of sentences, single words or even single phonemes. The output of this study was expected to find out how little data is necessary to compute a proper alignment. This project focuses mainly on Polish language, however it can be quite easily generalized for different languages. It also focuses solely on a audio with quite low level of noise, since  it introduces a lot of problems, and is out of the scope of this project.
+The purpose of this final master degree project was to experiment with various algorithms for speech and text alignment either with granularity of sentences, single words or even single phonemes. The output of this study was expected to find out how little data is necessary to compute a proper alignment. This project focuses mainly on Polish language, however it can be quite easily generalized for different languages. It also focuses solely on a audio with quite low level of noise, since noisy environment introduces a lot of problems, and is out of the scope of this project.
 \end{abstract}
 
 
@@ -26,20 +26,21 @@ The purpose of this final master degree project was to experiment with various a
 \newpage
 \section{Introduction}
 
+The purpose of this final master degree project was to experiment with various algorithms for speech and text alignment either with granularity of sentences, single words or even single phonemes. The output of this study was expected to find out how little data is necessary to compute a proper alignment. This project focuses mainly on Polish language, however it can be quite easily generalized for different languages. It also focuses solely on a audio with quite low level of noise, since noisy environment introduces a lot of problems, and is out of the scope of this project. \newline
+
 In two first chapters I would like to present a theory behind speech signal processing and speech recognition,
-that is well known and understood, and is mentioned in many different papers regarding speech related problems. \newline
+that is well known and understood, and is mentioned in many different papers regarding speech related problems. I also introduced here a frontend part of Sphinx library, which implements a popular way of speech signal preprocessing, which I reuse in this project. \newline
 
 The chapter 4 is exploring a simple approach with minimal knowledge, that produces very crude results. The minum knowledge here is enough reason to bring it up, but I also found some another application for this imperfect solution. \newline
 
 Next two chapters are exploring a possibility of using audio models from foreign languages to achieve alignment with satisfying accuracy.
-The keynote of this part of thesis is a study of similarities between languages and their phonetics. \newline
+The keynote of this part of thesis is a study of similarities between languages and their phonetics. I present here not only my own algorithms, but also certain parts of sphinx library, which I used: including tool for alignment problem using preprocessed audio model and dictionary, and in other case only state scorers from trained English and Russian models. \newline
 
 The chapter 7 combines conclusions and knowledge of previous chapters to study what can be done without any trained models and what knowledge is enough to align text for practical applications. \newline
 
 In the end I'm trying to show a small application of all presented solutions and show the results in more practical manner. \newline
 
-I try to approach this topic with a hackish scientific curiosity. The problem is presented, but I try to check what can be done if I redefine it in various configurations. I don't focus purely on results, because they are not as interesting as exploration of the area just to see what is there.
-
+I try to approach this topic with a hackish scientific curiosity. The problem is presented, but I try to check what can be done if I redefine it in various configurations. I don't focus purely on results, because they are not as interesting as exploration of the area just to see what is there. \newline
 
 \newpage
 \begin{center}
@@ -47,12 +48,12 @@ I try to approach this topic with a hackish scientific curiosity. The problem is
 \end {center}
 \subsection{Human factor}
 
-Speech is a most efficient way the human communicate. For generations this process was refined by evolution, so we can easily exchange messages even in hard situations. For this purpose our vocal mechanisms must well cooperate with our hearing ability. There is a certain set of sounds we can produce and our ears evolved to hear them as well as possible.\newline 
+Speech is a most efficient way the human communicate. For generations this process was refined by evolution, so we can easily exchange messages even in noisy environment. For this purpose our vocal mechanisms must well cooperate with our hearing ability. There is a certain set of sounds we can produce and our ears evolved to hear them as well as possible.\newline 
 
 What is sound? According to dictionary: "Vibrations transmitted through an elastic solid or liquid or gas, with frequencies in the approximate range of 20 to 20000 hertz, capable of being detected by human organs of hearing". [1]\newline
 
 How do we hear? Human ear consist about 30000 hair-cells, which can convert mechanical wave of the sound into electromagnetic wave inside auditory nerves [2]. 
-Each of these cell is excited by different frequency of mechanical wave of internal ear fluids, so it is no surprise, that people can hear only a certain range of frequencies, as stated in definition. These we expect to be finely tuned to the range of the sounds we can produce. Although it seems, that we can hear a bit more, but as we don't need that, it happens, that as we grow older, our hearing range is getting smaller, because our hear cells fail sometimes, but mostly those responsible for high frequencies, which we don't use too often.\newline
+Each of these cells is excited by different frequency of mechanical wave of internal ear fluids, so it is no surprise, that people can hear only a certain range of frequencies, as stated in definition. These we expect to be finely tuned to the range of the sounds we can produce. Although it seems, that we can hear a bit more, but as we don't need that, it happens, that as we grow older, our hearing range is getting smaller, because our hearing cells fail sometimes, but mostly those responsible for high frequencies, which we don't use too often.\newline
 
 Humans can hear frequencies, that begins as low as 12Hz (under laboratory conditions) to 20kHz (for adults usually much lower). However speech range is a little bit smaller than that [3]: \newline
 
@@ -72,10 +73,10 @@ Certain formulas were conceived to translate frequency scale to one, that is clo
 
 One popular is mel scale, where mel comes from melody: [6] \newline
 \begin{equation}
-    m = 2595log_{10}(1 + \frac{f}{700})
+    m = 2595 \: \: log_{10}(1 + \frac{f}{700})
 \end{equation}
-	
-What looks like that:
+where $f$ is a frequency and $m$ is scaled melody frequency. \newline
+This looks as in the plot:
 \begin{figure}[hb]
     \centering
     \includegraphics[scale=0.3]{mel_scale.jpg}
@@ -84,7 +85,7 @@ What looks like that:
 
 Another popular formula of so called bark scale, which is based on perception of loudness of the sound and proposed by Eberhard Zwicker in 1961. [7] \newline
 \begin{equation}
-    Bark = 13 atan(\frac{0.76f}{1000}) + 3.5 atan(\frac{f^2}{7500^2})
+    Bark = 13 \: \: atan(\frac{0.76f}{1000}) + 3.5 \: \: atan(\frac{f^2}{7500^2})
 \end{equation}
 In this project we use mel scale implemented in sphinx library, although bark scale is becoming more popular recently.
 
@@ -117,9 +118,9 @@ or for the discrete case:
 \end{equation}
 	
 
-So far we haven't found any use in the speech recognition for phase part of the coefficients, however amplitude determines how powerful is signal at given frequency. The power value is given by:
+So far we haven't found any use in the speech recognition for phase part of the coefficients, however amplitude determines how powerful is signal at given frequency. The power value is given by ($X_k$ is a complex coefficient):
 \begin{equation}
-    |X_k|/N = \sqrt{\Re(X_k)^2 + \Im(X_k)^2} / N
+    |X_k|/N = \sqrt{\Re e(X_k)^2 + \Im m(X_k)^2} / N
 \end{equation}
 
 \newpage
@@ -136,7 +137,8 @@ Also windows with abrupt signal discontinuities may cause result with spectral a
 \begin{equation}
    w_j = 0.54 - 0.46 cos(\frac{2 \pi j}{W - 1}) 
 \end{equation}
-Which's plot is:
+where $W$ is a window size (number of frames) and $j$ is a frame number and resultin $w_j$ is scaling weight.
+The function's plot is given below:
 \begin{figure}[hb]
     \centering
     \includegraphics[scale=0.5]{hamming_window.jpg}
@@ -151,7 +153,7 @@ Note that it emphasises values in the middle of the window, so our actual window
     \caption[]{Window shifting example from sphinx4 javadoc}
 \end{figure}
 
-A human speech signal in frequency and time domain: [3]
+A human speech signal in frequency and time domain plot, which shows powers of signal at each frequency: [3]
 \begin{figure}[hb]
     \centering
     \includegraphics[scale=0.5]{speech_spectrogram.jpg}
@@ -178,7 +180,7 @@ Cepstrum definition is: "Inverse Fourier transform of the logarithm of the magni
     C=|F^{-1}{log(|F{f(t)}|^2)}|^2
 \end{equation}
 
-,or:
+or:
 \begin{equation}
     c_x[n] = \frac{1}{2\pi} \int_{-\pi}^{\pi}log |X(e^{j \omega})| e^{j \omega n} d\omega
 \end{equation}
@@ -188,13 +190,12 @@ In speech related problems a power cepstrum is usually used and I haven't see an
 
 
 \newpage
-\addtolength{\textwidth}{4cm}
-This is a typical cepstrum sequence of the vowel [3] computed every 10ms. \newline
+\addtolength{\textwidth}{6cm}
 
-\begin{minipage}[-100,0]{5cm}
-    \includegraphics[width=5cm,height=19cm]{vowel_cepstrum.jpg}
+\begin{minipage}[-200,0]{5cm}
+    \includegraphics[width=5cm,height=20cm]{vowel_cepstrum.jpg}
 \end{minipage}
-\begin{minipage}[5cm,0]{9cm}
+\begin{minipage}[5cm,0]{11cm}
 
 If the sound becomes periodic in the frequency domain it's quefrency domain contains a peak which is related to the periodicity of the sound. \newline
 
@@ -224,12 +225,12 @@ x(n) = e(n) * h(n)
 Which on it's own can be seen as way of separating signals, since it is more easy to extract elements from a sum, than from a convolution.
 \newline
 \newline
-In the example with echo, we could have used the cepstrum to separate echoed signal from initial signal, and it might be used to filter out an audio feedback.
+In the example with echo (fig.7) a cepstrum of signal have clear peaks, which indicate repetitions of initial signal. Conversion the initial convolution of frequency spectrum to sum of signals in a cepstrum form, allows us to separate echoed signal from original signal, and it might also be used to filter out an audio feedback.
 
 \end{minipage}
 \newline
 \newline
-\captionof{figure}{Example phonemes cepstra from [3] \emph{Fundamentals of speech recognition}}
+\captionof{figure}{This is a typical cepstrum sequence of the vowel computed every 10ms taken from [3] \emph{Fundamentals of speech recognition}}
 \label{fig:fig1}
 
 \newpage
