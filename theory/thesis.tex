@@ -1304,7 +1304,8 @@ The statistics for “Boże Narodzenie” however shows, that before it goes bad
     \item Average difference  (start or end):			\textbf{0.032s}
     \item Error counts depending on time thresholds:
     \begin{center}
-        \includegraphics[scale=0.6]{boze_narodzenie_word_english_results.jpg}
+        \includegraphics[scale=0.55]{boze_narodzenie_word_english_results.jpg}
+        \caption[]{A number of word tags with time difference above error thresholds (in seconds) for "Boże Narodzenie" recording using English audio model}
     \end{center}
 \end{itemize}
 
@@ -1324,6 +1325,7 @@ The “Boże Narodzenie” statistics are:
 The error counts regarding different time thresholds:
 \begin{center}
     \includegraphics[scale=0.7]{boze_narodzenie_word_russian_results.jpg}
+    \caption[]{A number of word tags with time difference above error thresholds (in seconds) for "Boże Narodzenie" recording using Russian audio model}
 \end{center}
 
 \newpage
@@ -1339,6 +1341,7 @@ The statistics for “Doktor Piotr” sample are:
 The error counts regarding different time thresholds:
 \begin{center}
     \includegraphics[scale=0.7]{doktor_piotr_word_russian_results.jpg}
+    \caption[]{A number of word tags with time difference above error thresholds (in seconds) for "Doktor Piotr" sample using Russian audio model}
 \end{center}
 
 \newpage
@@ -1365,7 +1368,7 @@ I would like to use a trained Russian audio model (VoxForge) to align a selectio
 Having aligned words, I would like to do it per word basis. \newline
 
 Audio model is a trained Hidden Markov Model for each phoneme in a context of neighbouring phonemes or for all occurences of the phoneme with no context. Each HMM contains three states with transition table and probabilities of each transition as well as a set of normal distribution at each state, to calculate emission probability of observations (audio frames). \newline
-By merging together phoneme models we get a HMM for whole input text. Of course before first we need convert this text to sequence of phonemes and then to sequence of HMMs, but this can be acchieve similarly as in chapter 5. \newline
+By merging together phoneme models we get a HMM for whole input text. Of course before first we need convert this text to sequence of phonemes and then to sequence of HMMs, but this can be achieved similarly as in chapter 5. \newline
 
 Having HMM we can calculate the best possible sequence of states (using Viterbi algorithm) and all audio frames assigned to states from a single phoneme HMM should form together a single allophone of the phoneme. After that it just matter of calculating initial and ending time for each such a phone to produce an alignment. \newline
 
@@ -1379,7 +1382,7 @@ In the end my algorithm used only main state without any transition probabilitie
 The Gaussian distributions were extracted using sphinx library in a form of SenomeScorer objects, which is able to calculate score for given observation. A best sequence was found using a Viterbi like dynamic programming algorithm, which was all too similar to many other DP algorithms in this project. \newline
 
 At each iteration I processed a single audio frame.\newline
-The entry data for iteration $k+1$ is a partial solution array $R_k$. At the index $i$ in array $R_k$ a score of most probable seqeunce of $i$ states observing $k$ audio frame is stored. The output of$k+1$-th is $R_{k+1}$. \newline 
+The entry data for iteration $k+1$ is a partial solution array $R_k$. At the index $i$ in array $R_k$ a score of most probable seqeunce of $i$ states observing $k$ audio frame is stored. The output of $k+1$-th is $R_{k+1}$. \newline 
 
 The next values of solution array $R$ are calculated from a formula:
 \begin{equation}
@@ -1418,7 +1421,7 @@ Note that, the alignment algorithm has a complexity of $\Theta(nm)$, where $n$ i
 \newpage
 \subsection{Results}
 
-Tests are performed using Corpora corpus, which contains audio recordings of digits, names and some unusual sentences for tens of different speakers. \newline
+Tests are performed using Corpora corpus, which contains audio recordings of digits, names and some unusual sentences for tens of different speakers, and all of these recordings are tagged with phonemes. \newline
 My testing speech is created by merging all the files in random order for one speaker. The phoneme alignment is prepared by changing times of the labels from the recording put in $i$-th place by a total time of all recordings from first $i-1$ places. \newline
 
 Merged recording contains a 7 minutes and 26 second of audio data, a total of \textbf{843} spoken words and \textbf{3611} phoneme labels. \newline
@@ -1429,11 +1432,11 @@ A sample of needed changes: \newline
     the additional phoneme was ignored in the matching
     \item similarly in Russian conversion I never added additional phoneme (resulting with “nn e”), and Corpora sometimes had “i” phoneme in similar situations, \newline
     as above the additional phoneme was ignored
-    \item Corpora used actual phonetics replacing soften versions of i.e. “z”, “zh” with alternatives (“s”, “sz”) and vice-versa (hardening), \newline
+    \item Corpora uses actual phonetics replacing soften versions of i.e. “z”, “zh” with alternatives (“s”, “sz”) and vice-versa (hardening), \newline
     the phonemes were considered similar and were matched against each other
-    \item Corpora had separate phoneme for “ą”, “ę”, “dz”, “dż” like and I always split them into more phonemes, \newline
-    the phonemes were merged into one and the merged was matched against testing label
-    \item Corpora used a “?” symbol to indicate unrecognizable phonemes, which I actually found out from other recordings, \newline
+    \item Corpora has separate phoneme for “ą”, “ę”, “dz”, “dż” like, but my conversions always split them into more phonemes (i.e. 'o' and 'ł', 'e' and 'ł', 'd' and 'z', 'd' and 'ż'), \newline
+    my phonemes were merged into one single chunk, which was matched against testing label
+    \item Corpora uses a “?” symbol to indicate unrecognizable phonemes, which I actually found out from other recordings, \newline
     this one was replace with appropriate phonemes
     \item in one case few phonemes were merged into one shortened version, as speaker joined two words into one, \newline
     as above it was replaced with real phonemes and matched against
@@ -1448,9 +1451,11 @@ Phoneme alignment using Russian audio model. \newline
 A resulting match contained \textbf{3570} of pairs.
 \begin{center}
     \includegraphics[scale=0.4]{corpora_phoneme_russian_results.jpg}
+    \caption[]{A percentage of phoneme tags with time difference within error thresholds (in seconds)}
 \end{center}
 \begin{center}
     \includegraphics[scale=0.4]{corpora_phoneme_russian_counts.jpg}
+    \caption[]{A number of phoneme tags with time difference within error thresholds (in seconds)}
 \end{center}
 
 \begin{itemize}
@@ -1467,10 +1472,12 @@ It was hard to expect anything better, after all the actual phonetics are differ
 Statistics for phoneme alignment using trained Gaussian models from aligned words.
 A matching phonemes contained \textbf{3611} pairs.
 \begin{center}
-    \includegraphics[scale=0.55]{corpora_phoneme_trained_results.jpg}
+    \includegraphics[scale=0.47]{corpora_phoneme_trained_results.jpg}
+    \caption[]{A percentage of phoneme tags with time difference within error thresholds (in seconds)}
 \end{center}
 \begin{center}
-    \includegraphics[scale=0.55]{corpora_phoneme_trained_counts.jpg}
+    \includegraphics[scale=0.47]{corpora_phoneme_trained_counts.jpg}
+    \caption[]{A number of phoneme tags with time difference within error thresholds (in seconds)}
 \end{center}
 \begin{itemize}
     \item Average start difference: \textbf{0.02402s}
@@ -1485,8 +1492,8 @@ The average difference is down by 58\% and while using Russian audio model only 
 Strangely the maximum stayed the same, what actually can indicate, that the word alignment, done using Russian audio model, might be a culprit here. \newline
 
 Considering the fact, that we haven't use a specifically trained audio model for Polish language and we didn't have any knowledge of actual phoneme representation, then results are really good, although probably when using a better trained model, the percentages might be much better. \newline
-Actually according to [28], it is possible to obtain a phoneme alignment within error of 0.02s with accuracy over 90\%. I am not near this, but consider this method as an entry point for more elaborate training and aligning methods. \newline
-The important thing to remember is, that it was possible using only Russian audio model and conversion grammar, which contained only 158 rules. 
+Actually, according to [28], it is possible to obtain a phoneme alignment within error of 0.02s with accuracy over 90\%. I am not near this, but consider this method as an entry point for more elaborate training and aligning methods. \newline
+The important thing to remember is, that it was possible using only Russian audio model and conversion grammar, which contained only 158 rules (see implementation for details). 
 
 \newpage
 \begin{center}
@@ -1514,7 +1521,7 @@ The only problem with this approach is, that the aligned chunks may be quite lon
 
 
 \newpage
-\subsection{Word alignment with imperfect model}
+\subsection{Word alignment based on imperfect audio model}
 
 This part has the closest resemblance to the speech recognition. Because we need to align a text that will be converted to many thousands of phonemes, it is infeasible to calculate a proper best sequence alignment. At each frame of audio, we would have to calculate a best sequence ending with each phoneme and since there are an order more frames than states, it would be just too many operations to complete the task in a reasonable time. \newline
 
@@ -1570,6 +1577,7 @@ The statistics for sample of “Doktor Piotr” are: \newline
 The error counts regarding different time thresholds:
 \begin{center}
     \includegraphics[scale=0.6]{doktor_piotr_length_based_counts.jpg}
+    \caption[]{Number of words with time difference above error thresholds (in seconds) for "Doktor Piotr" recording}
 \end{center}
 Dropping to 0 at 0.5 second difference, while getting to 99\% of correct tags for error of 300ms.
 
@@ -1584,6 +1592,7 @@ The “Boże Narodzenie” statistics are: \newline
 The error counts regarding different time thresholds:
 \begin{center}
     \includegraphics[scale=0.6]{boze_narodzenie_length_based_counts.jpg}
+    \caption[]{Number of words with time difference above error thresholds (in seconds) for "Boże Narodzenie" recording}
 \end{center}
 Dropping to 0 at 1 second difference, while exceeding 98\% of correct tags for error of 300ms.
 
@@ -1760,6 +1769,7 @@ A picture shows intervals from two sequences, for which a distance is calculated
 
 \begin{minipage}[0,0]{15cm}
     \includegraphics[scale=0.5]{audio_merging.jpg}
+    \caption[]{An example of merging to audio parts at chosen point}
 \end{minipage}
 \begin{minipage}[15cm,0]{4cm}
 $s_i$
