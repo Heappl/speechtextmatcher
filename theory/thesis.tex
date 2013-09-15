@@ -2,6 +2,7 @@
 \documentclass[12pt,a4paper,english]{article}
 \usepackage{graphicx, csquotes, babel, multicol, multirow, amssymb, fullpage, amsmath, tabularx, caption}
 \usepackage[utf8]{inputenc}
+\usepackage[toc,page]{appendix}
 \inputencoding{utf8}
 \usepackage[T2A]{fontenc}
 \usepackage[table]{xcolor}
@@ -531,35 +532,16 @@ then they have to be divided by a total sum to produce actual likelihood:
 
 The denominator should sum to 1, after all it is a probability of emitting given point under a condition, that only $|X|$ points were emitted.
 
-\newpage
 \subsection{Expected-Maximization algorithm}
 
-Expected-Maximization method is a technique for estimating parameters of any underlying distribution based on observed data. It tries to maximize the likelihood, that the data would be observed by the distribution: 
+Expected-Maximization method is a technique for estimating parameters of any underlying distribution based on observed data [26]. It tries to maximize the likelihood, that the data would be observed by the distribution: 
 \begin{equation}
     argmax_{\theta} Pr(X | \theta)
 \end{equation}
 
-For certain distributions, parameters, that maximize likelihood of the data, can be solved with analytic methods, i.e. calculated mean vector and variance are parameters to normal distribution, that do maximize the likelihood of observing the training data. \newline
-We can calculate a derivative of normal density function to show it:
-\begin{multline}
-    ln(\prod_{x in X} (\frac 1 {\sqrt{2\pi\sigma^2}} e^{\frac{-(x-\mu)^2}{2\sigma^2}}))d\mu  = \sum_{x \in X}[\frac{-1} 2 ln(2\pi)-ln(\sigma)- \frac{(x-\mu)^2} {2 \sigma^2} ]d\mu = ... \\
-    ...= \frac {-1} {2 \sigma^2} \sum_{x in X}{(x-\mu)^2}d\mu = \frac 1 {\sigma^2} \sum_{x in X}{(x-\mu)}=0 \iff \\
-    \iff \sum_{x in X}{(x-\mu)}=0 \iff \mu = \frac 1 {|X|} \sum_{x in X}x
-\end{multline}
-
-what is a definition of a mean. \newline 
-
-\begin{multline}
-    ln(\prod_{x in X} Pr(x | \sigma))d\sigma = \sum_{x in X}[\frac {-1} 2 ln(2\pi)-ln(\sigma)- \frac {(x-\mu)^2} {2 \sigma^2} ]d\sigma = ... \\
-    ...= \sum_{x in X}[\frac {-1} \sigma + (x-\mu)^2 \sigma^{-3}] = \frac {-1} {\sigma} \sum_{x in X}[1-(x-\mu)^2 \sigma^{-2}]=... \\
-    ...= 0 \iff \sigma^{-2} \sum_{x in X}(x-\mu)^2 - | X |=0 \iff \sigma^{-2} | X | = \sum_{x in X}(x-\mu)^2 \iff \sigma^2 = \frac 1 {|X|} \sum_{x in X}(x-\mu)^2
-\end{multline}
-
-what is a definition of variance and a standard deviation is a square root of variance. \newline
-And similarly can be done for many other distributions, including multivariate normal distribution. \newline
+For certain distributions, parameters, that maximize likelihood of the data, can be solved with analytic methods, i.e. calculated mean vector and variance are parameters to normal distribution, that do maximize the likelihood of observing the training data (see apendix A).  Similarly can be done for many other distributions, including multivariate normal distribution. \newline
 
 \newpage
-
 It is not always the case, that one can calculate parameters so easily, i.e. mixture models of several populations may not give up so easily.
 Let's consider a mixture of Gaussian models of some populations. We have a random population, where each point is randomly drawn from each distribution. 
 So the total likelihood of any point is: $\sum_{i=0}^N p_i f_i(x)$, where $p_i$ is a probability of drawing a point from ith distribution and $f_i$ is a density function of ith model. \newline
@@ -590,9 +572,9 @@ In each iteration a likelihood $Q(\Theta^i,\Theta^{ i-1})$ converges to some loc
 We are happy with only local maximum, because the problem resists our efforts to solve it analytically. \newline
 
 
-For example a mixture model can be trained using following steps: \newline
+For example a mixture model \footnote{A sum  of several distributions} can be trained using following steps: \newline
 \begin{itemize}
-    \item In E step we calculate a probability, that a observation is drawn from each class.
+    \item In E step we calculate a probability, that each training point is drawn from each elemental distribution of a mixture.
     \item In M step we use this probabilities to calculate a new parameters ($\{(\mu_i, \sigma_i, p_i)\}$), that maximize likelihood of our observed data, as well as an estimated probability of data classification.
 \end{itemize}
 
@@ -604,13 +586,13 @@ We can describe an HMM by a triple:
     \lambda=(A, B, \pi)
 \end{equation}
  where $A$ is a transition matrix $A = \{ a_{ij} \} = p(Q_t=j | Q_{t-1}=i)$, \newline
- $B$ is a observation probability function vector $B = \{ b_i \}$, where each $b_i$ is a function calculating likelihood that a given observation $Q_t$  is produced by state $i$, \newline
+ $B$ is a probability function vector $B = \{ b_i \}$, where each $b_i$ is a function calculating likelihood that a given observation \footnote{a visible point of data we would like to model, an output token of HMM} $Q_t$ is produced by state $i$, \newline
  and $\pi$ is an initial state distribution  $\pi_i=P(Q_1=i)$ \newline
 
 For our purpose a $B$ functions will be a Gaussian multivariate distribution of observations emitted by a state. \newline
 
-The most probable state sequence for given sequence of observations can be calculated using dynamic programming (i.e. Viterbi algorithm). \newline
-The algorithm iterates over over the discrete time indexes $t_1, ..., t_n$, where at each moment only one observation $Q_{t_k}$ is emitted. \newline
+The most probable state sequence for given sequence of observations can be calculated using dynamic programming (i.e. Viterbi algorithm [30]). \newline
+The algorithm iterates over the discrete time indexes $t_1, ..., t_n$, where at each moment only one observation $Q_{t_k}$ is emitted. \newline
 
 The k-th iteration produces a vector o probabilities $P_k=[p_1, ..., p_m]$ of the best state sequence ending at a state $i$ at the moment $t_k$.
 For the initial moment the vector is equal to state intial probabilities $\pi$. \newline
@@ -656,10 +638,10 @@ Where:
 
 To calculate observation probabilities, we need:
 \begin{equation}
-    \alpha_i(t) = Pr(being \: after \: t \: steps \: at \: state \: i)
+    \alpha_i(t) = Pr(\text{being after $\boldsymbol{t}$ steps at state $\boldsymbol{i}$})
 \end{equation}
 \begin{equation}
-    \beta_i(t) = Pr(ending \: sequence | being \: after \: t \: steps \: at \: state \: i)
+    \beta_i(t) = Pr(\text{ending sequence $\boldsymbol{|}$ being after $\boldsymbol{t}$ steps at state $\boldsymbol{i}$})
 \end{equation}
 
 Both of these values can be calculated using dynamic programming. One is calculated by Viterbi's algorithm in forward passage, the other can be calculated in similar manner by backward passage.
@@ -669,19 +651,19 @@ Both of these values can be calculated using dynamic programming. One is calcula
 Combining these values, we can obtain:
 
 \begin{equation}
-    Pr(being \: at \: time \: \boldsymbol{t} \: at state \: \boldsymbol{i}) = \frac {\alpha_i(t)\beta_i(t)} {\sum_{j=1}^{N} \alpha_j(t)\beta_j(t) }
+    Pr(\text{being at time $\boldsymbol{t}$ at state $\boldsymbol{i}$}) = \frac {\alpha_i(t)\beta_i(t)} {\sum_{j=1}^{N} \alpha_j(t)\beta_j(t) }
 \end{equation}
 	
 and:
 	
 \begin{equation}
-    Pr(transition \: between \: states \: \boldsymbol{i} \: \boldsymbol{j} \: at \: time \: \boldsymbol{t}) = \frac {\alpha_i(t)a_{ij}\beta_j(t + 1)b_j(o_{t+1})} {\sum_{i=1}^{N} \sum_{j=1}^{N} \alpha_i(t)a_{ij}\beta_j(t + 1)b_j(o_{t+1})}
+    Pr(\text{transition between states $\boldsymbol{i}$ and $\boldsymbol{j}$ at time $\boldsymbol{t}$}) = \frac {\alpha_i(t)a_{ij}\beta_j(t + 1)b_j(o_{t+1})} {\sum_{i=1}^{N} \sum_{j=1}^{N} \alpha_i(t)a_{ij}\beta_j(t + 1)b_j(o_{t+1})}
 \end{equation}
 
 Probability of transition from states i to state j at any given time is:
 	
 \begin{equation}
-    Pr(transition \: \boldsymbol{i} \: \boldsymbol{j}) = \frac {\sum_{t=1}^{T-1} Pr(transition \: between \: states \: \boldsymbol{i} \: \boldsymbol{j} \: at \: time \: \boldsymbol{t})} {\sum_{t=1}^{T-1} Pr(being \: at \: time \: \boldsymbol{t} \: at \: state \: \boldsymbol{i}) }
+    Pr(\text{transition $\boldsymbol{i}$ $\boldsymbol{j}$}) = \frac {\sum_{t=1}^{T-1} Pr(\text{transition between states $\boldsymbol{i}$ $\boldsymbol{j}$ at time $\boldsymbol{t}$})} {\sum_{t=1}^{T-1} Pr(\text{being at time $\boldsymbol{t}$ at state $\boldsymbol{i}$}) }
 \end{equation}
 	
 
@@ -690,10 +672,10 @@ since it is emitted by the state with a probability of being at this state at th
 
 New parameters of multivariate normal distribution would be:
 \begin{equation}
-    \vec \mu = \frac 1 T \sum_{t=1}^{T} Pr(being \: at \: time \: \boldsymbol{t} \: at \: state \: \boldsymbol{i}) \vec o_t
+    \vec \mu = \frac 1 T \sum_{t=1}^{T} Pr(\text{being at time $\boldsymbol{t}$ at state $\boldsymbol{i}$}) \vec o_t
 \end{equation}
 \begin{equation}
-    \tilde C = \frac 1 T \sum_{t=1}^{T} Pr(being \: at \: time \: \bold{t} \: at \: state \: \bold{i})(\vec o_t - \vec \mu) \cdot (\vec o_t - \vec \mu)^T
+    \tilde C = \frac 1 T \sum_{t=1}^{T} Pr(\text{being at time $\bold{t}$ at state $\bold{i}$})(\vec o_t - \vec \mu) \cdot (\vec o_t - \vec \mu)^T
 \end{equation}
 
 
@@ -2009,6 +1991,28 @@ https://bitbucket.org/Heappl/speechtextmatcher.
 \bibitem{} Jeff A. Bilmes \emph{A Gentle Tutorial of the EM Algorithm and its Application to Parameter Estimation for Gaussian Mixture and Hidden Markov Models}
 \bibitem{} M. Karaś, M. Madejowa \emph{Słownik wymowy polskiej.}
 \bibitem{} John-Paul Hosom \emph{Speaker-Independent Phoneme Alignment Using Transition- Dependent States}
+\bibitem{} Larry Moss \emph{Example of the Baum-Welch Algorithm}
+\bibitem{} Emilio Frazzoli \emph{Principles of Autonomy and Decision Making. Lecture 21: Intro to Hidden Markov Models, the Baum-Welch algorithm}
 \end{thebibliography}
 
+\newpage
+\begin{appendices}
+\section{Calculating parameters for single variable normal distribution}
+We can calculate a derivative of normal density function to show it:
+\begin{multline}
+    ln(\prod_{x in X} (\frac 1 {\sqrt{2\pi\sigma^2}} e^{\frac{-(x-\mu)^2}{2\sigma^2}}))d\mu  = \sum_{x \in X}[\frac{-1} 2 ln(2\pi)-ln(\sigma)- \frac{(x-\mu)^2} {2 \sigma^2} ]d\mu = ... \\
+    ...= \frac {-1} {2 \sigma^2} \sum_{x in X}{(x-\mu)^2}d\mu = \frac 1 {\sigma^2} \sum_{x in X}{(x-\mu)}=0 \iff \\
+    \iff \sum_{x in X}{(x-\mu)}=0 \iff \mu = \frac 1 {|X|} \sum_{x in X}x
+\end{multline}
+
+what is a definition of a mean. \newline 
+
+\begin{multline}
+    ln(\prod_{x in X} Pr(x | \sigma))d\sigma = \sum_{x in X}[\frac {-1} 2 ln(2\pi)-ln(\sigma)- \frac {(x-\mu)^2} {2 \sigma^2} ]d\sigma = ... \\
+    ...= \sum_{x in X}[\frac {-1} \sigma + (x-\mu)^2 \sigma^{-3}] = \frac {-1} {\sigma} \sum_{x in X}[1-(x-\mu)^2 \sigma^{-2}]=... \\
+    ...= 0 \iff \sigma^{-2} \sum_{x in X}(x-\mu)^2 - | X |=0 \iff \sigma^{-2} | X | = \sum_{x in X}(x-\mu)^2 \iff \sigma^2 = \frac 1 {|X|} \sum_{x in X}(x-\mu)^2
+\end{multline}
+
+what is a definition of variance and a standard deviation is a square root of variance. \newline
+\end{appendices}
 \end{document}
