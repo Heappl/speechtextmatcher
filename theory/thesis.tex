@@ -954,8 +954,7 @@ And almost never one can cleanly separate two consecutive phones. \newline
  In order to better model different realisations of phonemes, an audio modelling contains models of phonemes at different triphone contexts. 
 For every possible neighbourhood a given phoneme might appear, a separate Gaussian model is trained, for example a WSJ model from sphinx database contains 40 different phonemes and additional silence phoneme, that gives 68921 different triphones, however WSJ model contains over 110k elements,  because of additional information about location within a word. \newline
 
-It is not over yet, because transitioning from phoneme to phoneme should be modelled somehow as well. The obvious solution is to train a triple state HMM, which will better fit the changing phone. \newline
-That triples number of states. \newline
+It is not over yet, because transitioning from phoneme to phoneme should be modelled somehow as well. The obvious solution is to train a triple state HMM, which will better fit the changing phone. That triples number of states. \newline
 
 This huge number of different models requires a lot of training data, which is on one hand not easy to come along with, on another requires a lot of time to train with. \newline
 Training data for speech recognition is one constant problem, which have to be dealt with. The problem is amplified, by the fact, that training samples should be small and very well described. That hardly can be done manually. \newline
@@ -986,11 +985,10 @@ Sphinx library provides two ways of language modelling to tackle sucha ambiguity
 
 For simple languages, like a sequence of digits or language containing one long sequence (like in case of text alignment), it is advisable to use language grammar. \newline
 For general recognition software like Apple Siri, ngrams are necessary, although I am not convinced that they haven't used a sort of grammar for typical queries. \newline
-
 Ngrams (in wsj n is maximum 3) are a way to assign a probability to word sequences. In above example it is expected, that “oneself” is more probable to occur in real word, than the later case, although obviously we can't judge so easily, since the probability of choosing these particular word depends on a probability of whole sentence. \newline
 
 Anyway I think that's enough about speech recognition. \newline
-For our purposes we need “only” audio model and word to phoneme sequence dictionary, in order to efficiently align text to speech. \newline
+For our purposes we need “only” audio model and word to phoneme sequence dictionary, in order to efficiently align text to speech, and we don't need to model language itself, since our language is one given text. \newline
 
 \newpage
 \subsection{Differences between english, russian and polish phonetics}
@@ -1424,8 +1422,7 @@ My final conclusion is that, regardless of some mismatches, it is a quite nice m
 
 \subsection{Using foreign audio model}
 
-I would like to use a trained Russian audio model (VoxForge) to align a selection of audio stream for each phoneme. \newline
-Having aligned words, I would like to do it per word basis. \newline
+I would like to use the word alignment obtained from previous chapter and create an alignment with phoneme granularity. For this purpose I would like to use a trained Russian audio model and align (for each word) a Russian phoneme represantation. After that, I would like to use the same word alignment to train my own audio model from the recording and use it again for phoneme alignment, this time using my experimental, Polish phoneme set. \newline
 
 Audio model is a trained Hidden Markov Model for each phoneme in a context of neighbouring phonemes or for all occurences of the phoneme with no context. Each HMM contains three states with transition table and probabilities of each transition as well as a set of normal distribution at each state, to calculate emission probability of observations (audio frames). \newline
 By merging together phoneme models we get a HMM for whole input text. Of course before first we need convert this text to sequence of phonemes and then to sequence of HMMs, but this can be achieved similarly as in chapter 5. \newline
@@ -1439,24 +1436,37 @@ In my experiments I tried to do exactly this, however I've noticed that:
 \end{itemize}
 In the end my algorithm used only main state without any transition probabilities. \newline
 
-The Gaussian distributions were extracted using sphinx library in a form of SenomeScorer objects, which is able to calculate score for given observation. A best sequence was found using a Viterbi like dynamic programming algorithm, which was all too similar to many other DP algorithms in this project. \newline
+\newpage
+The Gaussian distributions were extracted using sphinx library in a form of SenomeScorer objects, which are able to calculate score for given observation. A best sequence was found using a Viterbi like dynamic programming algorithm, which was all too similar to many other DP algorithms in this project. \newline
 
-At each iteration I process a single audio frame.\newline
-The entry data for iteration $k+1$ is a partial solution array $R_k$. At the index $i$ in array $R_k$ a score of most probable seqeunce of $i$ states observing $k$ audio frame is stored. The output of $k+1$-th is $R_{k+1}$. \newline 
+In general I have a sequence of audio frames $(f_1, ..., f_n)$, which was assigned to given word $W$. \newline
+I also have phoneme representation $(p_1, ..., p_m)$ of word $W$ and trained scorer for each phoneme $(\sigma_{p_1}, ..., \sigma_{p_m})$. \newline
+I would like to get a best possible assignment of phonemes and frames:
+\begin{equation}
+    (\{p_1, (f_1,...,f_{\alpha_1})\}, \{p_2, (f_{\alpha_1},...,f_{\alpha_2})\}, ..., \{p_m, (f_{\alpha_{m-1}},...,f_{\alpha_m})\})
+\end{equation}
+where the sum of scores: $\sum_{j=1}^m \sum_{l=\alpha_{j-1}}^{\alpha_j} \sigma_{p_j}(f_l)$ is maximized (assuming $\alpha_0 = 0$). \newline
+
+At $k$-th iteration I process a single audio frame $f_k$.\newline
+Let $A = (\alpha_0, ..., \alpha_m)$ and a  partial solution $R_{i, k}$ for first $i$ phonemes and $k$ frames:
+\begin{equation}
+    R_{k, i} = argmax_A \sum_{j=1}^i \: \: \: \: \sum_{l=min(\alpha_{j-1}, k)}^{\alpha_i} \sigma_{p_j}(f_l)
+\end{equation}
+The entry data for iteration $k+1$ is a partial solution set $R_k = (R_{k, 1}, ..., R_{k, m})$. \newline
 
 The next values of solution array $R$ are calculated from a formula:
 \begin{equation}
-    R_{k+1, i} = argmax_j (R_j + \sigma_i(k+1))
+    R_{k+1, i} = argmax_{j \in \text{Incoming$(i)$}} (R_{k,j} + \sigma_{p_i}(k+1))
 \end{equation}
-where $\sigma_i(k+1)$ is a log likelihood of emitting $k+1$-th audio frame by state $i$. \newline
+where Incoming$(i)$ is a set of states, that there exist a transition to state $i$ from. \newline
 This is a general Viterbi algorithm, but in my case there were only two outgoing states for each state in a HMM, so actual formula is:
 \begin{equation}
-    R_{k+1, i} = max(R_{i-1}, R_{i}) + \sigma_i(k+1)
+    R_{k+1, i} = max(R_{k, i-1}, R_{k, i}) + \sigma_{p_i}(k+1)
 \end{equation}
 
-\newpage
 This algorithm can be used with any scorers, so let's try to train the Gaussian distributions ourselves.
 
+\newpage
 \subsection{Training phoneme distribution using word alignment}
 
 Again I assume, that I already have word alignment (from chapter 5) and I would like to use it as my input training data. The data have very nice granularity,
