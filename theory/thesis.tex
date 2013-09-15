@@ -685,39 +685,45 @@ New parameters of multivariate normal distribution would be:
 \end {center}
 \setcounter{equation}{0}
 
-The basic idea behind this approach is to match sentences with continuous sequence of speech.
+The basic idea behind this approach is to match sentences with continuous sequences of speech.
 Humans rarely make pauses inside a sub-sentence and rarely continue to another sentence without a pause. \newline
 One simple approach to the alignment problem, which utilizes this fact, is to match part of speech with a portion of a text,
 which would take a similar time to say it. \newline \newline
 
 \subsection{Speech Detection}
 
-Before we can continue with an alignment, we need to detect pauses first or dually we need to detect speeches. \newline
+Before we can continue with an alignment, we need to detect pauses first or dually we need to detect speech parts. \newline
 
 On its own in various environments  the problem is quite hard, however we don't want to consider situations where extracting speech from background is too difficult. It is true, that humans are quite proficient at extracting speech from quite challenging situations like recognizing words of the song, or distinguishing speakers in a crowd.
 However even humans are not perfect, and are often prone for errors. Recognizing song lyrics is not always an easy task, and it remains an open question how much you can attribute the difficulty of this to the background music, how much to changed modulation of singer voice and how much to overabundance of signal in melody scale.
 On the other hand, humans can hear voices in white noise, or in the sounds of nature. Sound hallucinations are the most common among all. It's an easy test, where you try to hear something, where it is not there, but after couple of minutes, you'll start to imagine things. People are sometimes overfit to hear speech. \newline
 
-We leave this problematic cases and focus only on situations where noise to signal ratio is low and we can utilize statistics to detect speech. \newline
+We leave this problematic cases and focus only on situations where noise to signal ratio is low and we can utilize statistic method to detect speech.
+I chose to focus solely on audiobook recordings throughout this project and in this problem it so no different.\newline
 
 Our signal contains speech and silence parts and we assume an environment where speech is clearly louder than silence/noise. Obviously it may also contain non-speech parts which are similar to actual spoken words, like i.e. inhales or other sounds that talking people can make during speech intervals. At this point I don't care about them and leave dealing with them to other approaches. \newline
 This is preprocessing of the speech signal required by every single approach to either speech recognition or alignment. 
 
+Speech parts are loud and silence is well, silent, almost at least. The volume of the signal can be calculated in different way, i.e.:
+\begin{itemize}
+    \item absolute value of the signal
+    \item sum of powers of signal at each frequency
+\end{itemize}
+If we knew some threshold value of the volume, that splits a background noise from the speech, than algorithm of detecting the speech would be to find those parts that are consistently louder then the threshold. It may not be a perfect algorithm, but it is simple and, when there is not so much noise, quite efficient.
+
 \newpage
 
-Speech parts are loud and silence is well, silent, almost at least. If we knew some threshold value, that splits a background noise from the speech, than algorithm of detecting the speech would be to find those parts that are consistently louder then the threshold.  \newline
-
-The problem is to find the threshold and how to deal with consistency of the signal above it, since a small peak can always happen in the background, and a speech is sometimes quite quiet. \newline
+The problem is to find the threshold and how to deal with consistency of the signal, since a small peak can always happen in the background, and a speech is sometimes quite quiet. \newline
 One should choose wisely how to deal with it, since in theory it is possible to figure out even small pauses in the speech signal, like i.e. between syllables.
-I found out, that on one hand it is quite difficult to find these pauses and at the same time to not ignore endings of the sentences, which often are slowly fading to silence (because speaker lacks of breath). On another an alignment using length estimations don't improve, when we detect too many pauses,
+I found out, that on one hand it is quite difficult to find these pauses and at the same time to not ignore endings of the sentences, which often are slowly fading to silence (because speaker lacks of breath). On another note an alignment using length estimations don't improve, when we detect too many pauses,
 because the algorithm works better when the chunks of signal are bigger, so there's a greater chance they align with punctuation marks at the text. \newline
 
 In the speech recognition systems a detection algorithms have to process the incoming data in an online fashion. Sphinx library implements Bent-Schmidt-Nielsen algorithm, which calculates background noise level and current average signal online, meaning it is updated with each incoming frame. \newline
 When signal average level of processed window (see 2.5) is larger than a signal threshold (input constant) and a background average, than the window is classified as a speech. \newline
 \begin{equation}
-    Ave(signal) - Ave(background) > threshold
+    Ave(\text{signal}) - Ave(\text{background signal}) > threshold
 \end{equation}
-Whetever the signal was marked as part of speech signal, the background average is always updated.\newline
+Whetever the signal was marked as part of speech signal, the background average is always updated (see Sphinx implementation for details). \newline
 
 
 I found this algorithm to be too volatile at the beginning of the recording and it stops too easily at the middle of the longer sentence. I really needed an offline algorithm, which could detect quite reliably longer pauses, which are better aligned with punctuation marks. \newline
@@ -742,20 +748,20 @@ Next step is to calculate background averages from the frames considered backgro
 \end{equation}
 where $S$ is a set of all frames in audio stream, and frame $F$ is a set of magnitudes of frequencies from the frame,
 and $Ave$ is an average of all frames: $Ave_i = \frac 1 {|S|} \sum_{F \in S} \sigma_{F, i}$
-Speech frames $A$ are all remainging frames: $A = S \setminus B$. \newline
+Speech frames $A$ are all remaining frames: $A = S \setminus B$. \newline
 
 That is not enough though, because there are often frames inside a speech, which are quite low on volume. These are pauses between phonemes, or some frames of quiet talking (at the end of sentence usually), which didn't not passed the above filter. The granularity is just too big for the purpose of alignment algorithm. \newline
 
 To deal with this granularity I marked as speech all the frames, which didn't pass through filter, but where surrounded by frames, that did, as a speech as well.
 The reason for that, is to remove all the short pauses, which probably meant nothing and might even be an actual speech. My choice was to mark as a speech all pauses that were shorter than 200ms. \newline
 
-Theoretically filling holes is similar to the algorithm, which calculates vector of volume averages of couple of neighbouring frames, and then use this average in the above formula instead. This introduces a certain inertia for pauses or speeches, but at this point I need just a proper longer pause detection with abrupt endings as quickly as speech starts/ends. Although I must admit, that a certain inaccuracies are not so important for the paused based alignment, if only because the algorithm is quite inefficient and produces only approximated results.
+Theoretically filling holes is similar to the algorithm, which calculates vector of volume averages of couple of neighbouring frames, and then use this average in the above formula instead. This introduces a certain inertia for pauses or speech parts, but at this point I need just a proper longer pause detection with abrupt endings as quickly as speech starts/ends. Although I must admit, that a certain inaccuracies are not so important for the paused based alignment, if only because the algorithm is quite inefficient and produces only approximated results.
 
 \newpage
 
 \subsection{Text split}
 
-Before we can continue with alignment, we still would like to have text split to sentences. It is necessary to have a certain knowledge about punctuation in a given language.  Many modern languages use similar punctuation symbols for marking sentence or sub-sentences,
+Before we can continue with alignment, we still would like to have text split to sentences or phrases, which are expected to be spoken without continously. It is necessary to have a certain knowledge about punctuation in a given language.  Many modern languages use similar punctuation symbols for marking sentence or sub-sentences,
 but we still need to know a given language alphabet. \newline
 
 This part is very simple. We treat all the alphabets characters as a part of speech, while every other character as punctuation mark, which separates parts of the text, and which may have some correlation with a pauses in a recording. Resulting chunks are those, that contain only characters from alphabet and blanks. \newline
@@ -764,11 +770,13 @@ Couple of details are to be dealt with. Not only alphanumeric characters make a 
 
 Another is that, a sequence of white character might also be a separation. A title for example might not be separated by a dot mark, but only be a series of line breaks. Generally more than one line break is considered a pause indicator. \newline
 
+My algorithm accepts a raw text as an input and outputs a list of chunks, that contain only alphanumeric and single space characters.
+
 \newpage
 
 \subsection{Estimating time}
 
-The problem of matching chunks of text with extracted speeches is a problem of matching duration time of speech recording and
+The problem of matching chunks of text with extracted speech parts is a problem of matching duration time of speech recording and
 an estimated time of the chunks. Before we can continue, we need to estimated the time it takes to say words from each chunk. \newline
 
 Given: \newline
@@ -797,26 +805,30 @@ and $\mu_{word}$ is an average time it takes to say a single word:
 Although I'm not completely certain in what way my algorithm benefits from the second element,
 since I haven't run conclusive tests, by my intuition is, that it reduces variance of estimated values. \newline
 The proportions above I derived from purely empirical observations, but there were too many variables to be
-too attached to this exact coefficients.
+too attached to this exact coefficients. \newline
+
+This is a very crude estimation, where I don't use phoneme representation of the words. Using phonemes might improve estimation drastically,
+especially if we had some kind of idea of, how long each it takes say each phoneme on average, but here I'm trying to focus on simple method, that doesn't utilize apriori knowledge.
 
 \newpage
 
 \subsection{Alignment}
 
 The assignment problem tries to minimize the difference between speech time and estimated time of matched text chunk.
-If $A$ is a set of matched pairs of speech and text ($A = \{((s_i, e_i), t_i)\}$) then I want to minimize:
+If $A$ is a set of $N$ matched pairs of speech and text ($A = \{((s_i, e_i), t_i)\}$ for $i \in \{0, ..., N-1\}$) then I want to minimize:
 \begin{equation}
-    argmax_A \sum_{((s_i, e_i), t) \in A} ((e_i - s_i) - E(time \: to \: say \: \: t))^2
+    argmin_A \sum_{((s_i, e_i), t) \in A} ((e_i - s_i) - E(\text{time to say $t$}))^2
 \end{equation}
 This problem is easily solvable with dynamic programming. \newline
 
-The algorithm iterates over speeches. \newline
-At $k$-th iteration a vector $R$ of partial results are kept. The $i$-th element of the vector contains a result of matching first $k$ speeches and first $i$ sentences. \newline
+The algorithm iterates over speech parts. \newline
+At $k$-th iteration a vector $R$ of partial results are kept. The $i$-th element of the vector contains a result of matching first $k$ speech parts and first $i$ sentences. \newline
 Initial values of the vector is matching of first speech part with first $i$ text chunks:
 \begin{equation}
-    R(i) = ((e_0 - s_0) - \sum_{k = 0}^i E(time \: it \: takes \: to \: say \: \: t_i)^2
+    R(i) = ((e_0 - s_0) - \sum_{k = 0}^i E(\text{time it takes to say $t_i$})^2
 \end{equation}
 where $s_j$ and $e_j$ is start and end time of $j$-th speech, \newline
+$e_0$ and $s_0$ is ending and starting time of first detected speech,
 and $t_i$ is $i$-th text chunk. \newline
                
 The $k$-the iteration calculates next values from the formula:
@@ -825,30 +837,40 @@ The $k$-the iteration calculates next values from the formula:
 \end{equation}
 Estimated time it takes to say a text chunks $\{e_k, ..., e_{k+c}\}$ would be quite consuming to calculate at each iteration, but it can be precomputed. \newline
 
-Additionally a zero match was added as a way of adding a speech to a text chunk from previous iteration.  Note however, that it won't produce a result, where everything is matched to everything, what would have a minimal score equal to 0, since a time it takes to say whole text is a total time of all speeches. \newline
-However matching from each iteration contribute to the score separately, so the previous match adds a difference and skipped speech will also add it own difference (assuming it was $k$-th speech, than added score is equal to $(e_k - s_k)^2$). \newline
+Additionally a zero match, where speech can be matched with an empty text, was included as a way of adding a speech to a text chunk from previous iteration.  Note however, that it won't produce a result, where everything is matched to everything, what would have been a best possibly match with a score equal 0, since a time it takes to say whole text is a total time of all speech parts (total time was used to estimated all text parts). \newline
+However matching from each iteration contribute to the score separately, so the previous match adds a difference and skipped speech will also add its own difference (assuming it was $k$-th speech, than added score is equal to $(e_k - s_k)^2$). \newline
 It does improve the algorithm though, because of some short speech leftovers, which actually are part of previously matched sentence. \newline
 
 \newpage
-At the end of algorithm the $i$-th element in $R$ vector is equal to the best cumulative score of matching $i$ chunks and all speeches. Obviously if there are $n$ chunks, then the $n$-th element contains a score of best possible matching of all speeches and whole text. \newline
+At the end of the algorithm the $i$-th element in $R$ vector is equal to the best cumulative score of matching $i$ chunks and all speech parts. Obviously if there are $n$ chunks, then the $n$-th element contains a score of best possible matching of all speeches and whole text. \newline
 
 To recreate the matching, one could iterate backwards over partial values, or as I did it, to keep additional vector which keeps track of chosen indexes ($d$ in(9)) from all iterations. To produce the best matching, the algorithm traverses back through these indexes and for $k$-th speech it assigns all chunks between current and previous index. Empty assignment (index haven't changed) is considered to be merged with previous matching (time frame of previous label is updated with current speech). \newline
 \newline
 
 \subsection{Results}
 
-The efficiency of above method was tested versus a word alignment (obtained from different methods) in two ways:
+The efficiency of above method was tested versus a word alignment (obtained with method from section 5) in two ways:
 \begin{itemize}
-    \item for a given label from the output find words and they testing labels, \newline
-          merge the found testing labels times to produce total time of the text chunk, \newline
-          give some statistics about time differences
-    \item for a given label from the output find testing labels that are located within the time frame \newline
-          produce a text from found labels' words \newline
-          count the biggest word difference between the texts by formula below:
+    \item calculate statistics for time differences 
+          \subitem for a given label ($(s_j, e_j), t_i$), where $t_i$ is a sequence of words $\{w_1, ..., w_k\}$
+          \subitem for each word $w \in t_i$ find (from the testing alignment) its start $s_{w}$ and ending $e_{w}$ times,
+          \subitem merge all the found times to produce expected start and end times of the text chunk:
+            \begin{equation}
+                \text{expected start} = min(s_{w}, \text{ for } w \in t_i),
+            \end{equation}
+            \begin{equation}
+                \text{expected end} = max(e_{w}, \text{ for } w \in t_i),
+            \end{equation}
+          \subitem Note, that words are found sequentially, so the same words are different, if they occupy a different position in the text
+    \item calculate statistics for word differences
+          \subitem for a given label ($(s_j, e_j), t_i)$), where $t_i$ is a sequence of words $\{w_1, ..., w_k\}$
+          \subitem find all labels ($(s_a', e_a'), w_b$, from the testing alignment) where $s_a' < e_j$ and $s_b' > s_j$,
+          \subitem produce a text from found labels' words (in proper sequence)
+          \subitem count the biggest word difference between the texts by formula below:
           \begin{equation}
                len(output\_chunk) + len(testing\_chunk) - 2 length(biggest\_subsequence)
           \end{equation}
-          give some statistics about the word differences
+          \subitem Note, that I pick all the words, that have assigned at least one common frame with a tested chunk, since I want to test here the alignment algorithm and not the speech detection algorithm.
 \end{itemize}
 The testing recording is “Doktor Piotr” by Stefan Żeromski, which is 80 minutes long and consists \textbf{1886} sentences (or subsentences). \newline
 
@@ -866,9 +888,6 @@ The statistics are:
         \item standard deviation was \textbf{0.84s}
         \item maximum time difference was \textbf{11.21s}
     \end{itemize}
-    \begin{center}
-        \includegraphics[scale=0.6]{length_based_results_better.jpg}
-    \end {center}
     \item word differences:
     \begin{itemize}
         \item \textbf{393} chunks had \textbf{0} difference in words
@@ -876,10 +895,15 @@ The statistics are:
         \item \textbf{48} different by \textbf{2} words
         \item \textbf{56} with a difference over \textbf{5} words
     \end{itemize}
+    \begin{center}
+        \includegraphics[scale=0.6]{length_based_results_better.jpg}
+        \caption[]{Word statistics from a test of pause based alignment algorithm, max pause 200ms}
+    \end {center}
 \end{itemize}
 
 \newpage
-For \textbf{503} speeches, with a pause longer than \textbf{300ms}:
+For \textbf{503} speech parts, produced by a version of the algorithm, where the allowed size of holes (or pauses) in speech detection algorithm part,
+was set to \textbf{300ms}:
 \begin{itemize}
     \item time differences: \newline
     \begin{itemize}
@@ -888,9 +912,6 @@ For \textbf{503} speeches, with a pause longer than \textbf{300ms}:
         \item standard deviation was \textbf{5.23s}
         \item maximum time difference was \textbf{37.9s}
     \end{itemize}
-    \begin{center}
-        \includegraphics[scale=0.6]{length_based_results_worse.jpg}
-    \end {center}
     \item word differences:
     \begin{itemize}
         \item \textbf{179} chunks had \textbf{0} difference in words
@@ -898,6 +919,10 @@ For \textbf{503} speeches, with a pause longer than \textbf{300ms}:
         \item \textbf{20} different by \textbf{2} words
         \item \textbf{56} with a difference over \textbf{10} words
     \end{itemize}
+    \begin{center}
+        \includegraphics[scale=0.6]{length_based_results_worse.jpg}
+        \caption[]{Word statistics from a test of pause based alignment algorithm, max pause 300ms}
+    \end {center}
 \end{itemize}
 
 \newpage
@@ -908,7 +933,7 @@ The time statistics are showing a bit worse results, because word labels are mor
 The results are within expectations, after all it is very crude algorithm. It probably could be improved though, however it is hard without introducing much more knowledge about language and possibly some additional training data (i.e. time of phonemes). \newline
 
 This algorithm is a bit sensitive to a chunks created. If only the longer pauses are allowed, by increasing the holes filling factor from 200ms to 300ms in  speech detection algorithm, the results were considerably worse. \newline
-In this case detected speeches contained more silence frames and consequently the total time is different, and the estimated times might be a bit more wrong. Another reason why it produces worse results might be related to the fact, that it also causes the speeches to be on average longer. This kind of random variables follow a rule, that they differ from an estimated value by square root factor, ergo longer parts, worse estimations.
+In this case detected speech parts contained more silence frames and consequently the total time is different, and the estimated times might be a bit more wrong. Another reason why it produces worse results might be related to the fact, that it also causes the speeches to be on average longer. This kind of random variables follow a rule, that they differ from an estimated value by square root factor, ergo longer parts implies worse estimations.
 
 \newpage
 \begin{center}
@@ -1907,7 +1932,7 @@ Not every error in above table is a result of misalignment, some are outcome of 
 
 Also the synthesizer is not perfect and could be improved in many various ways, especially by improving the score of combining two consecutive words/phones to consider the whole similarity, so there are no sudden changes in volume or timbre. The main purpose of the simple synthesizer here is to check how phoneme alignment works, so these improvements are a bit out of scope of this thesis. \newline
 
-Generally the created speeches were comprehensible and the meaning could be grasped quite easily. The effect seems to agree with brought up statistics for word and phoneme alignment. It is ok, but not perfect.
+Generally the created speech parts were comprehensible and the meaning could be grasped quite easily. The effect seems to agree with brought up statistics for word and phoneme alignment. It is ok, but not perfect.
 
 
 \newpage
