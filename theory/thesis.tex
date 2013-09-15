@@ -439,6 +439,8 @@ By removing them we obtain so called Mahalanobis distance [16]:
 If we knew elements belonging to any given phoneme, we could calculate a distance between this training sample and any encountered speech signal.
 
 \newpage
+\newpage
+\subsection{Experiments}
 
 I conducted couple of experiments with different distances.
 Starting with a flawed alignment of larger portions of text I tried to:
@@ -446,17 +448,17 @@ Starting with a flawed alignment of larger portions of text I tried to:
 	\item find the same word, that is quite lengthy and occurs multiple times just by searching for similar sequences,
 	\item find a given sequence of three phonemes in a text, based on estimated location (time)
 \end{itemize}
+The idea behind these experiments, was to see if similarities in speech can be found based on similarities in text.
+In theory if we could match similar sequences, than maybe we could derive from the matching a phoneme set (with example phones), that could be used in further studies. \newline
+In both experiments different distance measures was used, to see how helpful they are at separating different phonemes. \newline
 
-Mahalanobis distance in those experiments where not expected to any give significant results,
-since there were conducted without knowledge of phone classification and it behaved without a surprise. \newline
+In first experiment I chose some long word, that occured more then once in the text. Then I'll estimated the times it should appear in the speech and then for quite large areas (which was more or less of $O(\sqrt{total \: \: time})$ in size) around the estimated time, I searched for the most similar sequences either with a speech signal in form of feature vectors described earlier as well as vector of frequency magnitudes. \newline
+This experiment was an utter failure, since it always found two familiar sequences, that were in no way familiar in speech sense.
+However I also tried to see how it behaved with marked one occurence of the word, and then it was actually able to find other occurences, ... sometimes. \newline
 
+In the second experiment I picked first three letters of the text and a portion of detected speech, which suppose to be aligned together. I found all occurences of the letters and then I proceded in similar manner, as in first experiment. I estimated time they all should appear in recording and then I have tried to find them within a certain neighborhood of the estimated times. It wasn't a success, but I was able to find around 50\% of all occurences of three letter sequence from beginning of the text and other found were quite similar (80\% of the time they contained two out of three phonemes), although I was lucky, that in my testing recording, the starting three letter sequence occurrences in the text were quite far from each other, so I never searched twice the same area. \newline
 
-The euclidean norm were performing the best. \newline
-In the second experiment it was able to find around 50\% of all occurences of three phoneme sequence from beginning of the text and other found were quite similar (80\% of the time they contained two out of three phonemes), although I was lucky, that in my testing recording, the starting three phonemes occurrences later in the text were quite far from each other. \newline
-
-
-Searching for whole word didn't give me any satisfying results. I could find a similar word when I pointed, which it should have being searched for,
-but without the intervention it always found a sequences which weren't similar at all (from a speech point of view) and at the same time the matching words, I was expected to find, were far in the list.
+My conclusion is, that the Euclidean norm were performing the best, although Mahalanobis distance in those experiments were not expected to give any significant results, since there were conducted without knowledge of phone classification and it behaved without a surprise. \newline
 
 \newpage
 \subsection{Gaussian Model}
@@ -472,7 +474,7 @@ Luckily there is a definition of multivariate normal distribution, that consider
 \end{equation}
                        
 where $\Sigma$ is a covariance matrix and $|\Sigma|$ is its determinant. \newline
-
+The problem with this vector arises, when $\Sigma$ matrix is singular, which is not invertible nor it has determinant. This can happen quite often, when the observation data is too small. \newline
 
 Covariance matrix is always symmetric and positive-semidefinitive.\newline
 Symmetry comes directly from a definition: $cov(X) = E[(X - E(X))(X - E(X))^T]$, since outer product of a single vector gives always a symmetric matrix. \newline
