@@ -376,14 +376,14 @@ A phone is a unit of speech sound [20]. Phoneme's definition is: "The smallest c
 Language grapheme set usually differs from it audio counterparts, although it does depend on, which language are we talking about. English seems to differ quite a lot, while Italian not so much, what seems to be related to adoption of Latin alphabet. Polish grapheme and phoneme sets are quite similar, although there are some differences. Usually the grapheme set contains more characters than needed to represent every word from given language and at the same time it is much too small to represent all the nuances of human speech. What is more problematic, the word graphic representation sometimes has very little to do with actual phones of the word. I.e. there are so called homographes: words, that are written the same yet they pronunciation differs ("zamarzać" from "marznąć" and "morzyć") or homophones, that look differently, but are pronounced similar ("może", "morze"). In polish though, the former is quite rare and this fact is actually used by me (chapter 5.3). \newline
 
 
-Actual phones that are classified under single phoneme create a diversified family.  Different variants of a phoneme are called allophones. For example /l/ in English "leap" and "deal" or polish examples of allophones (/ł/ in "umysł" might be soundless contrary to "ławka") or vowels between soft consonants (/a/ in "jajko"). [22] \newline
+Actual phones that are classified under single phoneme create a diversified family.  Different variants of a phoneme are called allophones. For example /l/ in English "leap" and "deal" or polish examples of allophones (/ł/ in "umysł" might be soundless contrary to "ławka") or vowels between soft consonants (/a/ in "jajko"). [22] Note, that if two phonemes never occur in similar context, than they may actually be treated as two allophones of the same phoneme. I.e. in Polish language there is no such a context, that both phonemes 'j' and 'ń' share. Consequently, even though they are quite different, they can be treated as one. \newline
 
 The phonemes can differ quite substantially depending on the surrounding phones. For example almost each phoneme in polish changes to softer version when put next to /i/ or /j/, although sometimes the change is so substantial, that we no longer talk about allophone, but a completely separate phoneme ('ć' $\iff$ 'c', in contrast to vowels' changes). Notice, that the choice of extracting allophone to a completely new phoneme is all about checking, if leaving it as it is, won't create a situation, where we are unable to distinguish two words with different meaning (see phoneme definition).
 Additionally consecutive phones are not necessarily separated by clearly visible moment of silence. Often one phone is converting slowly into another. To model such a transitions a each middle phoneme of all triphones (sequence of three phonemes) are modelled seperately and stored with a context (neighborhood). \newline
+\newpage
 
 Phonemes are very important in the computational language modelling, either in speech recognition or alignment. The importance is derived directly from its definition. It is a unit of speech, which can't be switched to another without changing the meaning. This is the unit, that need to be modelled if we want to recognize and/or distinguish different words. Finer granularity of model is necessary only to make a better prediction where an observed phone belongs.
 
-\newpage
 Some of English phonemes and example phones:
 \begin{figure}[hb]
     \centering
@@ -944,11 +944,7 @@ In this case detected speech parts contained more silence frames and consequentl
 Audio based alignment is simplified problem of speech recognition. Usually in speech recognition the language consist of millions of words in different inflection, which may create many different sentences. In audio alignment we expect only one text and only one sentence at the time. \newline
 
 Usually speech recognition is based on trained Hidden Markov Models with Gaussian Phoneme models, although successful systems rarely rely on single state phoneme model. \newline
-As I mentioned before (3.1) there are many different allophones of single phoneme. A variations are largely attributed to surrounding they are spoken in. For example in polish there are softening phonemes 'i' and 'j', that clearly change how preceding or succeeding phonemes are realized. At some contexts it may happen that certain phoneme will lose it voice are even get silent completely, at another they will be strengthened with additional voice, i.e.: 
-\begin{description}
-	\item[“staw płytki”] $\rightarrow$ “w” loses it voice and starts to remind a phoneme “f”
-	\item[“plac budowy”] $\rightarrow$ “c” gains additional voice and reminds a phoneme “dz”
-\end{description}
+As I mentioned before (3.1) there are many different allophones of single phoneme. A variations are largely attributed to surrounding they are spoken in. For example in polish there are softening phonemes 'i' and 'j', that clearly change how preceding or succeeding phonemes are realized (i.e. softened allophones of 'p', 'b', 'f', 'v', 'm', which rarely are treated as separate phonemes). There are lot of classified allophones for Polish language, which may come either from foreing influence, historical pronunciation or other reasons, and we expect, that machines can find much more of such. \newline
 And almost never one can cleanly separate two consecutive phones. \newline
 
  In order to better model different realisations of phonemes, an audio modelling contains models of phonemes at different triphone contexts. 
