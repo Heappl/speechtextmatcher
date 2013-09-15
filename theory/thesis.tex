@@ -976,7 +976,7 @@ However let's dwell on this a little bit longer, so we can see what a huge simpl
 
 Let's start with a simple example by using WSJ dictionary: \newline
 phoneme sequence “W AH N”, which  on it's own can be recognized as word “one” or “won” is also a prefix for 36 another different words and subsequence of total 117 different words. \newline
-There is a sequence “W AH N S EH L F”, which assigned to word “oneself”, however it may also be from the end of word “penguin” (“W AH N”) and beginning of word “cellphone” (“S EH L F”). \newline
+There is a sequence “W AH N S EH L F”, which assigned to word “oneself”, however it may also be from the end of word “penguin” (“P EH NG G W AH N”) and beginning of word “cellphone” (“S EH L F OW N”). \newline
 
 Sphinx library provides two ways of language modelling to tackle sucha ambiguity:
 \begin{itemize}
@@ -990,12 +990,12 @@ For general recognition software like Apple Siri, ngrams are necessary, although
 Ngrams (in wsj n is maximum 3) are a way to assign a probability to word sequences. In above example it is expected, that “oneself” is more probable to occur in real word, than the later case, although obviously we can't judge so easily, since the probability of choosing these particular word depends on a probability of whole sentence. \newline
 
 Anyway I think that's enough about speech recognition. \newline
-For our purposes we need “only” audio model and word to phoneme sequence dictionary, in order to efficiently  align text to speech. \newline
+For our purposes we need “only” audio model and word to phoneme sequence dictionary, in order to efficiently align text to speech. \newline
 
 \newpage
 \subsection{Differences between english, russian and polish phonetics}
 
-The sets of phonemes for any language differ slightly between publications and they differ even more between different audio models. For that reason I'm not going to introduce here established phonology for any language, however I'll try to match a phoneme set used by WSJ model for English, VoxForge model for Russian, Corpora and mine for Polish. \newline
+The sets of phonemes for any language differ slightly between publications and they differ even more between different audio models. For that reason I'm not going to introduce here established phonology for any language, however I'll try to match a phoneme set used by WSJ \footnote{model trained on Wall Street Journal data from Sphinx library} model for English, VoxForge \footnote{open source audio model created by voxforge.org group} model for Russian, Corpora \footnote{phoneme tagged corpus for Polish} and mine\footnote{my own experimental set of phonemes} for Polish. \newline
 
 In the table below I collected phonemes from four used sets and analysed differences, that may cause problem to represent some words using given phonetics and in result may cause problems with alignment. The table is organized so the similar phonemes are next to each other. If there is not alternative in a language, than the row remains empty. \newline
 
@@ -1044,8 +1044,6 @@ D & \underline{d}a\underline{d} & d & \underline{д}лина & d & d & \underlin
 \\ \cline{1-7}
  &  & dd & \underline{д}итя &  &  & & \strutA{1ex}
 \\ \hline
-DH & \underline{th}ey &  &  &  &  &  & No counterparts, something between „d” and „z”.
-\\ \hline
 \end{tabularx}
 \end{center}
 
@@ -1056,6 +1054,8 @@ DH & \underline{th}ey &  &  &  &  &  & No counterparts, something between „d�
 \hline
 \rowcolor[gray]{0.8}
 English & example & Russian & example & Corpora Polish & Polish used by me & example & Notes on similarities
+\\ \hline
+DH & \underline{th}ey &  &  &  &  &  & No counterparts, something between „d” and „z”.
 \\ \hline
  &  &  &  & e\_ (ę) &  & s\underline{ę}k & Like „ee l” or „e ł” or „EH W”
 \\ \hline
@@ -1203,7 +1203,7 @@ Character sequence & English phoneme sequence & Russian phoneme sequence & Polis
 \\ \hline
 a & AA & aa & a
 \\ \hline
-ą & AW & oo l & o ł
+ą & AW & oo l & o ł \footnotemark
 \\ \hline
 b & B & b & b
 \\ \hline
@@ -1239,6 +1239,7 @@ dzia & JH Y AA & d zz aa & d ź j a
 \\ \hline
 \end{tabular}
 \end{center}
+\footnotetext{alternatively one can use 'o u'}
 
 \newpage
 
@@ -1249,18 +1250,27 @@ My rules were able to produce a set of possible phoneme representations, simply 
 
 The algorithm looks as follows:
 \begin{itemize}
+    \item input:
+        \begin{itemize}
+            \item character sequence (any text only with alpha characters and spaces)
+            \item conversion grammar
+        \end{itemize}
+    \item output:
+        \begin{itemize}
+            \item possible phoneme represations for input text
+        \end{itemize}
     \item variables:
-    \begin{itemize}
-        \item $\bold{S}$ - a set of all rules in the grammar
-        \item $\bold{P}$ - a set of potential candidates
-        \item $\bold{c}$ - longest matched candidate so far
-        \item $\bold{R}$ - output set of phoneme sequences
-    \end{itemize}
+        \begin{itemize}
+            \item $\bold{S}$ - a set of all rules in the grammar
+            \item $\bold{P}$ - a set of potential candidates
+            \item $\bold{c}$ - longest matched candidate so far
+            \item $\bold{R}$ - output set of phoneme sequences
+        \end{itemize}
     \item at the start we have:
-    \begin{itemize}
-        \item $P = S$
-        \item $c$ is unset
-    \end{itemize}
+        \begin{itemize}
+            \item $P = S$
+            \item $c$ is unset
+        \end{itemize}
     \item iterate over a character sequence,
     \begin{itemize}
         \item remove all candidates from $P$, that will never be a match after adding current character,
@@ -1278,6 +1288,56 @@ The algorithm looks as follows:
     \end{itemize}
 
 \end{itemize}
+
+\newpage
+
+If we supply algorithm with conversion table as below:
+\begin{center}
+\begin{tabular}{| p{3.5cm} | p{3.5cm} | p{3.5cm} | p{3.3cm} |}
+\hline
+\rowcolor[gray]{0.8}
+Character sequence & English phoneme sequence & Russian phoneme sequence & Polish phoneme sequence
+\\ \hline
+a & AA & aa & a
+\\ \hline
+t & T & t & t
+\\ \hline
+d & D & d & d
+\\ \hline
+e & EH, ER & e & e
+\\ \hline
+r & R & r, rr & r
+\\ \hline
+z & Z & z, zz & z
+\\ \hline
+drz & JH & d zh & d ż
+\\ \hline
+ch & HH & h & h
+\\ \hline
+h & HH & h & h
+\\ \hline
+c & T S & c & c
+\\ \hline
+w & V & v & v
+\\ \hline
+o & AO & oo, ay & o
+\\ \hline
+\end{tabular}
+\end{center}
+
+The output of the algorithm for an input text "chata", would be:
+\begin{itemize}
+    \item $\bold{English}$ 'HH AA T AA'
+    \item $\bold{Russian}$ 'h aa t aa'
+    \item $\bold{Polish}$ 'h a t a'
+\end{itemize}
+and for word "drzewo":
+\begin{itemize}
+    \item $\bold{English}$ 'JH EH V AO', 'JH ER V AO'
+    \item $\bold{Russian}$ 'd zh e v oo', 'd zh e v ay'
+    \item $\bold{Polish}$ 'd ż e w o'
+\end{itemize}
+giving two alternatives of Russian and English phoneme realization. \newline
 
 I would leave here an open question if it is possible to create such a grammar for more accurate dictionaries.It might be, since phonemes are the effect of how comfortable it is to say a given sequence of phones and people are not really able to remember too complex conversion. It might be possible, that the grammar would need take into account some rare oddities, like word “one”, but there is definitely a finite number of such. In order to find such a grammar, probably a study on existing and trained dictionaries should be done, but this is out of the scope of this project.
 
@@ -1349,12 +1409,12 @@ Analysing the above statistics it can be noticed, that even if English model did
 
 It is also noticeable, that they perform a bit differently. While English model finds borders of the word quite well, except for spectacular failures of course, the Russian on other hand frequently happens to include a pause after the word. This is a bit problematic for many different applications, except maybe for training, which can deal with that. Anyway since for English, the algorithm failed to finish the alignment, it may have happened, that it would show similar behaviour in later parts of the book. \newline
 
-The additional pause added to a word label isn't completely bad, since it means, that we are quite sure, that given selection contains an assigned word, and that there is very little total misses. Direct observation of collected data supported that conclusion. There were very few total misses and only related to alignment conjunctives (“w” especially).\newline
+The additional pause added to a word label isn't completely bad, since it means, that we are quite sure, that given selection contains an assigned word, and that there is very little total misses. Direct observation of collected data supported that conclusion. There were very few total misses and only related to alignment conjunctives or prepositions and postpositions (“w” especially).\newline
 From autopsy of collected data we also see, that the biggest mismatches were committed, when accounting a silence as a part of word. \newline
 
-One could try to further improve above method, at least by meddling with a phoneme conversions or maybe even training dictionary from a corpus, to get a better phoneme representation. I can't be sure at this point how big impact has the simple conversion grammar on results, although it doesn't seem to be the most promising room for improvement. \newline
+One could try to further improve above method, at least by meddling with a phoneme conversions or maybe even training dictionary from a corpus, to get a better phoneme representation. I can't be sure at this point how big impact has the simple conversion grammar on results, although it doesn't seem to be the most promising room for improvement.  Additionally the method can be improved by merging results or scorers of different models. It might produce much better results, especially since each model have different problems with alignment. \newline
 
-My final conclusion is that, regardless of some mismatches, it is a quite nice method for word alignment, especially for the purpose of further improvements in speech recognition systems and audio model trainings. 
+My final conclusion is that, regardless of some mismatches, it is a quite nice method for word alignment, especially for the purpose of further improvements in speech recognition systems and audio model trainings.
 
 \newpage
 \begin{center}
@@ -1381,7 +1441,7 @@ In the end my algorithm used only main state without any transition probabilitie
 
 The Gaussian distributions were extracted using sphinx library in a form of SenomeScorer objects, which is able to calculate score for given observation. A best sequence was found using a Viterbi like dynamic programming algorithm, which was all too similar to many other DP algorithms in this project. \newline
 
-At each iteration I processed a single audio frame.\newline
+At each iteration I process a single audio frame.\newline
 The entry data for iteration $k+1$ is a partial solution array $R_k$. At the index $i$ in array $R_k$ a score of most probable seqeunce of $i$ states observing $k$ audio frame is stored. The output of $k+1$-th is $R_{k+1}$. \newline 
 
 The next values of solution array $R$ are calculated from a formula:
@@ -1440,7 +1500,6 @@ A sample of needed changes: \newline
     this one was replace with appropriate phonemes
     \item in one case few phonemes were merged into one shortened version, as speaker joined two words into one, \newline
     as above it was replaced with real phonemes and matched against
-\newpage
 \end{itemize}
 Resulting matching was checked manually after the changes. \newline
 
