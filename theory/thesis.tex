@@ -815,7 +815,7 @@ especially if we had some kind of idea of, how long each it takes say each phone
 \subsection{Alignment}
 
 The assignment problem tries to minimize the difference between speech time and estimated time of matched text chunk.
-If $A$ is a set of $N$ matched pairs of speech and text ($A = \{((s_i, e_i), t_i)\}$ for $i \in \{0, ..., N-1\}$) then I want to minimize:
+If $A$ is a set of $N$ matched pairs of speech and text ($A = \{((s_i, e_i), t_i)\}$ for $i \in (0, ..., N-1)$) then I want to minimize:
 \begin{equation}
     argmin_A \sum_{((s_i, e_i), t) \in A} ((e_i - s_i) - E(\text{time to say $t$}))^2
 \end{equation}
@@ -835,7 +835,7 @@ The $k$-the iteration calculates next values from the formula:
 \begin{equation}
     R(i) = argmax_{d in <0, i - 1>} [P(i-l) + [(e_k - s_k) - \sum_{j = i - l}^d E(time \: to \: say \: t_j)]^2 ]
 \end{equation}
-Estimated time it takes to say a text chunks $\{e_k, ..., e_{k+c}\}$ would be quite consuming to calculate at each iteration, but it can be precomputed. \newline
+Estimated time it takes to say a text chunks $(e_k, ..., e_{k+c})$ would be quite consuming to calculate at each iteration, but it can be precomputed. \newline
 
 Additionally a zero match, where speech can be matched with an empty text, was included as a way of adding a speech to a text chunk from previous iteration.  Note however, that it won't produce a result, where everything is matched to everything, what would have been a best possibly match with a score equal 0, since a time it takes to say whole text is a total time of all speech parts (total time was used to estimated all text parts). \newline
 However matching from each iteration contribute to the score separately, so the previous match adds a difference and skipped speech will also add its own difference (assuming it was $k$-th speech, than added score is equal to $(e_k - s_k)^2$). \newline
@@ -852,7 +852,7 @@ To recreate the matching, one could iterate backwards over partial values, or as
 The efficiency of above method was tested versus a word alignment (obtained with method from section 5) in two ways:
 \begin{itemize}
     \item calculate statistics for time differences 
-          \subitem for a given label ($(s_j, e_j), t_i$), where $t_i$ is a sequence of words $\{w_1, ..., w_k\}$
+          \subitem for a given label ($(s_j, e_j), t_i$), where $t_i$ is a sequence of words $(w_1, ..., w_k)$
           \subitem for each word $w \in t_i$ find (from the testing alignment) its start $s_{w}$ and ending $e_{w}$ times,
           \subitem merge all the found times to produce expected start and end times of the text chunk:
             \begin{equation}
@@ -863,7 +863,7 @@ The efficiency of above method was tested versus a word alignment (obtained with
             \end{equation}
           \subitem Note, that words are found sequentially, so the same words are different, if they occupy a different position in the text
     \item calculate statistics for word differences
-          \subitem for a given label ($(s_j, e_j), t_i)$), where $t_i$ is a sequence of words $\{w_1, ..., w_k\}$
+          \subitem for a given label ($(s_j, e_j), t_i)$), where $t_i$ is a sequence of words $(w_1, ..., w_k)$
           \subitem find all labels ($(s_a', e_a'), w_b$, from the testing alignment) where $s_a' < e_j$ and $s_b' > s_j$,
           \subitem produce a text from found labels' words (in proper sequence)
           \subitem count the biggest word difference between the texts by formula below:
@@ -941,7 +941,7 @@ In this case detected speech parts contained more silence frames and consequentl
 \end {center}
 \subsection{Speech recognition}
 
-Audio based alignment is simplified problem of speech recognition. Usually in speech recognition the language consist of millions of words in different conjugations, which may create many different sentences. In audio alignment we expect only one text and only one sentence at the time. \newline
+Audio based alignment is simplified problem of speech recognition. Usually in speech recognition the language consist of millions of words in different inflection, which may create many different sentences. In audio alignment we expect only one text and only one sentence at the time. \newline
 
 Usually speech recognition is based on trained Hidden Markov Models with Gaussian Phoneme models, although successful systems rarely rely on single state phoneme model. \newline
 As I mentioned before (3.1) there are many different allophones of single phoneme. A variations are largely attributed to surrounding they are spoken in. For example in polish there are softening phonemes 'i' and 'j', that clearly change how preceding or succeeding phonemes are realized. At some contexts it may happen that certain phoneme will lose it voice are even get silent completely, at another they will be strengthened with additional voice, i.e.: 
@@ -1409,7 +1409,7 @@ Training algorithm is a variation of EM algorithm and consists two steps:
 Phoneme representation of a given word was once again created using our conversion grammar with a small twist, that this time I'm not going to use Russian ones, but a set of Polish phonemes, refined in a series of experiments and described in chapter 5. \newline
 In order to tackle with a problem of unexpected pauses, a silence phoneme (“sil”) was added at the beginning and at the end of each word phoneme sequence. \newline
 
-Initial distributions are calculated from an initial simple selection of phoneme observations. For each word, it's phoneme sequence $\{p_1, ..., p_k\}$ and aligned audio sequence $\{f_1, ..., f_n\}$, a frame $f_j$ was assigned to phoneme $p_i$ if and only if $ (i - 1) \frac n k < j <= i \frac n k$.\newline
+Initial distributions are calculated from an initial simple selection of phoneme observations. For each word, it's phoneme sequence $(p_1, ..., p_k)$ and aligned audio sequence $(f_1, ..., f_n)$, a frame $f_j$ was assigned to phoneme $p_i$ if and only if $ (i - 1) \frac n k < j <= i \frac n k$.\newline
 
 A total likelihood is calculated. When it converges below given threshold, then algorithm terminates and phoneme models are saved. \newline
 
@@ -1520,7 +1520,7 @@ This part has the closest resemblance to the speech recognition. Because we need
 
 I have visited this kind of problem before in chapter 5: an explosion of the number of states in speech recognition. The solution there was to cut on number of states by keeping a fixed size priority queue with a best scoring sequences only. In our case it should behave at least as well. \newline
 
-The alignment is performed on a whole text at once. At first it is converted to a phoneme sequence $P = \{p_i, ..., p_n\}$, with additional “sil” phonemes at the beginning, at the end and between each two consecutive words. \newline
+The alignment is performed on a whole text at once. At first it is converted to a phoneme sequence $P = (p_i, ..., p_n)$, with additional “sil” phonemes at the beginning, at the end and between each two consecutive words. \newline
 
 A state $s_i$ is a phoneme at given position $i$ in $P$ sequence and a normal distribution $N(\theta_{p_i})$,
 and can be seen as a duple: $s_i = (p_i, N(\theta_{p_i}))$, where $\theta_{p_i}$ are parameters of normal distribution trained for a phoneme $p_i$. \newline
@@ -1606,10 +1606,10 @@ The problem also showed in the average time difference, which is up to 3 times b
 \end {center}
 \setcounter{equation}{0}
 
-What do we need phoneme alignment for? For training purposes it is not needed really, since a word or sentence level tagging is great enough. \newline
+What do we need phoneme alignment for? For training purposes it may not be needed, since a word or sentence level tagging is quite good, although additional alignment may improve training performance and/or efficiency and maybe more elaborate methods can be proposed, that can utilize initial phoneme tagging. \newline
 There is one application, that is widely used: from train announcements through automatic reading to  blind people support systems. It is a speech synthesizer, and such, that not only can be easily understood, but also sounds human alike. People tend to dislike artificial things that resemble humans to closely, but not completely. The automatic announcement systems can't be creepy or people will feel uneasy around it and may not want to hear it at all. Personally I hate synthesized audio books, which are just so unpleasant to listen to. \newline
 
-It is nearly impossible to record all possible words at all possible forms to create well sounding synthesizer even for quite small announcement systems. An obvious alternative is to use a proper phoneme alignment to extract and combine parts from completely unrelated sentences, to produce a new form of or totally new word. \newline \newline
+It is nearly impossible to record all possible words at all possible forms to create well sounding synthesizer even for quite small announcement systems. An obvious alternative is to use a proper phoneme alignment to extract and combine parts from similarly sounding sentences, to produce a new form of or totally new word. \newline \newline
 
 \subsection{Testing application of a synthesizer}
 
@@ -1623,9 +1623,9 @@ Testing is relatively straightforward and requires a good ear and a bit of time.
 Speech synthesizing can be simple and hard depending on what we actually want to get in the end and how much can we invest into preparation of audio files. \newline
 
 On one end we have an easy problem of combining spoken words and phrases into sentences and the only thing we need to do, is match a silence part together. \newline
-On the other we have a complete synthesizer, which don't have any prepared audio data and tries to produce the sound signal on it is own. It is doable, but currently all such a synthesizers have very little in common with a human speech and sound very robotic. Synthesizing a human like speech this way at this moment is completely outside our capabilities, but we can't disprove, that it won't be possible someday, after all in theory it is “only” a matter of simulating human respiration organs. \newline
+On the other we have a complete synthesizer, which don't have any prepared audio data and tries to produce the sound signal on it is own. It is manageable, but currently all such a synthesizers have very little in common with a human speech and sound very robotic. Synthesizing a human like speech this way at this moment is completely outside our capabilities, but we can't disprove, that it won't be possible someday, after all in theory it is “only” a matter of simulating human respiration organs. \newline
 
-Current top performing synthesizers are settling somewhere at the middle. Although for announcement system (i.e. in trains) it looks like it never synthesizes single word, but all are already recorded and it only combines them into larger statements. It might be feasible in this case, but most of the time it is impractical, because of the number of words needed to be recorded by a living, breathing and wanting to be paid human. Recording of million of words would take around 7 weeks of non-stop work assuming, that recording of one word would take only a second. And that is nearly not enough, especially for languages where conjugation is much more complex than in English. \newline
+Current top performing synthesizers (i.e. Ivona) are settling somewhere at the middle. Although for announcement systems (i.e. in trains) it looks like it never synthesizes single word, but all are already recorded and it only combines them into larger statements. It might be feasible in this case, but most of the time it is impractical, because of the number of words needed to be recorded by a living, breathing and wanting to be paid human. Recording of million of words would take around 7 weeks of non-stop work assuming, that recording of one word would take only a second. And that is nearly not enough, especially for languages where inflection is much more complex than in English. \newline
 
 The solution is to use much smaller recording set and use it to create/synthesize words, that don't exist in the set. \newline
 
@@ -1634,15 +1634,17 @@ I experimented with two algorithms for word synthesizing. First is a bit better 
 
 Both algorithms have a common part of choosing word candidates and merging them altogether. The only difference is a part of creating candidate when the word doesn't exist in the input text. \newline
 
-In the common part we use a function, that scores a merging of two candidates $c_k$ and $c_{k+1}$ for $k$-th word and ($k+1$)-th word. \newline
-The score is an euclidean difference between a small number of sequential frames from the ending of $c_k$ and the beginning of $c_{k+1}$. \newline
-The beginning is a prefix of any $c_i$, which has a length not greater than a fixed fraction of $|c_i|$. \newline
-Similarly the ending is a suffix of any $c_i$, which has a length not greater than the same fixed fraction of $c_i$. 
-
 \newpage
 
 Synthesizing algorithm:
 \begin{enumerate}
+    \item Input of the algorithm is:
+        \begin{enumerate}
+            \item text to be synthesized
+            \item audio file with recorded text
+            \item word alignment: list of words with assigned part of the recording (starting and ending time)
+            \item phoneme alignment: list of phonemes with assigned part of the recording (starting and ending time)
+        \end{enumerate}
     \item For each word in the text:
         \begin{enumerate}
             \item extract all parts of recording, that are tagged with the word
@@ -1653,20 +1655,24 @@ Synthesizing algorithm:
     \item Choose a best sequence of audio streams using dynamic programming as below:
         \begin{enumerate}
             \item partial result array $R_0$ is initialized with $\{0\}$
-            \item iterate over word sequence $\{w_1, ..., w_n\}$:
+            \item iterate over word sequence $(w_1, ..., w_n)$:
                 \begin{enumerate}
-                    \item entry data for $k+1$-th iteration is $R_k = \{s_1, ..., s_{|C_{w_k}|}\}$,
-                    where $C_{w_k}$ is set of candidates for $k$-th word,
-                    and $s_i$ is a score of best scoring merged stream ending with a $i$-th candidate
-                    \item next score set $\{s_1', ..., s_{|C_{w_{k+1}}'|}\}$ is given by a formula:
+                    \item entry data for $k+1$-th iteration is $R_k = (s_1, ..., s_{|C_{w_k}|})$,
+                    where $C_{w_k}$ is set of candidates for $k$-th word $(c_{1, w_k}, ..., c_{|C_{w_k}|, w_k})$,
+                    and $s_i$ is a score of best scoring merged stream ending with an $i$-th candidate
+                    \item next score set $(s_1', ..., s_{|C_{w_{k+1}}'|})$ is given by a formula:
                     \begin{equation}
-                        s_i' = argmin_{j \in \{1,...,|C_{w_k}|\}} (s_j + score(j, i))
+                        s_i' = argmin_{j \in (1,...,|C_{w_k}|)} (s_j + score(c_{j, w_k}, c_{i, w_{k+1}}))
                     \end{equation}
                 \end{enumerate}
             \item recreate best scoring sequence either from partial scores or with additional data stored in forward run
         \end{enumerate}
     \item Merge calculated sequence into one audio stream.
 \end{enumerate}
+
+The scoring function a of merging two candidates: $c_{i,w_k} \in C_{w_k}$ for $k$-th word and $c_{j,w_{k+1}} \in C_{w_{k+1}}$ for $k+1$-th word, is a sum of euclidean distances between a small\footnote{i.e. a constant factor of size of candidates} number of sequential frames from the ending of $c_{i,w_k}$ and the beginning of $c_{j,w_{k+1}}$. \newline
+The beginning is a prefix of any $c_{i,w_k}$, which has a length not greater than a fixed fraction of $|c_{i,w_k}|$. \newline
+Similarly the ending is a suffix of any $c_{i,w_k}$, which has a length not greater than the same fixed fraction of $|c_{i,w_k}|$. 
 
 \newpage
 
@@ -1699,7 +1705,7 @@ This algorithm is a bit better for checking correctness of phoneme alignment, be
 For the same reason it will have a poorer quality, because even if the aligner is perfect, the boundary frames might have some sound artefacts caused by preceding or succeeding phoneme, i.e. it is quite common, that the last vowel of the sentences changes to a breathing sound, when a speaker is exhaling or breathing in after longer sentence, and that is quite hard to separate, without actually training for recognizing breathing sounds, but to train them, you need a text with marked occurrences of such. \newline
 \newline
 
-The resulting audio contained quite some of such a artefacts and sometimes a bit additional silence here and there. The phonemes seemed to be more or less in order, but the word was a bit hard to understand, because the flow was kind of odd and very unnatural. Clearly it isn't a good synthesizer.
+The resulting audio contained quite some of such artefacts and sometimes a bit additional silence here and there. The phonemes seemed to be more or less in order, but the word was a bit hard to understand, because the flow was kind of odd and very unnatural. Clearly it isn't a good synthesizer.
 
 \newpage
 \subsubsection{Middle to middle synthesizer}
@@ -1708,24 +1714,24 @@ In this algorithm each non-existing word was synthesized separately resulting wi
 
 The input to the algorithm is a phoneme alignment of the recording:
 \begin{equation}
-    L = \{ W_1, W_2, ..., W_n \}
+    L = ( W_1, W_2, ..., W_n )
 \end{equation}
- where element $W_i$ is a phoneme sequence $\{p_{w_i, 1}, ..., p_{w_i, |w_i|}\}$ created from word $w_i$,
- accompanied with the assignment function $f$, that for each $p_{w_i, j}$ returns a unique (regarding pair for indexes $(w_i, j)$ and not actual phoneme) part of audio stream, i.e. $\{f_k, ..., f_{k+m}\}$. \newline
+ where element $W_i$ is a phoneme sequence $(p_{w_i, 1}, ..., p_{w_i, |w_i|})$ created from word $w_i$,
+ accompanied with the assignment function $f$, that for each $p_{w_i, j}$ returns a unique (regarding pair for indexes $(w_i, j)$ and not actual phoneme) part of audio stream, i.e. $(f_k, ..., f_{k+m})$. \newline
 
 The algorithm first looks for candidates to be merged into a synthesized stream:
 \begin{itemize}
-    \item convert word to phoneme sequence $\{\rho_1, ..., \rho_n\}$
+    \item convert word to phoneme sequence $(\rho_1, ..., \rho_n)$
     \item for each $0 \leq i \leq n$ start with an empty set $S_i$:
     \begin{itemize}
         \item for each $W_k \in L$ and for each $0 \leq j \leq |w_k|$ find a maximum value of $m$, \newline
               where $j+m < |w_k|$ and $\forall_{z \in <j, j+m>} p_{w_k, z} = \rho_{i+z-j}$,
-        \item if $m > 2$ add a sequence $\{p_{w_k, j}, ..., p_{w_k, j + m}\}$ to set $S_i$
+        \item if $m > 2$ add a sequence $(p_{w_k, j}, ..., p_{w_k, j + m})$ to set $S_i$
     \end{itemize}
     \item if $S_i=\emptyset$, then repeat second step, but now add a sequence if $m>1$
 \end{itemize}
 
-An element $S_i$ from the sequence of candidate sets $\{S_1,...,S_n\}$ resulted from above procedure, has the property, that each of it's elements are a subsequences of phoneme representation of the synthesized word, and all of them start with a phoneme $\rho_i$. \newline
+An element $S_i$ from the sequence of candidate sets $(S_1,...,S_n)$ resulted from above procedure, has the property, that each of it's elements are a subsequences of phoneme representation of the synthesized word, and all of them start with a phoneme $\rho_i$. \newline
 
 It is possible, that one of such a candidate set would be empty, if there were no such a subsequence, but it is not quite likely, that in larger file it will happen. In this case we could fall back to some variation of this method and the first one, but a preferred subsequences of length of at least 3 are quite common.\newline
 
@@ -1734,16 +1740,16 @@ The algorithm once again uses a dynamic programming technique in quite similar m
 
 \newpage
 
-The algorithm iterates over the candidates $\{S_1, ..., S_n\}$. \newline
-The k-th iteration processes the set $S_{k+1} = \{s_1, ..., s_l\}$. \newline
+The algorithm iterates over the candidates $(S_1, ..., S_n)$. \newline
+The k-th iteration processes the set $S_{k+1} = (s_1, ..., s_l)$. \newline
 At the beginning of iteration ($k+1$)-th for each element $s_i \in S_k$ the algortithm keeps a best scoring synthesized stream, for which a phoneme representation ends with a sequence $s_i$. \newline
 
 The next iteration results are obtained by calculating best scoring synthesized stream for each element $s_j' \in S_{k+1}$, as follows. \newline
 
 A score between candidates $s_i$ and $s_j'$ is calculated by finding a closest frame (by Euclidean distance) of the second phoneme in $s_i$ and a first phoneme in $s_j'$, which should correspond to the same $\rho_{k+1}$. \newline
 
-If the second phoneme from $s_i$ has assigned consecutive frames from $a$ to $b$: $\{f_a, ..., f_b\}$, \newline
-and the first phoneme from $s_j$h as assigned frames from $c$ to $d$: $\{f_c, ..., f_d\}$, \newline
+If the second phoneme from $s_i$ has assigned consecutive frames from $a$ to $b$: $(f_a, ..., f_b)$, \newline
+and the first phoneme from $s_j$h as assigned frames from $c$ to $d$: $(f_c, ..., f_d)$, \newline
 then a score of combining those two sequences is:
 \begin{equation}
     argmax_{x \in <\frac {(a + b)} 2 - \frac {|a - b|} \delta, \frac {(a + b)} 2 + \frac {|a - b|} \delta>, y \in <\frac {(c + d)} 2 - \frac {|c - d|} \delta, \frac {(c + d)} 2 + \frac {|c - d|} \delta>}(dist(f_x, f_y))
@@ -1970,7 +1976,7 @@ Also it might be interesting to study if it is possible to perform such a alignm
 Even more intersting if it can be done for recordings with poor quality, like phone calls etc. These might be extra hard not only because of poor signal quality, but also because people's diction in daily situation is not very good and the flow of the text shows a lot of irregularities with different interruptions (people interrupt each other, sometimes thay wait for other to get back, etc). \newline
 These are quite hard situations even for well prepared systems. \newline
 
-One application of such a system would be automatic training for any language recogniton software with very little human interference. Currently the top speech recognition software is being developed mainly for English, while hundreds of other languages attracts much less attention, with one exception of Google recognition software. Unless English will become the world's official language and all of people will be able to speak English with similar accent, the need for such system is quite obvious. \newline
+One application of such a system would be automatic training for any language recogniton software with very little human interference. Currently the top speech recognition software is being developed mainly for English, while hundreds of other languages attracts much less attention, with one exception of Google recognition software. Unless English will become the world's official language and all of people will be able to speak English with similar accent, the need for such system is quite obvious, although they may not necessary care about minimal knowledge constraint. \newline
 If it would be possible to generate a speech recognition software easily for any language, then a majority of people wouldn't be excluded from using certain technologies (i.e. SIRI), or at least a competition among providers of such a software could be much more fierce. \newline
 
 I also believe that by studying how computers can gain certain knowledge may prove to be beneficial in understanding how people learn, and that is not only useful, but purely interesting. \newline
