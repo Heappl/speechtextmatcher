@@ -32,10 +32,10 @@ The purpose of this final master degree project was to experiment with various a
 In two first chapters I would like to present a theory behind speech signal processing and speech recognition,
 that is well known and understood, and is mentioned in many different papers regarding speech related problems. I also introduced here a frontend part of Sphinx library, which implements a popular way of speech signal preprocessing, which I reuse in this project. \newline
 
-The chapter 4 is exploring a simple approach with minimal knowledge, that produces very crude results. The minum knowledge here is enough reason to bring it up, but I also found some another application for this imperfect solution. \newline
+The chapter 4 is exploring a simple approach with minimal knowledge, that produces very crude results. The minimum knowledge here is enough reason to bring it up, but I also found some another application for this imperfect solution. \newline
 
 Next two chapters are exploring a possibility of using audio models from foreign languages to achieve alignment with satisfying accuracy.
-The keynote of this part of thesis is a study of similarities between languages and their phonetics. I present here not only my own algorithms, but also certain parts of sphinx library, which I used: including tool for alignment problem using preprocessed audio model and dictionary, and in other case only state scorers from trained English and Russian models. \newline
+The keynote of this part of thesis is a study of similarities between languages and their phonetics. I present here not only my own algorithms, but also certain parts of sphinx library, which I used: including tool for alignment problem using preprocessed audio model and dictionary, and in other case state scorers from trained English and Russian models. \newline
 
 The chapter 7 combines conclusions and knowledge of previous chapters to study what can be done without any trained models and what knowledge is enough to align text for practical applications. \newline
 
@@ -49,7 +49,7 @@ I try to approach this topic with a hackish scientific curiosity. The problem is
 \end {center}
 \subsection{Human factor}
 
-Speech is a most efficient way the human communicate. For generations this process was refined by evolution, so we can easily exchange messages even in noisy environment. For this purpose our vocal mechanisms must well cooperate with our hearing ability. There is a certain set of sounds we can produce and our ears evolved to hear them as well as possible.\newline 
+Speech is a most efficient way for the humans to communicate. For generations this process was refined by evolution, so we can easily exchange messages even in noisy environment. For this purpose our vocal mechanisms must well cooperate with our hearing ability. There is a certain set of sounds we can produce and our ears evolved to hear them as well as possible.\newline 
 
 What is sound? According to dictionary: "Vibrations transmitted through an elastic solid or liquid or gas, with frequencies in the approximate range of 20 to 20000 hertz, capable of being detected by human organs of hearing". [1]\newline
 
@@ -68,15 +68,15 @@ Humans can hear frequencies, that begins as low as 12Hz (under laboratory condit
 \newpage
 \subsection{Mel scale}
 
-How we perceive sound, that is completely different matter and topic for long philosophical discussion. However we can help ourselves with some subjective experiments. For example Stevens, Volkman and Newman conducted an experiment on a number of listeners to measure, what do we perceive as equally distanced pitches. In this experiment, the participants of the experiment were asked to judge if given pitches were in equal distances. The output was, that humans don't experience sound linearly respectively to the frequency scale, but a perceptual scale was closer to logarithmic one. [5] \newline
+How do we perceive sound, that is completely different matter and topic for long philosophical discussion. However we can help ourselves with some subjective experiments. For example Stevens, Volkman and Newman conducted an experiment on a number of listeners to measure, what do we perceive as equally distanced pitches. In this experiment, the participants of the experiment were asked to judge if given pitches were in equal distances. The output was, that humans don't experience sound linearly in respect to the frequency scale, but a perceptual scale is closer to a logarithmic one. [5] \newline
 
-Certain formulas were conceived to translate frequency scale to one, that is closer to how human actually perceive sound. \newline
+Certain formulas were conceived to translate a frequency scale to one, that is closer to how human actually perceive sound. \newline
 
-One popular is mel scale, where mel comes from melody: [6] \newline
+One popular is a mel scale, where mel comes from melody: [6] \newline
 \begin{equation}
     m = 2595 \: \: log_{10}(1 + \frac{f}{700})
 \end{equation}
-where $f$ is a frequency and $m$ is scaled melody frequency. \newline
+where $f$ is a frequency and $m$ is a scaled melody frequency. \newline
 This looks as in the plot:
 \begin{figure}[hb]
     \centering
@@ -84,20 +84,20 @@ This looks as in the plot:
     \caption[]{Mel scale from http://en.wikipedia.org/wiki/Mel\_scale}
 \end{figure}
 
-Another popular formula of so called bark scale, which is based on perception of loudness of the sound and proposed by Eberhard Zwicker in 1961. [7] \newline
+Another popular formula of so called bark scale, which is based on a perception of loudness of the sound and proposed by Eberhard Zwicker in 1961. [7] \newline
 \begin{equation}
     Bark = 13 \: \: atan(\frac{0.76f}{1000}) + 3.5 \: \: atan(\frac{f^2}{7500^2})
 \end{equation}
-In this project we use mel scale implemented in sphinx library, although bark scale is becoming more popular recently.
+In this project we use a mel scale implemented in the sphinx library, although the bark scale is becoming more popular recently.
 
 \newpage
 \subsection{Frequency spectrum}
 
 The conclusion from the anatomy of human ear is, that frequencies of the sound are important.
-How can we obtain frequency spectrum from a digitized sound, so we can proceed further? \newline
-The obvious tool for conversion of discrete function to frequencies is Discrete Fourier Transform, named after Jean Baptiste Joseph Fourier it is one of the most often used techniques of modern times. \newline
+How can we obtain a frequency spectrum from a digitized sound, so we can proceed further? \newline
+The obvious tool for conversion of a discrete function to frequencies is Discrete Fourier Transform, named after Jean Baptiste Joseph Fourier it is one of the most often used techniques of modern times. \newline
 
-It all started from the postulate, that a heat equation can be satisfied by function of form: [11] \newline
+It all started a the postulate, that a heat equation can be satisfied by function of form: [11] \newline
 \begin{equation}
     f(x)=\sum_{n=0}^N(A_n cos(nx) + B_n sin(nx))
 \end{equation}
@@ -106,7 +106,7 @@ or in complex form:
     f(\theta)=\sum_{n=-\infty}^{\infty} C_n e^{i n \theta}
 \end{equation}
 
-Basically we convert our function's domain to frequency domain or to domain of sinusoidal functions. $C_n$ coefficients are complex values that encode both amplitude and phase of the converted signal/function at each frequency. \newline
+Basically we convert our function's domain to a frequency domain or to domain of sinusoidal functions. $C_n$ coefficients are complex values that encode both amplitude and phase of the converted signal/function at each frequency. \newline
 
 The coefficients for any integrable functions over an interval $[\frac{-T}{2}, \frac{T}{2}]$ can be obtain using formula: [11] \newline
 \begin{equation}
@@ -119,7 +119,7 @@ or for the discrete case:
 \end{equation}
 	
 
-So far we haven't found any use in the speech recognition for phase part of the coefficients, however amplitude determines how powerful is signal at given frequency. The power value is given by ($X_k$ is a complex coefficient):
+So far we haven't found any use in the speech recognition for a phase part of the coefficients, however the amplitude determines how powerful is a signal at given frequency. The power value is given by ($X_k$ is a complex coefficient):
 \begin{equation}
     |X_k|/N = \sqrt{\Re e(X_k)^2 + \Im m(X_k)^2} / N
 \end{equation}
@@ -132,13 +132,13 @@ A sample conversion:
     \caption[]{Example of Discrete Fourier Transform from brokensymmetry.typepad.com}
 \end{figure}
 
-What size of the window should we use? First we have to notice, that in order to capture certain frequency, the window needs to be large enough. We would like to examine signals of frequency ranged from 100Hz (see speech frequencies ranges in chapter 2.1), which is a period of 100th of the second, so a 10millisecond window would be our bottom limit. \newline
+What size of the window should we use? First we have to notice, that in order to capture certain frequency, the window needs to be large enough. We would like to examine signals of frequencies ranged from 100Hz (see speech frequencies ranges in chapter 2.1), which is a period of 100th of the second, so a 10millisecond window would be our bottom limit. \newline
 
-Also windows with abrupt signal discontinuities may cause result with spectral artefacts, so a windowing function is usually applied. Popular choice is a Hamming window function: [8]
+Windows with abrupt signal discontinuities may contain spectral artefacts, so a windowing function is usually applied. Popular choice is a Hamming window function: [8]
 \begin{equation}
    w_j = 0.54 - 0.46 cos(\frac{2 \pi j}{W - 1}) 
 \end{equation}
-where $W$ is a window size (number of frames) and $j$ is a frame number and resultin $w_j$ is scaling weight.
+where $W$ is a window size (number of frames) and $j$ is a frame number and result ($w_j$) is a scaling weight.
 The function's plot is given below:
 \begin{figure}[hb]
     \centering
@@ -154,7 +154,7 @@ Note that it emphasises values in the middle of the window, so our actual window
     \caption[]{Window shifting example from sphinx4 javadoc}
 \end{figure}
 
-A human speech signal in frequency and time domain plot, which shows powers of signal at each frequency: [3]
+A plot of human speech signal in a frequency domain, which shows powers of signal at each frequency, and a plot in a time domain: [3]
 \begin{figure}[hb]
     \centering
     \includegraphics[scale=0.5]{speech_spectrogram.jpg}
@@ -211,10 +211,10 @@ while FT is defined:
     \hat{f}(\zeta) = \int_{\mathbb{R} ^ n} f(x) e^{-2 i \pi \zeta x} dx
 \end{equation}
 
-Why taking logarithm of the magnitude? It serves as a normalization of power spectrum. In speech for example it happens, that low frequency components are usually more powerful than high frequncy components and by normalizing the signal, the periodicity becomes more apparent. \newline
+Why taking logarithm of the magnitude? It serves as a normalization of the power spectrum. In speech for example it happens, that low frequency components are usually more powerful than high frequency components and by normalizing the signal, the periodicity becomes more apparent. \newline
 
 
-A bit different way of looking at the signal cepstrum is as a homomorphic transformation which changes convolution into sum. [3]
+A bit different way of looking at the signal cepstrum is as a homomorphic transformation which changes a convolution into a sum. [3]
 \begin{equation}
 x(n) = e(n) * h(n)
 \end{equation}
@@ -226,7 +226,7 @@ x(n) = e(n) * h(n)
 Which on it's own can be seen as way of separating signals, since it is more easy to extract elements from a sum, than from a convolution.
 \newline
 \newline
-In the example with echo (fig.7) a cepstrum of signal have clear peaks, which indicate repetitions of initial signal. Conversion the initial convolution of frequency spectrum to sum of signals in a cepstrum form, allows us to separate echoed signal from original signal, and it might also be used to filter out an audio feedback.
+In the example with an echo (fig.7) a cepstrum of signal have clear peaks, which indicate repetitions of initial signal. Conversion of the initial convolution of frequency spectrum to sum of signals in a cepstrum form, allows us to separate echoed signal from an original signal, and it might also be used to filter out an audio feedback.
 
 \end{minipage}
 \newline
@@ -250,7 +250,7 @@ The sphinx fronted performs signal transformation and produces data composed of 
 while actually only 13 are base ones and the rest is a derivation of these, what is also quite common choice among speech related projects. \newline
 
 Sphinx frontend is a list of transformations executed on the result of the transformation placed higher in the list.
-In another words it is a transformation composition. \newline
+In another words it is a transformations composition. \newline
 \newline
 This Sphinx frontend pipeline includes: \newline
 \begin{itemize}
@@ -269,13 +269,13 @@ I'll try to introduce them a bit closer to show, how speech signal can be transf
 
 \subsubsection{Data Blocker}
 
-This initial transformation reads incoming double data read from audio source (file or microphone) and
+This initial transformation reads incoming double data from audio source (file or microphone) and
 prepares blocks of the data to be used in later phases. In our case blocks contain 10ms of audio data.
 
 \subsubsection{Preemphasizer}
 
 The Preemphasizer applies a formula: $Y[i]=X[i]-(X[i-1] * preemphasizerFactor)$.
-The purpose of this transformation is to emphasize the high frequency components. It is kind of filter,
+The purpose of this transformation is to emphasize the high frequency components. It is a kind of filter,
 which allows high frequency components to pass through, but weakens the low frequency ones.
 
 
@@ -286,15 +286,15 @@ Creates windows from the incoming data. A windowing function
     W(n)=(1-\alpha) - \alpha cos(\frac{2 \pi n}{N - 1})
 \end{equation}
  is applied afterwards. Alpha coefficient set to 0.46 results with a mentioned before Hamming windowing
- function, which is a default setting and the one used by me.
+ function, what is a default setting and the one used by me.
 
 \subsubsection{Discrete Fourier Transform}
 
 Sphinx performs this step using its own implementation of Fast Fourier Transform.
 The FFT can perform transformation with complexity $\Omega(Nlog(N))$, where N is the size of the input data.
-It can be perform on whole data, however in speech we would like to get an information of the frequencies 
+It can be perform on a whole data, however, when dealing with speech, we would like to get an information of the frequencies 
 of a small frame, that contains consistent speech signal, in particular a single phoneme.
-The output data is the power spectrum of input data window and the complex/phase information is lost.
+The output data is the power spectrum of the input data window and the complex/phase information is lost.
 The number of FFT points is the closest power of 2 equal or larger to the number of samples in the incoming window of data. However the input signal is real, so resulting FFT is symmetric, so only half of the data is returned and the output size is $\frac{FFT points}{2} + 1$.
 
 \newpage
@@ -303,13 +303,13 @@ The number of FFT points is the closest power of 2 equal or larger to the number
 
 This step is a part of calculating a Mel Frequency Cepstrum. \newline
 
-Conversion of frequency spectrum into a mel-spectrum using triangular overlapping windows defined as:
+Conversion of a frequency spectrum into a mel-spectrum using triangular overlapping windows defined as:
 \begin{equation}
     w(n) = 1 - |\frac{n - (N - 1)/2}{(N + 1)/2}|
 \end{equation}
 
 
-The number of triangles/filters defined the size of mel-spectrum and the sphinx's default is 40. \newline
+The number of triangles/filters defines the size of the mel-spectrum and the sphinx's default is 40. \newline
 The filters are chosen, so the result would simulate a mel-scale given by the formula:
 \begin{equation}
     melFreq = 2595 log(1 + linearFrequency / 700)
@@ -338,21 +338,20 @@ A DCT type II (most common) coefficients are defined as:
     C(u) = \alpha(u)\sum_{x=0}^{N-1} f(x)cos[\frac{\pi(2x+1)u}{2N}] 
 \end{equation}
 and it is quite tightly related to real part of the Fourier Transform. [18]
-The transform represents a function as a sum of cosine functions and it is equivalent to the DFT operating
-real data with even symmetry. \newline
+The transform represents a function as a sum of cosine functions and it is equivalent to the DFT operating on a real data with even symmetry. \newline
 The number of dimensions returned is set by default to 13, what is quite common choice. The first feature is closely related
 to energy of the speech signal (not completely, since IFT was performed only on magnitudes of frequencies coefficients).
 
 \subsubsection{Cepstral Mean Normalization}
 
-Performs a normalization of MFCC vector by subtracting a mean of all the input. There are two versions
-of this step. One that calculates mean online and the other that reads all data before performing
+Performs a normalization of the MFCC vector by subtracting a mean of all the input. There are two versions
+of this step. One that calculates mean online and the other that reads all the data before performing
 subtraction.
 
 \subsubsection{Deltas feature extractor}
 
 The final transformation in the sphinx frontend chain. It calculates first and second order derivative of the
-cepstrum as additional features of the speech signal. It improves noticeable speech processing algorithms
+cepstrum as additional features of the speech signal. It improves noticeably speech processing algorithms
 by adding additional information about changes in the cepstrum data. \newline
 
 For the initial cepstrum data it adds additionally twice the size vector with first and second order
@@ -371,15 +370,15 @@ differences, calculated as shown in the picture:
 
 \subsection{Phones, phonemes and graphemes}
 
-A phone is a unit of speech sound [20]. Phoneme's definition is: "The smallest contrastive linguistic unit, which may bring about a change of meaning" [21], so the phoneme is a classification unit of phones, which allow us to represent speech while preserving its meaning.  While speech is being modelled using phonemes the graphical part of the language in form of text is modelled with characters or graphemes. \newline
+A phone is a unit of speech sound [20]. Phoneme's definition is: "The smallest contrastive linguistic unit, which may bring about a change of meaning" [21], so the phoneme is a classification unit of phones, which allow us to represent speech while preserving its meaning.  While speech is being modelled using phonemes the graphical part of the language in a form of text is modelled with characters or graphemes. \newline
 
-Language grapheme set usually differs from it audio counterparts, although it does depend on, which language are we talking about. English seems to differ quite a lot, while Italian not so much, what seems to be related to adoption of Latin alphabet. Polish grapheme and phoneme sets are quite similar, although there are some differences. Usually the grapheme set contains more characters than needed to represent every word from given language and at the same time it is much too small to represent all the nuances of human speech. What is more problematic, the word graphic representation sometimes has very little to do with actual phones of the word. I.e. there are so called homographes: words, that are written the same yet they pronunciation differs ("zamarzać" from "marznąć" and "morzyć") or homophones, that look differently, but are pronounced similar ("może", "morze"). In polish though, the former is quite rare and this fact is actually used by me (chapter 5.3). \newline
+Language grapheme set usually differs from it audio counterparts, although it does depend on, which language are we talking about. English seems to differ quite a lot, while Italian not so much, what seems to be related to adoption of Latin alphabet. Polish grapheme and phoneme sets are quite similar, although there are some differences. Usually the grapheme set contains more characters than needed to represent every word from a given language and at the same time it is much too small to represent all the nuances of human speech. What is more problematic, the word graphic representation sometimes has very little to do with actual phones of the word. I.e. there are so called homographes: words, that are written the same yet they pronunciation differs ("zamarzać" from "marznąć" and "morzyć") or homophones, that look differently, but are pronounced similar ("może", "morze"). In polish though, the former is quite rare and this fact is actually used by me (chapter 5.3). \newline
 
 
 Actual phones that are classified under single phoneme create a diversified family.  Different variants of a phoneme are called allophones. For example /l/ in English "leap" and "deal" or polish examples of allophones (/ł/ in "umysł" might be soundless contrary to "ławka") or vowels between soft consonants (/a/ in "jajko"). [22] Note, that if two phonemes never occur in similar context, than they may actually be treated as two allophones of the same phoneme. I.e. in Polish language there is no such a context, that both phonemes 'j' and 'ń' share. Consequently, even though they are quite different, they can be treated as one. \newline
 
-The phonemes can differ quite substantially depending on the surrounding phones. For example almost each phoneme in polish changes to softer version when put next to /i/ or /j/, although sometimes the change is so substantial, that we no longer talk about allophone, but a completely separate phoneme ('ć' $\iff$ 'c', in contrast to vowels' changes). Notice, that the choice of extracting allophone to a completely new phoneme is all about checking, if leaving it as it is, won't create a situation, where we are unable to distinguish two words with different meaning (see phoneme definition).
-Additionally consecutive phones are not necessarily separated by clearly visible moment of silence. Often one phone is converting slowly into another. To model such a transitions a each middle phoneme of all triphones (sequence of three phonemes) are modelled seperately and stored with a context (neighborhood). \newline
+The phones can differ quite substantially depending on the surrounding. For example almost each phoneme in Polish changes to softer version when put next to /i/ or /j/, although sometimes the change is so substantial, that we no longer talk about allophone, but a completely separate phoneme ('ć' $\iff$ 'c', in contrast to vowels' changes). Notice, that the choice of extracting allophone to a completely new phoneme is all about checking, if leaving it as it is, won't create a situation, where we are unable to distinguish two words with different meaning (see phoneme definition).
+Additionally consecutive phones are not necessarily separated by clearly visible moment of silence. Often one phone is converting slowly into another. To model such transitions, each middle phoneme of all triphones (sequence of three phonemes) are modelled seperately and stored with a context (neighborhood). \newline
 \newpage
 
 Phonemes are very important in the computational language modelling, either in speech recognition or alignment. The importance is derived directly from its definition. It is a unit of speech, which can't be switched to another without changing the meaning. This is the unit, that need to be modelled if we want to recognize and/or distinguish different words. Finer granularity of model is necessary only to make a better prediction where an observed phone belongs.
