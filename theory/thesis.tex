@@ -443,20 +443,20 @@ If we knew elements belonging to any given phoneme, we could calculate a distanc
 \subsection{Experiments}
 
 I conducted couple of experiments with different distances.
-Starting with a flawed alignment of larger portions of text I tried to:
+Starting with a flawed alignment of larger portions of a text I tried to:
 \begin{itemize}
 	\item find the same word, that is quite lengthy and occurs multiple times just by searching for similar sequences,
 	\item find a given sequence of three phonemes in a text, based on estimated location (time)
 \end{itemize}
 The idea behind these experiments, was to see if similarities in speech can be found based on similarities in text.
 In theory if we could match similar sequences, than maybe we could derive from the matching a phoneme set (with example phones), that could be used in further studies. \newline
-In both experiments different distance measures was used, to see how helpful they are at separating different phonemes. \newline
+In both experiments different distance measures were used, to see how helpful they are at separating different phonemes. \newline
 
-In first experiment I chose some long word, that occured more then once in the text. Then I'll estimated the times it should appear in the speech and then for quite large areas (which was more or less of $O(\sqrt{total \: \: time})$ in size) around the estimated time, I searched for the most similar sequences either with a speech signal in form of feature vectors described earlier as well as vector of frequency magnitudes. \newline
-This experiment was an utter failure, since it always found two familiar sequences, that were in no way familiar in speech sense.
+In first experiment I chose some long word, that occured more then once in the text. Then I'll estimated the times it should appear in the speech and then for quite large areas (which was more or less of $O(\sqrt{total \: \: time})$ in size) around the estimated time, I searched for the most similar sequences either with a speech signal in form of feature vectors described earlier, or a vector of frequencies magnitudes. \newline
+This experiment was an utter failure, since it always found two familiar sequences, that were in no way familiar in a speech sense.
 However I also tried to see how it behaved with marked one occurence of the word, and then it was actually able to find other occurences, ... sometimes. \newline
 
-In the second experiment I picked first three letters of the text and a portion of detected speech, which suppose to be aligned together. I found all occurences of the letters and then I proceded in similar manner, as in first experiment. I estimated time they all should appear in recording and then I have tried to find them within a certain neighborhood of the estimated times. It wasn't a success, but I was able to find around 50\% of all occurences of three letter sequence from beginning of the text and other found were quite similar (80\% of the time they contained two out of three phonemes), although I was lucky, that in my testing recording, the starting three letter sequence occurrences in the text were quite far from each other, so I never searched twice the same area. \newline
+In the second experiment I picked first three letters of the text and a portion of detected speech, which suppose to be aligned together. I found all occurences of the letters and then I proceded in similar manner, as in first experiment. I estimated time they all should appear in the recording and then I have tried to find them within a certain neighborhood of the estimated times. It wasn't a success, but I was able to find around 50\% of all occurences of the three letter sequence from the beginning of the text and other found were quite similar (80\% of the time they contained two out of three phonemes), although I was lucky, that in my testing recording, the starting three letter sequence occurrences in the text were quite far from each other, so I never searched twice the same area. \newline
 
 My conclusion is, that the Euclidean norm were performing the best, although Mahalanobis distance in those experiments were not expected to give any significant results, since there were conducted without knowledge of phone classification and it behaved without a surprise. \newline
 
@@ -484,7 +484,7 @@ Positive-semidefinitive matrix is a matrix, where for any product $a^T A a$ with
     a^T A a >= 0
 \end{equation}
 
-A product with any vector $a$ and covariance matrix is also equal to: 
+A product with any vector $a$ and a covariance matrix is also equal to: 
 \begin{equation}
     a^T \Sigma a = a^T E(XX^T) a + a^T\mu\mu^T a = \frac 1 N (\sum_{i=1}^N a^T X X^T a) + a^T\mu\mu^T a
 \end{equation}
@@ -557,7 +557,7 @@ The Expected-Maximization technique deals with this problem, by finding better p
     Q(\Theta^i,\Theta^{ i-1})= E[log Pr(\chi, \Upsilon | \Theta) | \chi, \Theta^{i-1}]
 \end{equation}
 
- , where $\Upsilon$ is an unknown data, which can be estimated using $\Theta^{i-1}$, and when known, then $\Theta^{i}$ can be found, by find the parameters, which maximize log likelihood of observing random variables $\chi$ and $\Upsilon$. \newline
+ where $\Upsilon$ is an unknown data, which can be estimated using $\Theta^{i-1}$, and when known, then $\Theta^{i}$ can be found, by finding the parameters, which maximize log likelihood of observing random variables $\chi$ and $\Upsilon$. \newline
 
 
 Thus the EM algorithm contains two steps in single iteration: \newline
@@ -566,9 +566,9 @@ Thus the EM algorithm contains two steps in single iteration: \newline
 	\item During E step, we find $\Upsilon$ data given previous estimate of $\Theta$.
 	\item During M step, we calculate $\Theta$, that maximizes likelihood of observed data and expected hidden data.
 \end{itemize}
-In each iteration a likelihood $Q(\Theta^i,\Theta^{ i-1})$ converges to some local maximum. \newline
+At each iteration the likelihood $Q(\Theta^i,\Theta^{ i-1})$ converges to some local maximum. \newline
 
-We are happy with only local maximum, because the problem resists our efforts to solve it analytically. \newline
+We are happy with only local maximum, because the problem resists our efforts to be solved analytically. \newline
 
 
 For example a mixture model \footnote{A sum  of several distributions} can be trained using following steps: \newline
@@ -605,7 +605,7 @@ and $b_i(Q_{k+1})$ is probability, that state $i$ emitted observation $Q_{k+1}$.
 
 At the end a maximum probability from elements of $P_n$ gives us a probability of observing the sequence with the maximum likelihood for given sequence of observations. \newline
 
-To find actual sequence of states, we can keep a state for which a maximum was produced for each moment $t_k$ and state $i$ and recreate the maximum likelihood path.
+To find actual sequence of states, we can keep a state for which a maximum was produced at each moment $t_k$ and state $i$ and then recreate the maximum likelihood path.
 
 \newpage
 \subsection{Baum Welch algorithm}
