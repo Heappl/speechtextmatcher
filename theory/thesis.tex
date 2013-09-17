@@ -406,16 +406,16 @@ To calculate a distance we could use various norms:
     ||x||_k = (\sum_{i=0}^{N} x_i^k)^\frac{1}{k}
 \end{equation}
 and $x$ is a signal frame or its feature vector. \newline
-All such norms are fine for uncorrelated vectors, which is really the case with speech signal. \newline
+All such norms are fine for uncorrelated vectors, which is really not the case with speech signal. \newline
 
 
 For correlated vectors, we could try to introduce some weighting factor inside.\newline
 What factor should we use?\newline
 One approach is to tune the factors using external methods, which theoretically may give us some additional benefit of properly modelling phonemes, that we try to measure distance from, however this is a bit out of the scope of this chapter and most probably would in the end look similar to a different method.
 A simpler approach would be to calculate correlations and use them in a distance measure.
-If we had a correlation matrix ($P$) and than our distance could be:
+If we had a correlation matrix ($P$), than our distance could be:
 \begin{equation}
-    dist_{using correlations}(\vec x, \vec p) = (\vec x - \vec p)^T P^{-1} (\vec x - \vec p)
+    dist_{\text{using correlations}}(\vec x, \vec p) = (\vec x - \vec p)^T P^{-1} (\vec x - \vec p)
 \end{equation}
                
 Karl Pearson introduced such an idea [23] in form of correlation coefficient defined between two random populations:  
