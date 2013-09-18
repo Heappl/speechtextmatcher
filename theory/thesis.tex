@@ -1420,7 +1420,7 @@ My final conclusion is that, regardless of some mismatches, it is a quite nice m
 I would like to use the word alignment obtained from previous chapter and create an alignment with phoneme granularity. For this purpose I would like to use a trained Russian audio model and align (for each word) a Russian phoneme represantation. After that, I would like to use the same word alignment to train my own audio model from the recording and use it again for phoneme alignment, this time using my experimental, Polish phoneme set. \newline
 
 Audio model is a trained Hidden Markov Model for each phoneme in a context of neighbouring phonemes or for all occurences of the phoneme with no context. Each HMM contains three states with transition table and probabilities of each transition as well as a set of normal distribution at each state, to calculate emission probability of observations (audio frames). \newline
-By merging together phoneme models we get a HMM for whole input text. Of course before first we need convert this text to sequence of phonemes and then to sequence of HMMs, but this can be achieved similarly as in chapter 5. \newline
+By merging together phoneme models we get an HMM for whole input text. Of course first we need convert this text to sequence of phonemes and then to sequence of HMMs, but this can be achieved similarly as in chapter 5. \newline
 
 Having HMM we can calculate the best possible sequence of states (using Viterbi algorithm) and all audio frames assigned to states from a single phoneme HMM should form together a single allophone of the phoneme. After that it just matter of calculating initial and ending time for each such a phone to produce an alignment. \newline
 
@@ -1432,7 +1432,7 @@ In my experiments I tried to do exactly this, however I've noticed that:
 In the end my algorithm used only main state without any transition probabilities. \newline
 
 \newpage
-The Gaussian distributions were extracted using sphinx library in a form of SenomeScorer objects, which are able to calculate score for given observation. A best sequence was found using a Viterbi like dynamic programming algorithm, which was all too similar to many other DP algorithms in this project. \newline
+The Gaussian distributions were extracted using sphinx library in a form of SenomeScorer objects, which are able to calculate score for a given observation. A best sequence was found using a Viterbi like dynamic programming algorithm, which was all too similar to many other DP algorithms in this project. \newline
 
 In general I have a sequence of audio frames $(f_1, ..., f_n)$, which was assigned to given word $W$. \newline
 I also have phoneme representation $(p_1, ..., p_m)$ of word $W$ and trained scorer for each phoneme $(\sigma_{p_1}, ..., \sigma_{p_m})$. \newline
@@ -1470,7 +1470,7 @@ From chapter 5 we could see, that my data was not as accurately described, since
 
 Training algorithm is a variation of EM algorithm and consists two steps:
 \begin{itemize}
-    \item \textbf{expectation step} – alignment of phonemes given previously trained distribution and using an algorithm from 6.1 for each word separately
+    \item \textbf{expectation step} – alignment of phonemes given previously trained distribution and using the algorithm from 6.1 for each word separately
     \item \textbf{maximization step} – calculating normal distribution for each phoneme from assigned observations obtained by expectation step
 \end{itemize}
 
@@ -1490,7 +1490,7 @@ Tests are performed using Corpora corpus, which contains audio recordings of dig
 My testing speech is created by merging all the files in random order for one speaker. The phoneme alignment is prepared by changing times of the labels from the recording put in $i$-th place by a total time of all recordings from first $i-1$ places. \newline
 
 Merged recording contains a 7 minutes and 26 second of audio data, a total of \textbf{843} spoken words and \textbf{3611} phoneme labels. \newline
-The Corpora phonetics differ a bit from what I used in Polish model and definitely differs from Russian phonemes. In order to compare the alingments the I had to convert phonemes to the same set. Most of the time it was relatively easy and I just converted a Corpora phoneme to the one used by me. However there were certain cases where it was not easy.\newline
+The Corpora phonetics differ a bit from what I used in Polish model and definitely differs from Russian phonemes. In order to compare the alingments, I had to convert phonemes to the same set. Most of the time it was relatively easy and I just converted a Corpora phoneme to the one used by me. However there were certain cases where it was not easy.\newline
 A sample of needed changes: \newline
 \begin{itemize}
     \item in my Polish models after soften consonant (like “nie”) I added additional “j” phoneme (resulting with “ń j e”) and Corpora didn't always have anything there, \newline
@@ -1502,7 +1502,7 @@ A sample of needed changes: \newline
     \item Corpora has separate phoneme for “ą”, “ę”, “dz”, “dż” like, but my conversions always split them into more phonemes (i.e. 'o' and 'ł', 'e' and 'ł', 'd' and 'z', 'd' and 'ż'), \newline
     my phonemes were merged into one single chunk, which was matched against testing label
     \item Corpora uses a “?” symbol to indicate unrecognizable phonemes, which I actually found out from other recordings, \newline
-    this one was replace with appropriate phonemes
+    this one was replaced with appropriate phonemes
     \item in one case few phonemes were merged into one shortened version, as speaker joined two words into one, \newline
     as above it was replaced with real phonemes and matched against
 \end{itemize}
