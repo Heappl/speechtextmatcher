@@ -1574,7 +1574,7 @@ In the chapter 4 I described a method, that finds larger chunks of speech and ma
 First of all as I mentioned before, training audio model from a large chunks requires quite a lot of time, because of complexity $\Theta(nm)$, where $n$ is a number of phonemes and $m$ is the size of audio chunk, what is more or less quadratic in relation to a number of characters in a chunk. \newline
 Secondly we would expect, that longer streams might reduce our chance for a proper convergence of phonemes, but maybe not nearly as much as incorrectly assigned ones. \newline
 
-Because of that I chose only chunks, that are shorter than a given constime time threshold. This value is problematic to choose automatically, because shorter texts, may require to use all of them in order to be able to train good enough model.For the longer texts may it may be enough to use only a few seconds short ones.
+Because of that I chose only chunks, that are shorter than a given constant time threshold. This value is problematic to choose automatically, because shorter texts, may require to use all of them in order to be able to train good enough model.For the longer texts may it may be enough to use only a few seconds short ones.
 In any case a certain amount of training data is required. It is hard to believe, that it would be possible to train anything from a 10 second sentence. \newline
 
 For the chosen chunks the algorithm converts assigned text to a phoneme sequence and between any two words additional silence phoneme is inserted, and at the beginning and at the end of the block. \newline
