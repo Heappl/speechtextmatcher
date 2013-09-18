@@ -1680,7 +1680,7 @@ The problem also showed in the average time difference, which is up to 3 times b
 \setcounter{equation}{0}
 
 What do we need phoneme alignment for? For training purposes it may not be needed, since a word or sentence level tagging is quite good, although additional alignment may improve training performance and/or efficiency and maybe more elaborate methods can be proposed, that can utilize initial phoneme tagging. \newline
-There is one application, that is widely used: from train announcements through automatic reading to  blind people support systems. It is a speech synthesizer, and such, that not only can be easily understood, but also sounds human alike. People tend to dislike artificial things that resemble humans to closely, but not completely. The automatic announcement systems can't be creepy or people will feel uneasy around it and may not want to hear it at all. Personally I hate synthesized audio books, which are just so unpleasant to listen to. \newline
+There is one application, that is widely used: from train announcements through automatic reading to  blind people support systems. It is a speech synthesizer, and such, that not only can be easily understood, but also sounds human alike. People tend to dislike artificial things that resemble humans too closely, but not completely. The automatic announcement systems can't be creepy or people will feel uneasy around it and may not want to hear it at all. Personally I hate synthesized audio books, which are just so unpleasant to listen to. \newline
 
 It is nearly impossible to record all possible words at all possible forms to create well sounding synthesizer even for quite small announcement systems. An obvious alternative is to use a proper phoneme alignment to extract and combine parts from similarly sounding sentences, to produce a new form of or totally new word. \newline \newline
 
@@ -1689,7 +1689,7 @@ It is nearly impossible to record all possible words at all possible forms to cr
 Except for uncountable possible applications of synthesizer, we can firstly use it as an additional way for testing our alignments, especially phoneme alignment. Dry statistics are not necessary the most intuitive way to check how our software performs and in the case of phonemes, it may actually be a much better testing ground. People don't agree too well what part of recording constitutes for a phoneme, if only because a single phone is barely perceivable by a human, so naturally such a manual alignment must escape to alternatives method of trying to find a part of word, which doesn't sound like it should. \newline
 It is a similar technique to synthesizing words with an audio assigned to phonemes, but instead of doing this manually, we can try to this automatically. \newline
 
-Testing is relatively straightforward and requires a good ear and a bit of time. We synthesize some sentences which may contain some of interesting phonemes and the we check if doesn't sound odd or if it is even understandable. 
+Testing is relatively straightforward and requires a good ear and a bit of time. We synthesize some sentences, that may contain some of interesting phonemes and then we check if it doesn't sound odd or if it is even understandable. 
 
 \newpage
 \subsection{Synthesizing speech with phoneme alignment}
@@ -1822,7 +1822,7 @@ The next iteration results are obtained by calculating best scoring synthesized 
 A score between candidates $s_i$ and $s_j'$ is calculated by finding a closest frame (by Euclidean distance) of the second phoneme in $s_i$ and a first phoneme in $s_j'$, which should correspond to the same $\rho_{k+1}$. \newline
 
 If the second phoneme from $s_i$ has assigned consecutive frames from $a$ to $b$: $(f_a, ..., f_b)$, \newline
-and the first phoneme from $s_j$h as assigned frames from $c$ to $d$: $(f_c, ..., f_d)$, \newline
+and the first phoneme from $s_j$ has assigned frames from $c$ to $d$: $(f_c, ..., f_d)$, \newline
 then a score of combining those two sequences is:
 \begin{equation}
     argmax_{x \in <\frac {(a + b)} 2 - \frac {|a - b|} \delta, \frac {(a + b)} 2 + \frac {|a - b|} \delta>, y \in <\frac {(c + d)} 2 - \frac {|c - d|} \delta, \frac {(c + d)} 2 + \frac {|c - d|} \delta>}(dist(f_x, f_y))
@@ -1861,11 +1861,11 @@ At the end a best scoring stream is returned as a resulting synthesized audio fo
 
 How does it work? It is hard create automatic test for speech synthesizing. Theoretically I could rerun word alignment to see how it would perform for synthesized speech, however the alignment works even if there are occasional mismatches between text and speech, so it doesn't really gives much, except maybe checks if there are no total misses. It poses a certain challenge to create such a test, the challenge, that I'm not necessary willing to take, since I am a bit more optimistic about total misses, especially after looking at statistics from previous chapters and in the end, the human inspection is necessary anyway to check how it actually performs. \newline
 
-My idea of test is to try to synthesize various texts more and less randomly chosen and see for myself how it performs and where it behaves incorrectly. \newline
+My idea of a test is to try to synthesize various texts more or less randomly chosen and see for myself how it performs and where it behaves incorrectly. \newline
 
 A recording used for synthesizing is a full text of “Doktor Piotr” which contains an hour and 22 minutes of speech. The phonemes are aligned by training model from initial word alignment obtained using method from chapter 7, that doesn't need external audio model, but trains it itself using initially time and pause based alignment. \newline
 
-I chose couple of unrelated texts, which contain some of tongue twisters, a part of epic poem “Pan Tadeusz”, a part of novel “Przedwiosnie”, and couple sentences from cultural column in “Politika” weekly magazine. \newline
+I chose couple of unrelated texts, which contain some of tongue twisters, a part of epic poem “Pan Tadeusz”, a part of novel “Przedwiosnie”, and a couple sentences from cultural column in “Politika” weekly magazine. \newline
 \newline
 
 The first algorithm shows quite substantial flaws in phoneme alignment. Apparently a lot of phonemes has additional trailing frames from a succeeding phoneme, what renders the created speech, to be incomprehensible, although closer inspection shows, that actual phonemes are correct, just not perfectly aligned. And it doesn't matter if the model was trained from the word labelling obtained using Russian audio model or Polish trained from initial pause based alignment. It shows, that an alignment with more perfection is needed for this kind algorithm. \newline
@@ -2006,7 +2006,7 @@ Notes on erroneous parts in synthesized speech using words and phonemes initiate
 Synthesizer results are showing us what kind of mistakes the phoneme aligner makes and what exactly the percentages presented in previous chapter mean. \newline
 It appears, that the word alignment is not perfect and sometimes it is off by selecting too much, although it doesn't seem to happen too often. Much more common mistake is assigning too little to the word label, what results with missing phonemes, although this might be case on any word misalignment, where phoneme alignment just couldn't find correct tagging. \newline
 
-The most obvious conclusion is that, this kind precision is not enough for the perfect speech creation, although only 3 words among the synthesized sentenced were actually not recognizable, and among them, there was one, where it actually changed it meaning. \newline
+The most obvious conclusion is that, this kind precision is not enough for the perfect speech creation, although only 3 words among the synthesized sentenced were actually not recognizable, and among them, there was one, where it actually changed its meaning. \newline
 
 Not every error in above table is a result of misalignment, some are outcome of the compactness of conversion grammar or plainly because of incorrect phoneme conversion. After all there is no guarantee, that conversion will produce a correct phoneme description. \newline
 
@@ -2022,7 +2022,7 @@ Generally the created speech parts were comprehensible and the meaning could be 
 \setcounter{equation}{0}
 
 I believe that I managed to show in this thesis, that word alignment can be done without much apriori knowledge.
-My algorithm was able to return a decent alignment for input audio file and recorded text with only knowledge about:
+My algorithm was able to return a decent alignment for an input audio file and recorded text with only knowledge about:
 \begin{enumerate}
     \item punctuation marks and their relationship to pauses
     \item a bit of knowledge about relationship between graphemes and phonemes (conversions grammars)
@@ -2046,7 +2046,7 @@ Promising improvements include:
     \item improving the above algorithm by rerunning speech alignement with imperfect model
     \item combining model from couple of separate texts
 \end{itemize}
-Also it might be interesting to study if it is possible to perform such a alignment in more noisy environments especially for songs and crowd recordings. \newline
+Also it might be interesting to study if it is possible to perform such an alignment in more noisy environments especially for songs and crowd recordings. \newline
 Even more intersting if it can be done for recordings with poor quality, like phone calls etc. These might be extra hard not only because of poor signal quality, but also because people's diction in daily situation is not very good and the flow of the text shows a lot of irregularities with different interruptions (people interrupt each other, sometimes thay wait for other to get back, etc). \newline
 These are quite hard situations even for well prepared systems. \newline
 
@@ -2054,7 +2054,7 @@ One application of such a system would be automatic training for any language re
 If it would be possible to generate a speech recognition software easily for any language, then a majority of people wouldn't be excluded from using certain technologies (i.e. SIRI), or at least a competition among providers of such a software could be much more fierce. \newline
 
 I also believe that by studying how computers can gain certain knowledge may prove to be beneficial in understanding how people learn, and that is not only useful, but purely interesting. \newline
-I haven't exhausted the topic even in a slightest, since it is just a part of larger question: how one can learn a language without external help. How human infants learn to talk, and how computers can mimick (or not) to learn language as well. \newline
+I haven't exhausted the topic even in a slightest, since it is just a part of larger question: how one can learn a language without external help. How human infants learn to talk, and how computers can mimick (or not) learning language as well. \newline
 I think, that answering this question with great detail, may improve our solutions for human-computer interactions and others. \newline
 However many there are applications, a pure exploration is always enough reason to study a question. If it was asked, let's try answer it. \newline
 
