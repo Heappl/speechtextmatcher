@@ -943,7 +943,7 @@ In this case the detected speech parts contained more silence frames and consequ
 Audio based alignment is simplified problem of speech recognition. Usually in speech recognition the language consist of millions of words in different inflection, which may create many different sentences. In audio alignment we expect only one text and only one sentence at the time. \newline
 
 Usually speech recognition is based on trained Hidden Markov Models with Gaussian Phoneme models, although successful systems rarely rely on a single state phoneme model. \newline
-As I mentioned before (3.1) there are many different allophones of single phoneme. A variations are largely attributed to surrounding they are spoken in. For example in polish there are softening phonemes 'i' and 'j', that clearly change how preceding or succeeding phonemes are realized (i.e. softened allophones of 'p', 'b', 'f', 'v', 'm', which rarely are treated as separate phonemes). There are lot of classified allophones for Polish language, which may come either from foreing influence, historical pronunciation or other reasons, and we expect, that machines can find much more of such. \newline
+As I mentioned before (3.1) there are many different allophones of single phoneme. A variations are largely attributed to surrounding they are spoken in. For example in Polish there are softening phonemes 'i' and 'j', that clearly change how preceding or succeeding phonemes are realized (i.e. softened allophones of 'p', 'b', 'f', 'v', 'm', which rarely are treated as separate phonemes). There are lot of classified allophones for Polish language, which may come either from foreing influence, historical pronunciation or other reasons, and we expect, that machines can find much more of such. \newline
 And almost never one can cleanly separate two consecutive phones. \newline
 
  In order to better model different realisations of phonemes, an audio modelling contains models of phonemes at different triphone contexts. 
@@ -965,22 +965,22 @@ of kept states with calculated score. \newline
 The sphinx library deals with this problem by searching in a breadth first search manner (meaning that it will keep states only from a current moment) and to cut on number of states to process, a priority queue is used, which keeps only best scoring ones. \newline
 
 And this is the part of recognition software we would like to use for the alignment problem. \newline
-The difference from here is that, we do know what the text is spoken, while for recognition there is no such knowledge. \newline
+The difference is that, we do know what the text is spoken, while for recognition there is no such knowledge. \newline
 However let's dwell on this a little bit longer, so we can see what a huge simplification it makes. \newline
 
 Let's start with a simple example by using WSJ dictionary: \newline
 phoneme sequence “W AH N”, which  on it's own can be recognized as word “one” or “won” is also a prefix for 36 another different words and subsequence of total 117 different words. \newline
 There is a sequence “W AH N S EH L F”, which assigned to word “oneself”, however it may also be from the end of word “penguin” (“P EH NG G W AH N”) and beginning of word “cellphone” (“S EH L F OW N”). \newline
 
-Sphinx library provides two ways of language modelling to tackle sucha ambiguity:
+Sphinx library provides two ways of language modelling to tackle such an ambiguity:
 \begin{itemize}
-    \item ngrams frequencies
+    \item N-grams frequencies
     \item language grammar
 \end{itemize}
 
 For simple languages, like a sequence of digits or language containing one long sequence (like in case of text alignment), it is advisable to use language grammar. \newline
-For general recognition software like Apple Siri, ngrams are necessary, although I am not convinced that they haven't used a sort of grammar for typical queries. \newline
-Ngrams (in wsj n is maximum 3) are a way to assign a probability to word sequences. In above example it is expected, that “oneself” is more probable to occur in real word, than the later case, although obviously we can't judge so easily, since the probability of choosing these particular word depends on a probability of whole sentence. \newline
+For general recognition software like Apple Siri, N-grams are necessary, although I am not convinced that they haven't used a sort of grammar for typical queries. \newline
+N-grams (in wsj n is maximum 3) are a way to assign a probability to word sequences. In the above example it is expected, that “oneself” is more probable to occur in real word, than the later case, although obviously we can't judge so easily, since the probability of choosing these particular words depends on a probability of a whole sentence. \newline
 
 Anyway I think that's enough about speech recognition. \newline
 For our purposes we need “only” audio model and word to phoneme sequence dictionary, in order to efficiently align text to speech, and we don't need to model language itself, since our language is one given text. \newline
@@ -1182,7 +1182,7 @@ Usually the dictionaries are created by analysing actual recordings. \newline
 I would like to propose a way of converting grapheme sequences into phonetic description, which might be good enough for many real life applications, like word alignment or even phoneme alignment. \newline
 Nevertheless it would still be applicable only to problems which are easier than speech recognition, but only because it is a hard problem, which tries to get as much accuracy from sub-problems as it is only possible. \newline
 
-Take a look at English  word “one” and “tone”. The differ with character, but a phonectics are: “W AH N”  and “T OW N”.  \newline
+Take a look at English  word “one” and “tone”. They differ with character, but phonectics are: “W AH N”  and “T OW N”.  \newline
 It doesn't seem to be trivial, and actually it might be necessary to study in more detail a language to find quite accurate grammar. However for Polish it might be easy enough to create such a grammar, that will give us enough accuracy to perform alignment task. \newline
 
 We need at least three of such a grammars, converting to English, Russian and Polish phonemes. \newline
@@ -1236,7 +1236,7 @@ dzia & JH Y AA & d zz aa & d ź j a
 
 \newpage
 
-The conversion table looks similar to description of lexer tokens and in general it is what we do here. We convert word into tokens standing for a phoneme sequence. It might be a good idea to use regular expression in the grammar, however I haven't found a need for these, hence my rules convert a character sequence only. \newline
+The conversion table looks similar to description of lexer tokens and in general it is what we do here. We convert word into tokens standing for a phoneme sequence. It might be a good idea to use regular expression in the grammar, however I haven't found any need for these, hence my rules convert a character sequence only. \newline
 
 My rules were able to produce a set of possible phoneme representations, simply by adding a set of phoneme sequences to the right side of the rule. These however didn't prove to be quite beneficial, and after a short time experimenting with it, I reduced number of sets dramatically. After awhile I actually used a different variants only for the word alignment and only when I used sphinx with foreign audio model. \newline
 
@@ -1337,7 +1337,7 @@ I would leave here an open question if it is possible to create such a grammar f
 \newpage
 \subsection{Audio model alignment and results.}
 
-This part is relatively easy, because sphinx library already support word alignment using any audio model. It requires only a phonetic dictionary, which we can create using conversion grammar from previous chapter.  Whole conversion works similar to recognizing word, the same breadth first search algorithm with queue of best results is used, except that a HMM for whole language is created from simple grammar, which allows only one big sequence of words. \newline
+This part is relatively easy, because the Sphinx library already support word alignment using any audio model. It requires only a phonetic dictionary, which we can create using conversion grammar from previous chapter.  Whole conversion works similar to recognizing word, the same breadth first search algorithm with queue of best results is used, except that an HMM for whole language is created from simple grammar, which allows only one big sequence of words. \newline
 
 We would like to test word alignment using English (WSJ) model and Russian (VoxForge) and compare it to some manually aligned sample. \newline
 
@@ -1398,7 +1398,7 @@ The error counts regarding different time thresholds:
 \end{center}
 
 \newpage
-Analysing the above statistics it can be noticed, that even if English model didn't go wrong, it still seems to perform worse, than Russian model. The average difference is twice bigger than for the former.  Also the counts of errors in relation to total number of aligned words shows, that Russian models outperforms the English one, what is quite understandable, since we knew apriori, that Russian is much more similar to Polish. \newline
+When analysing the above statistics it can be noticed, that even if English model doesn't go wrong, it still seems to perform worse, than Russian model. The average difference is twice bigger than for the former.  Also the counts of errors in relation to total number of aligned words shows, that Russian models outperforms the English one, what is quite understandable, since we knew apriori, that Russian is much more similar to Polish. \newline
 
 It is also noticeable, that they perform a bit differently. While English model finds borders of the word quite well, except for spectacular failures of course, the Russian on other hand frequently happens to include a pause after the word. This is a bit problematic for many different applications, except maybe for training, which can deal with that. Anyway since for English, the algorithm failed to finish the alignment, it may have happened, that it would show similar behaviour in later parts of the book. \newline
 
