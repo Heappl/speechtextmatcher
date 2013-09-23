@@ -576,21 +576,21 @@ which would take a similar time to say. \newline \newline
 
 \subsection{Speech Detection}
 
-Before we can continue with an alignment, we need to detect pauses first or dually we need to detect speech parts. \newline
+Before we can continue with an alignment, we need to detect pauses first or dually we need to detect speech parts.
 
 On its own in various environments  the problem is quite hard, however we don't want to consider situations where extracting speech from background is too difficult. It is true, that humans are quite proficient at extracting speech from quite challenging situations like recognizing words of the song, or distinguishing speakers in a crowd.
 However even humans are not perfect, and are often prone for errors. Recognizing song lyrics is not always an easy task, and it remains an open question how much you can attribute the difficulty of this to the background music, how much to changed modulation of singer voice and how much to overabundance of signal in melody scale.
-On the other hand, humans can hear voices in white noise, or in the sounds of nature. Sound hallucinations are the most common among all. It's an easy test, where you try to hear something, where it is not there, but after couple of minutes, you'll start to imagine things. People are sometimes overfit to hear speech. \newline
+On the other hand, humans can hear voices in white noise, or in the sounds of nature. Sound hallucinations are the most common among all. It's an easy test, where you try to hear something, where it is not there, but after couple of minutes, you'll start to imagine things. People are sometimes overfit to hear speech.
 
 We leave this problematic cases and focus only on situations where noise to signal ratio is low and we can utilize statistic method to detect speech.
-I chose to focus solely on audiobook recordings throughout this project and in this problem it so no different.\newline
+I chose to focus solely on audiobook recordings throughout this project and in this problem it is no different.\newline
 
 Our signal contains speech and silence parts and we assume an environment where speech is clearly louder than silence/noise. Obviously it may also contain non-speech parts which are similar to actual spoken words, like i.e. inhales or other sounds that talking people can make during speech intervals. At this point I don't care about them and leave dealing with them to other approaches. \newline
 This is preprocessing of the speech signal required by every single approach to either speech recognition or alignment. 
 
 Speech parts are loud and silence is well, silent, almost at least. The volume of the signal can be calculated in different way, i.e.:
 \begin{itemize}
-    \item absolute value of the signal
+    \item absolute value of the raw and normalized\footnote{average value of whole stream is 0} signal frame
     \item sum of powers of signal at each frequency
 \end{itemize}
 If we knew some threshold value of the volume, that splits a background noise from the speech, than algorithm of detecting the speech would be to find those parts that are consistently louder then the threshold. It may not be a perfect algorithm, but it is simple and, when there is not so much noise, quite efficient.
@@ -598,7 +598,7 @@ If we knew some threshold value of the volume, that splits a background noise fr
 \newpage
 
 The problem is to find the threshold and how to deal with consistency of the signal, since a small peak can always happen in the background, and a speech is sometimes quite quiet. \newline
-One should choose wisely how to deal with it, since in theory it is possible to figure out even small pauses in the speech signal, like i.e. between syllables.
+One should choose wisely how to deal with it, since in theory it is possible to figure out even small pauses in the speech signal, like i.e. between syllables or maybe even pause, that are part of phoneme, like in stop (plosive) consonants ('t', 'd', 'k', 'g', 'b', 'p'). \newline
 I found out, that on one hand it is quite difficult to find these pauses and at the same time not to ignore endings of the sentences, which often are slowly fading to silence (because speaker lacks of breath). On another note an alignment using length estimations don't improve, when we detect too many pauses,
 because the algorithm works better when the chunks of signal are bigger, so there's a greater chance they align with punctuation marks in the text. \newline
 
@@ -607,7 +607,7 @@ When signal average level of processed window (see 2.5) is larger than a signal 
 \begin{equation}
     Ave(\text{signal}) - Ave(\text{background signal}) > threshold
 \end{equation}
-Whetever the signal was marked as part of speech signal, the background average is always updated (see Sphinx implementation for details). \newline
+Whetever the signal was marked as a part of speech signal, the background average is always updated (see Sphinx implementation for details). \newline
 
 
 I found this algorithm to be too volatile at the beginning of the recording and it stops too easily at the middle of the longer sentence. I really needed an offline algorithm, which could detect quite reliably longer pauses, which are better aligned with punctuation marks. \newline
@@ -628,7 +628,7 @@ I also found out, that by increasing magnitude differences in favour of lower fr
 After mingling with above ideas, my best working solution is to calculate average of the whole frequency spectrum (not only sum of magnitudes), without any transformation to initial values (except for sphinx's preemphasizer transformation).
 Next step is to calculate background averages from the frames considered background, which are all frames where each frequency power is below average, so the background frames set $B$ is:
 \begin{equation}
-    B = \{ F \in S \sum_{\sigma_i in F} sgn(max(0, \sigma_i - Ave_i)) = 0 \}
+    B = \{ F \in S \: | \text{ there is no such } \sigma_i \in F \text{ where } \sigma_i > Ave_i\}
 \end{equation}
 where $S$ is a set of all frames in audio stream, and frame $F$ is a set of magnitudes of frequencies from the frame,
 and $Ave$ is an average of all frames: $Ave_i = \frac 1 {|S|} \sum_{F \in S} \sigma_{F, i}$
@@ -650,7 +650,7 @@ but we still need to know a given language alphabet. \newline
 
 This part is very simple. We treat all the alphabet characters as a part of speech, while every other character as punctuation mark, which separates parts of the text, and which may have some correlation with a pauses in a recording. Resulting chunks are those, that contain only characters from alphabet and blanks. \newline
 
-Couple of details are to be dealt with. Not only alphanumeric characters make a word, i.e. a `'` is also a character, that must be treated as part of speech character at this point, although in later phases it might be ignored. \newline
+Couple of details are to be dealt with. Not only alphanumeric characters make a word, i.e. a `'` is also a character, that must be treated as a part of speech character at this point, although in later phases it might be ignored. \newline
 
 Another is that, a sequence of white character might also be a separation. A title for example might not be separated by a dot mark, but only be a series of line breaks. Generally more than one line break is considered a pause indicator. \newline
 
@@ -675,7 +675,7 @@ where $l_i$ is number of words in i-th chunk. \newline
 
 My proposition is to estimate a time of single word with a formula:
 \begin {equation}
-    E(\text{time to say }w) = \sum_{c \in w} 0.95 \mu_{char} + 0.05 \mu_{word}
+    E(\text{time to say }w) = 0.95 \: |w| \mu_{char} + 0.05 \: \mu_{word}
 \end {equation}
 where  $\mu_{char}$ is an average time it takes to say a single character:
 \begin {equation}
