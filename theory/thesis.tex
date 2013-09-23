@@ -471,9 +471,7 @@ My conclusion is, that the Euclidean norm were performing the best, although Mah
 \newpage
 \subsection{Gaussian Model}
 
-Given observation points belonging to a single class (a phoneme) with a given probability,
-we would like to model a distribution of emitting data point by the class. \newline
-
+The alternative way of recognizing phonemes is to calculate a probability, that a frame belongs to a phoneme set. The universe of possible signal frames is huge and yet we would like to be able to calculate the probability, when we know only a finite number of points belonging to the phoneme. The popular way to do this, is by finding the distribution, that explains the training points with the greatest likelihood. Here I would like to show how to model a such a distribution. \newline
 
 A natural choice is a normal distribution, although we have to remember, that observation comes from a multidimensional universum, where populations are not independent. \newline
 Luckily, there is a definition of multivariate normal distribution, that considers correlations:
@@ -482,21 +480,12 @@ Luckily, there is a definition of multivariate normal distribution, that conside
 \end{equation}
                        
 where $\Sigma$ is a covariance matrix and $|\Sigma|$ is its determinant. \newline
-The problem with this vector arises, when $\Sigma$ matrix is singular, which is not invertible nor it has determinant. This can happen quite often, when the observation data is too small. \newline
-
-
-
-In order to prevent degenerate cases we can allow only positive-definite matrices. \newline
-Any such a matrix is guaranteed to be invertible. \newline
-
+The problem with this vector arises, when $\Sigma$ matrix is singular, which is not invertible nor it has determinant. This can happen quite often, when the observation data is too small. As we can see from the Appendix A.2, the covariance matrix is at least positive-semidefinitive, however in order to prevent degenerate cases we can allow only positive-definite matrices, and any such a matrix is guaranteed to be invertible. If we keep our training data large, then this should be common, that the covariance matrix will be invertible. \newline
 
 If the number of dimensions is equal to one, then the formula reduces to single-variable normal distribution: 
 \begin{equation}
     f(x) = \frac 1 {\sqrt{(2\pi)}\sigma}e^{-{ \frac {(x-\mu)^2}{2 \sigma^2}}}
 \end{equation}
-
-
-\newpage
 
 A normal distribution of emitting signal frame have two free parameters: a mean vector and a covariance matrix,
 which needs to be calculated.\newline
@@ -511,8 +500,6 @@ and a covariance matrix by:
 \begin{equation}
     \hat C = \sum_{vec X} Pr(\vec X) (\vec X - \mu) (\vec X - \mu)^T
 \end{equation}
-\newline
-
 
 In the case, that probability is not a direct likelihood of given point, but a conditional probability of emitting the signal,
 (i.e. under the condition that it belongs to given sequence), the probabilities need to be normalized first. \newline
@@ -534,10 +521,10 @@ Expected-Maximization method is a technique for estimating parameters of any und
     argmax_{\theta} Pr(X | \theta)
 \end{equation}
 
-For certain distributions, parameters, that maximize likelihood of the data, can be solved with analytic methods, i.e. calculated mean vector and variance are parameters to normal distribution, that do maximize the likelihood of observing the training data (see apendix A).  Similarly can be done for many other distributions, including multivariate normal distribution. \newline
+For certain distributions, parameters, that maximize likelihood of the data, can be solved with analytic methods, i.e. calculated mean vector and variance are parameters to normal distribution, that do maximize the likelihood of observing the training data (see appendix A.1).  Similarly can be done for many other distributions, including multivariate normal distribution. \newline
 
-\newpage
-It is not always the case, that one can calculate parameters so easily, i.e. mixture models of several populations may not give up so easily.
+It is not always the case, that one can calculate parameters so easily, i.e. mixture models of several populations may not give up so easily. Since we have several phonemes, that we would like to model, such a technique may come in handy. I show here an example application of this technique on mixture model, however I use different variants of the method quite frequently (see chapter 6 and 7), and generally it is quite popular, i.e. it is used in Sphinx library (see chapter 5). \newline
+
 Let's consider a mixture of Gaussian models of some populations. We have a random population, where each point is randomly drawn from each distribution. 
 So the total likelihood of any point is: $\sum_{i=0}^N p_i f_i(x)$, where $p_i$ is a probability of drawing a point from ith distribution and $f_i$ is a density function of ith model. \newline
 
@@ -545,9 +532,9 @@ Since each model from a mixture is easily solvable, if we knew to which model ea
 or at least if we knew what is the probability, that given point was drawn from each given class (see chapter about Gaussian model). \newline
 On the other hand it would be simple to calculate a probability, that a point was drawn from some distribution if we knew all the parameters of all models. \newline
 
+\newpage
 
 The Expected-Maximization technique deals with this problem, by finding better parameters using their previous estimation, and thus by iterating over series of converging estimates it is guaranteed to find some local maximum. \newline
-
 
 \begin{equation}
     Q(\Theta^i,\Theta^{ i-1})= E[log Pr(\chi, \Upsilon | \Theta) | \chi, \Theta^{i-1}]
@@ -574,104 +561,6 @@ For example a mixture model \footnote{A sum  of several distributions} can be tr
 \end{itemize}
 
 \newpage
-\subsection{Hidden Markov Model}
-
-We can describe an HMM by a triple:
-\begin{equation}
-    \lambda=(A, B, \pi)
-\end{equation}
- where $A$ is a transition matrix $A = \{ a_{ij} \} = p(Q_t=j | Q_{t-1}=i)$, \newline
- $B$ is a probability function vector $B = \{ b_i \}$, where each $b_i$ is a function calculating likelihood that a given observation \footnote{a visible point of data we would like to model, an output token of HMM} $Q_t$ is produced by state $i$, \newline
- and $\pi$ is an initial state distribution  $\pi_i=P(Q_1=i)$ \newline
-
-For our purpose a $B$ functions will be a Gaussian multivariate distribution of observations emitted by a state. \newline
-
-The most probable state sequence for given sequence of observations can be calculated using dynamic programming (i.e. Viterbi algorithm [30]). \newline
-The algorithm iterates over the discrete time indexes $t_1, ..., t_n$, where at each moment only one observation $Q_{t_k}$ is emitted. \newline
-
-The k-th iteration produces a vector o probabilities $P_k=[p_1, ..., p_m]$ of the best state sequence ending at a state $i$ at the moment $t_k$.
-For the initial moment the vector is equal to state intial probabilities $\pi$. \newline
-
-The $P_{k+1}$ is calculated as follows:
-\begin{equation}
-    P_{k+1, i} = max(P_{k, j} a_{j, i} b_i(Q_{k+1}))
-\end{equation}
-where $a_{j, i}$ is a probability of transition from state $j$ to state $i$, \newline
-and $b_i(Q_{k+1})$ is probability, that state $i$ emitted observation $Q_{k+1}$. \newline
-
-At the end a maximum probability from elements of $P_n$ gives us a probability of observing the sequence with the maximum likelihood for given sequence of observations. \newline
-
-To find actual sequence of states, we can keep a state for which a maximum was produced at each moment $t_k$ and state $i$ and then recreate the maximum likelihood path.
-
-\newpage
-\subsection{Baum Welch algorithm}
-
-To train Hidden Markov Models we have to use a generalized version of EM algorithm, namely a Baum-Welch algorithm. \newline
-In the training of HMM we have observed data $X$ and we want to find parameters set $\theta$, which will maximize the probability of observing $X$, meaning:
-\begin{equation}
-    argmax_\theta(Pr(X | \theta)))
-\end{equation}
-
-If we knew what was the sequence of states in the HMM, we would be able to calculate optimal value of $\theta$ parameters. However we don't know, what the states of HMM were, hence hidden in the name. On the other hand if we knew $\theta$, then we could easily calculate sequence of states, which would maximize the probability of emitting input observations (i.e. using Viterbi algorithm). \newline
-
-EM technique is meant for such a situations. \newline
-
-In the EM spirit, for each iteration we will perform two steps, bringing us to some local maximum: \newline
-\begin{description}
-    \item[expectation step]
-	Given previous estimation of parameters $\theta$, we calculate the probabilities of being at any time $t$ and at any state $i$: $Pr(s_i, t)$
-    \item[maximization step]
-	Given probabilities of being at any state $i$, we calculate next estimation of $\theta$ parameters, which will maximize the likelihood of observing $X$: $argmax_\theta(Pr(X | \theta))$.
-\end{description}
-
-How can we calculate $\theta = \{A, B\}$ parameters? \newline
-Where:
-\begin{description}
-    \item[A =] transition probabilities (probability of transition between any two states)
-	\item[B =] observation probabilities (probability of observing any data at any given time)
-\end{description}
-
-To calculate observation probabilities, we need:
-\begin{equation}
-    \alpha_i(t) = Pr(\text{being after $\boldsymbol{t}$ steps at state $\boldsymbol{i}$})
-\end{equation}
-\begin{equation}
-    \beta_i(t) = Pr(\text{ending sequence $\boldsymbol{|}$ being after $\boldsymbol{t}$ steps at state $\boldsymbol{i}$})
-\end{equation}
-
-Both of these values can be calculated using dynamic programming. One is calculated by Viterbi's algorithm in forward passage, the other can be calculated in similar manner by backward passage.
-
-\newpage
-
-Combining these values, we can obtain:
-
-\begin{equation}
-    Pr(\text{being at time $\boldsymbol{t}$ at state $\boldsymbol{i}$}) = \frac {\alpha_i(t)\beta_i(t)} {\sum_{j=1}^{N} \alpha_j(t)\beta_j(t) }
-\end{equation}
-	
-and:
-	
-\begin{equation}
-    Pr(\text{transition between states $\boldsymbol{i}$ and $\boldsymbol{j}$ at time $\boldsymbol{t}$}) = \frac {\alpha_i(t)a_{ij}\beta_j(t + 1)b_j(o_{t+1})} {\sum_{i=1}^{N} \sum_{j=1}^{N} \alpha_i(t)a_{ij}\beta_j(t + 1)b_j(o_{t+1})}
-\end{equation}
-
-Probability of transition from states i to state j at any given time is:
-	
-\begin{equation}
-    Pr(\text{transition $\boldsymbol{i}$ $\boldsymbol{j}$}) = \frac {\sum_{t=1}^{T-1} Pr(\text{transition between states $\boldsymbol{i}$ $\boldsymbol{j}$ at time $\boldsymbol{t}$})} {\sum_{t=1}^{T-1} Pr(\text{being at time $\boldsymbol{t}$ at state $\boldsymbol{i}$}) }
-\end{equation}
-	
-
-The probability of being at time $t$ at state $i$ can be used to calculated new probabilities of emitting observation $o_t$ at time $t$ by a state $i$,
-since it is emitted by the state with a probability of being at this state at this time. \newline
-
-New parameters of multivariate normal distribution would be:
-\begin{equation}
-    \vec \mu = \frac 1 T \sum_{t=1}^{T} Pr(\text{being at time $\boldsymbol{t}$ at state $\boldsymbol{i}$}) \vec o_t
-\end{equation}
-\begin{equation}
-    \tilde C = \frac 1 T \sum_{t=1}^{T} Pr(\text{being at time $\bold{t}$ at state $\bold{i}$})(\vec o_t - \vec \mu) \cdot (\vec o_t - \vec \mu)^T
-\end{equation}
 
 
 \newpage
@@ -938,7 +827,7 @@ In this case the detected speech parts contained more silence frames and consequ
 
 Audio based alignment is simplified problem of speech recognition. Usually in speech recognition the language consist of millions of words in different inflection, which may create many different sentences. In audio alignment we expect only one text and only one sentence at the time. \newline
 
-Usually speech recognition is based on trained Hidden Markov Models with Gaussian Phoneme models, although successful systems rarely rely on a single state phoneme model. \newline
+Usually speech recognition is based on trained Hidden Markov Models (see appendices A.3 and A.4) with Gaussian Phoneme models, although successful systems rarely rely on a single state phoneme model. \newline
 As I mentioned before (3.1) there are many different allophones of single phoneme. A variations are largely attributed to surrounding they are spoken in. For example in Polish there are softening phonemes 'i' and 'j', that clearly change how preceding or succeeding phonemes are realized (i.e. softened allophones of 'p', 'b', 'f', 'v', 'm', which rarely are treated as separate phonemes). There are lot of classified allophones for Polish language, which may come either from foreing influence, historical pronunciation or other reasons, and we expect, that machines can find much more of such. \newline
 And almost never one can cleanly separate two consecutive phones. \newline
 
@@ -955,7 +844,7 @@ Another bad news is, that a model trained on news feeds, is expected to perform 
 
 Once we have our audio model, than speech recognition is an easy piece, isn't it? \newline
 Not really, since so many possible and often similar words make it a hard problem. Rarely a speech recognition software is based solely on audio model to recognize a sequence of phonemes. \newline
-Problem is, that the number of states is too huge in order to be processed exhaustively, even though we can use a Viterbi algorithm to find a best (most probable) sequence of states for given observation sequence and we keep results only for a present moment in time (a single frame), that still gives a huge number
+Problem is, that the number of states is too huge in order to be processed exhaustively, even though we can use a Viterbi algorithm (see appendix A.3) to find a best (most probable) sequence of states for a given observation sequence and we keep results only for a present moment in time (a single frame), that still gives a huge number
 of kept states with calculated score. \newline
 
 The sphinx library deals with this problem by searching in a breadth first search manner (meaning that it will keep states only from a current moment) and to cut on number of states to process, a priority queue is used, which keeps only best scoring ones. \newline
@@ -1415,10 +1304,10 @@ My final conclusion is that, regardless of some mismatches, it is a quite nice m
 
 I would like to use the word alignment obtained from previous chapter and create an alignment with phoneme granularity. For this purpose I would like to use a trained Russian audio model and align (for each word) a Russian phoneme represantation. After that, I would like to use the same word alignment to train my own audio model from the recording and use it again for phoneme alignment, this time using my experimental, Polish phoneme set. \newline
 
-Audio model is a trained Hidden Markov Model for each phoneme in a context of neighbouring phonemes or for all occurences of the phoneme with no context. Each HMM contains three states with transition table and probabilities of each transition as well as a set of normal distribution at each state, to calculate emission probability of observations (audio frames). \newline
+Audio model is a trained Hidden Markov Model (see appendices A.3 and A.4) for each phoneme in a context of neighbouring phonemes or for all occurences of the phoneme with no context. Each HMM contains three states with transition table and probabilities of each transition as well as a set of normal distribution at each state, to calculate emission probability of observations (audio frames). \newline
 By merging together phoneme models we get an HMM for whole input text. Of course first we need convert this text to sequence of phonemes and then to sequence of HMMs, but this can be achieved similarly as in chapter 5. \newline
 
-Having HMM we can calculate the best possible sequence of states (using Viterbi algorithm) and all audio frames assigned to states from a single phoneme HMM should form together a single allophone of the phoneme. After that it just matter of calculating initial and ending time for each such a phone to produce an alignment. \newline
+Having HMM we can calculate the best possible sequence of states (using Viterbi algorithm - appendix A.3) and all audio frames assigned to states from a single phoneme HMM should form together a single allophone of the phoneme. After that it just matter of calculating initial and ending time for each such a phone to produce an alignment. \newline
 
 In my experiments I tried to do exactly this, however I've noticed that:
 \begin{itemize}
@@ -2098,7 +1987,8 @@ https://bitbucket.org/Heappl/speechtextmatcher.
 
 \newpage
 \begin{appendices}
-\section{Calculating parameters for single variable normal distribution}
+\section{Phoneme modelling}
+\subsection{Calculating parameters for single variable normal distribution}
 We can calculate a derivative of normal density function to show it:
 \begin{multline}
     ln(\prod_{x in X} (\frac 1 {\sqrt{2\pi\sigma^2}} e^{\frac{-(x-\mu)^2}{2\sigma^2}}))d\mu  = \sum_{x \in X}[\frac{-1} 2 ln(2\pi)-ln(\sigma)- \frac{(x-\mu)^2} {2 \sigma^2} ]d\mu = ... \\
@@ -2117,7 +2007,7 @@ what is a definition of a mean. \newline
 what is a definition of variance and a standard deviation is a square root of variance. \newline
 
 \newpage
-\section{Covariance matrix properties}
+\subsection{Covariance matrix properties}
 Covariance matrix is always symmetric and positive-semidefinitive.\newline
 Symmetry comes directly from a definition: $cov(X) = E[(X - E(X))(X - E(X))^T]$, since outer product of a single vector gives always a symmetric matrix. \newline
 
@@ -2132,7 +2022,105 @@ A product with any vector $a$ and a covariance matrix is also equal to:
 \end{equation}
 and each element of the sum is square of inner product of two vectors, so it is always positive (or equal to zero). \newline
 
+\newpage
+\subsection{Hidden Markov Model}
 
+We can describe an HMM by a triple:
+\begin{equation}
+    \lambda=(A, B, \pi)
+\end{equation}
+ where $A$ is a transition matrix $A = \{ a_{ij} \} = p(Q_t=j | Q_{t-1}=i)$, \newline
+ $B$ is a probability function vector $B = \{ b_i \}$, where each $b_i$ is a function calculating likelihood that a given observation \footnote{a visible point of data we would like to model, an output token of HMM} $Q_t$ is produced by state $i$, \newline
+ and $\pi$ is an initial state distribution  $\pi_i=P(Q_1=i)$ \newline
+
+For our purpose a $B$ functions will be a Gaussian multivariate distribution of observations emitted by a state. \newline
+
+The most probable state sequence for a given sequence of observations can be calculated using dynamic programming (i.e. Viterbi algorithm [30]). \newline
+The algorithm iterates over the discrete time indexes $t_1, ..., t_n$, where at each moment only one observation $Q_{t_k}$ is emitted. \newline
+
+The k-th iteration produces a vector o probabilities $P_k=[p_1, ..., p_m]$ of the best state sequence ending at a state $i$ at the moment $t_k$.
+For the initial moment the vector is equal to state intial probabilities $\pi$. \newline
+
+The $P_{k+1}$ is calculated as follows:
+\begin{equation}
+    P_{k+1, i} = max(P_{k, j} a_{j, i} b_i(Q_{k+1}))
+\end{equation}
+where $a_{j, i}$ is a probability of transition from state $j$ to state $i$, \newline
+and $b_i(Q_{k+1})$ is probability, that state $i$ emitted observation $Q_{k+1}$. \newline
+
+At the end a maximum probability from elements of $P_n$ gives us a probability of observing the sequence with the maximum likelihood for a given sequence of observations. \newline
+
+To find actual sequence of states, we can keep a state for which a maximum was produced at each moment $t_k$ and state $i$ and then recreate the maximum likelihood path.
+
+\newpage
+\subsection{Baum Welch algorithm}
+
+To train Hidden Markov Models we have to use a generalized version of EM algorithm, namely a Baum-Welch algorithm. \newline
+In the training of HMM we have observed data $X$ and we want to find parameters set $\theta$, which will maximize the probability of observing $X$, meaning:
+\begin{equation}
+    argmax_\theta(Pr(X | \theta)))
+\end{equation}
+
+If we knew what was the sequence of states in the HMM, we would be able to calculate optimal value of $\theta$ parameters. However we don't know, what the states of HMM were, hence hidden in the name. On the other hand if we knew $\theta$, then we could easily calculate sequence of states, which would maximize the probability of emitting input observations (i.e. using Viterbi algorithm). \newline
+
+EM technique is meant for such a situations. \newline
+
+In the EM spirit, for each iteration we will perform two steps, bringing us to some local maximum: \newline
+\begin{description}
+    \item[expectation step]
+	Given previous estimation of parameters $\theta$, we calculate the probabilities of being at any time $t$ and at any state $i$: $Pr(s_i, t)$
+    \item[maximization step]
+	Given probabilities of being at any state $i$, we calculate next estimation of $\theta$ parameters, which will maximize the likelihood of observing $X$: $argmax_\theta(Pr(X | \theta))$.
+\end{description}
+
+How can we calculate $\theta = \{A, B\}$ parameters? \newline
+Where:
+\begin{description}
+    \item[A =] transition probabilities (probability of transition between any two states)
+	\item[B =] observation probabilities (probability of observing any data at any given time)
+\end{description}
+
+To calculate observation probabilities, we need:
+\begin{equation}
+    \alpha_i(t) = Pr(\text{being after $\boldsymbol{t}$ steps at state $\boldsymbol{i}$})
+\end{equation}
+\begin{equation}
+    \beta_i(t) = Pr(\text{ending sequence $\boldsymbol{|}$ being after $\boldsymbol{t}$ steps at state $\boldsymbol{i}$})
+\end{equation}
+
+Both of these values can be calculated using dynamic programming. One is calculated by Viterbi's algorithm in forward passage, the other can be calculated in similar manner by backward passage.
+
+\newpage
+
+Combining these values, we can obtain:
+
+\begin{equation}
+    Pr(\text{being at time $\boldsymbol{t}$ at state $\boldsymbol{i}$}) = \frac {\alpha_i(t)\beta_i(t)} {\sum_{j=1}^{N} \alpha_j(t)\beta_j(t) }
+\end{equation}
+	
+and:
+	
+\begin{equation}
+    Pr(\text{transition between states $\boldsymbol{i}$ and $\boldsymbol{j}$ at time $\boldsymbol{t}$}) = \frac {\alpha_i(t)a_{ij}\beta_j(t + 1)b_j(o_{t+1})} {\sum_{i=1}^{N} \sum_{j=1}^{N} \alpha_i(t)a_{ij}\beta_j(t + 1)b_j(o_{t+1})}
+\end{equation}
+
+Probability of transition from states i to state j at any given time is:
+	
+\begin{equation}
+    Pr(\text{transition $\boldsymbol{i}$ $\boldsymbol{j}$}) = \frac {\sum_{t=1}^{T-1} Pr(\text{transition between states $\boldsymbol{i}$ $\boldsymbol{j}$ at time $\boldsymbol{t}$})} {\sum_{t=1}^{T-1} Pr(\text{being at time $\boldsymbol{t}$ at state $\boldsymbol{i}$}) }
+\end{equation}
+	
+
+The probability of being at time $t$ at state $i$ can be used to calculated new probabilities of emitting observation $o_t$ at time $t$ by a state $i$,
+since it is emitted by the state with a probability of being at this state at this time. \newline
+
+New parameters of multivariate normal distribution would be:
+\begin{equation}
+    \vec \mu = \frac 1 T \sum_{t=1}^{T} Pr(\text{being at time $\boldsymbol{t}$ at state $\boldsymbol{i}$}) \vec o_t
+\end{equation}
+\begin{equation}
+    \tilde C = \frac 1 T \sum_{t=1}^{T} Pr(\text{being at time $\bold{t}$ at state $\bold{i}$})(\vec o_t - \vec \mu) \cdot (\vec o_t - \vec \mu)^T
+\end{equation}
 
 \end{appendices}
 \end{document}
