@@ -35,11 +35,11 @@ that is well known and understood, and is mentioned in many different papers reg
 The chapter 4 is exploring a simple approach with minimal knowledge, that produces very crude results. The minimum knowledge here is enough reason to bring it up, but I also found some another application for this imperfect solution. \newline
 
 Next two chapters are exploring a possibility of using audio models from foreign languages to achieve alignment with satisfying accuracy.
-The keynote of this part of thesis is a study of similarities between languages and their phonetics. I present here not only my own algorithms, but also certain parts of sphinx library, which I used: including tool for alignment problem using preprocessed audio model and dictionary, and in other case state scorers from trained English and Russian models. \newline
+The keynote of this part of the thesis is a study of similarities between languages and their phonetics. I present here not only my own algorithms, but also certain parts of sphinx library, which I used: including tool for alignment problem using preprocessed audio model and dictionary, and in other case state scorers from trained English and Russian models. \newline
 
 The chapter 7 combines conclusions and knowledge of previous chapters to study what can be done without any trained models and what knowledge is enough to align text for practical applications. \newline
 
-In the end I'm trying to show a small application of all presented solutions and show the results in more practical manner. \newline
+In the end I'm trying to show a small application of all presented solutions and show the results in a more practical manner. \newline
 
 I try to approach this topic with a hackish scientific curiosity. The problem is presented, but I try to check what can be done if I redefine it in various configurations. I don't focus purely on results, because they are not as interesting as exploration of the area just to see what is there. \newline
 
@@ -49,7 +49,7 @@ I try to approach this topic with a hackish scientific curiosity. The problem is
 \end {center}
 \subsection{Human factor}
 
-Speech is a most efficient way for the humans to communicate. For generations this process was refined by evolution, so we can easily exchange messages even in noisy environment. For this purpose our vocal mechanisms must well cooperate with our hearing ability. There is a certain set of sounds we can produce and our ears evolved to hear them as well as possible.\newline 
+Speech is a most efficient way for the humans to communicate. For generations this process was refined by evolution, so we can easily exchange messages even in a noisy environment. For this purpose our vocal mechanisms must well cooperate with our hearing ability. There is a certain set of sounds we can produce and our ears evolved to hear them as well as possible.\newline 
 
 What is sound? According to dictionary: "Vibrations transmitted through an elastic solid or liquid or gas, with frequencies in the approximate range of 20 to 20000 hertz, capable of being detected by human organs of hearing". [1]\newline
 
@@ -61,7 +61,7 @@ Humans can hear frequencies, that begins as low as 12Hz (under laboratory condit
 \begin{figure}[hb]
     \centering
     \includegraphics[scale=0.5]{speech_range.jpg}
-    \caption[]{Speech range from [3] \emph{Fundamentals of speech recognition}}
+    \caption[]{Speech range from \emph{Fundamentals of speech recognition} [3]}
 \end{figure}
 
 
@@ -93,7 +93,7 @@ In this project we use a mel scale implemented in the sphinx library, although t
 \newpage
 \subsection{Frequency spectrum}
 
-The conclusion from the anatomy of human ear is, that frequencies of the sound are important.
+The conclusion from the anatomy of a human ear is that frequencies of the sound are important.
 How can we obtain a frequency spectrum from a digitized sound, so we can proceed further? \newline
 The obvious tool for conversion of a discrete function to frequencies is Discrete Fourier Transform, named after Jean Baptiste Joseph Fourier it is one of the most often used techniques of modern times. \newline
 
@@ -101,7 +101,7 @@ It all started a the postulate, that a heat equation can be satisfied by functio
 \begin{equation}
     f(x)=\sum_{n=0}^N(A_n cos(nx) + B_n sin(nx))
 \end{equation}
-or in complex form:
+what resulted with a question about representation of a function in a complex form:
 \begin{equation}
     f(\theta)=\sum_{n=-\infty}^{\infty} C_n e^{i n \theta}
 \end{equation}
@@ -125,7 +125,7 @@ So far we haven't found any use in the speech recognition for a phase part of th
 \end{equation}
 
 \newpage
-A sample conversion:
+On figure 3 we can see sample functions and the result of Fourier Transform applied to them.
 \begin{figure}[hb]
     \centering
     \includegraphics[scale=0.3]{sample_dft_conversion.jpg}
@@ -158,7 +158,7 @@ A plot of human speech signal in a frequency domain, which shows powers of signa
 \begin{figure}[hb]
     \centering
     \includegraphics[scale=0.5]{speech_spectrogram.jpg}
-    \caption[]{Example speech signal from [3] \emph{Fundamentals of speech recognition}}
+    \caption[]{Example speech signal from \emph{Fundamentals of speech recognition} [3]}
 \end{figure}
 
 \newpage
@@ -172,7 +172,7 @@ For example a cepstrum of an echoed signal in the picture below shows clearly a 
 \begin{figure}[hb]
     \centering
     \includegraphics[scale=0.4]{echo_cepstrum.jpg}
-    \caption[]{Cepstrum of signal with echo from [12] \emph{The Quefrency Alanysis of Time Series for Echoes}}
+    \caption[]{Cepstrum of signal with echo from \emph{The Quefrency Alanysis of Time Series for Echoes} [12]}
 \end{figure}
 
 
@@ -239,7 +239,7 @@ In the example with an echo (fig.7) a cepstrum of signal have clear peaks, which
 
 
 Sphinx is a speech recognition toolkit with a lot of useful functionalities for any speech related problem.  \newline
-The main feature of Sphinx library is a speech recognition using input audio model and dictionary. However it is a modular and open source library,
+The main feature of Sphinx library is an ability of speech recognition using input audio model and dictionary. However it is a modular and open source library,
 so it is easy to use any part inside different projects, like signal preprocessing (fronted part). In addtion there are some example tools, that can be used separately, like
 for example audio model based aligner. \newline
 
@@ -319,7 +319,7 @@ The given filters should look like in the picture:
 \begin{figure}[hb]
     \centering
     \includegraphics[scale=0.4]{mel_filters.jpg}
-    \caption[]{Melody filters from [3] \emph{Fundamentals of speech recognition}}
+    \caption[]{Melody filters from \emph{Fundamentals of speech recognition} [3]}
 \end{figure}
 
 Not all frequencies are covered by the filters.
@@ -375,7 +375,7 @@ A phone is a unit of speech sound [20]. Phoneme's definition is: "The smallest c
 Language grapheme set usually differs from it audio counterparts, although it does depend on, which language are we talking about. English seems to differ quite a lot, while Italian not so much, what seems to be related to adoption of Latin alphabet. Polish grapheme and phoneme sets are quite similar, although there are some differences. Usually the grapheme set contains more characters than needed to represent every word from a given language and at the same time it is much too small to represent all the nuances of human speech. What is more problematic, the word graphic representation sometimes has very little to do with actual phones of the word. I.e. there are so called homographes: words, that are written the same yet they pronunciation differs ("zamarzać" from "marznąć" and "morzyć") or homophones, that look differently, but are pronounced similar ("może", "morze"). In polish though, the former is quite rare and this fact is actually used by me (chapter 5.3). \newline
 
 
-Actual phones that are classified under single phoneme create a diversified family.  Different variants of a phoneme are called allophones. For example /l/ in English "leap" and "deal" or polish examples of allophones (/ł/ in "umysł" might be soundless contrary to "ławka") or vowels between soft consonants (/a/ in "jajko"). [22] Note, that if two phonemes never occur in similar context, than they may actually be treated as two allophones of the same phoneme. I.e. in Polish language there is no such a context, that both phonemes 'j' and 'ń' share. Consequently, even though they are quite different, they can be treated as one. \newline
+Actual phones, that are classified as a single phoneme, make a diversified family.  Different variants of a phoneme are called allophones. For example /l/ in English "leap" and "deal" or polish examples of allophones (/ł/ in "umysł" might be soundless contrary to "ławka") or vowels between soft consonants (/a/ in "jajko") [22], or an example, where two allophones can be easily recognized, in the word "koński": 'ń' before 's' has  to allophones: 'ń' and '\~{\j}', which is a nasal 'j'. \newline
 
 The phones can differ quite substantially depending on the surrounding. For example almost each phoneme in Polish changes to softer version when put next to /i/ or /j/, although sometimes the change is so substantial, that we no longer talk about allophone, but a completely separate phoneme ('ć' $\iff$ 'c', in contrast to vowels' changes). Notice, that the choice of extracting allophone to a completely new phoneme is all about checking, if leaving it as it is, won't create a situation, where we are unable to distinguish two words with different meaning (see phoneme definition).
 Additionally consecutive phones are not necessarily separated by clearly visible moment of silence. Often one phone is converting slowly into another. To model such transitions, each middle phoneme of all triphones (sequence of three phonemes) are modelled seperately and stored with a context (neighborhood). \newline
@@ -388,7 +388,7 @@ Some of English phonemes and example phones:
     \centering
     \includegraphics[height=8.7cm, width=13cm]{example_phones_1.jpg}
     \includegraphics[height=8.7cm, width=13cm]{example_phones_2.jpg}
-    \caption[]{Example phones from [3] \emph{Fundamentals of speech recognition}}
+    \caption[]{Example phones from \emph{Fundamentals of speech recognition} [3]}
 \end{figure}
 
 \newpage
@@ -401,7 +401,7 @@ To calculate a distance we could use various norms:
 \begin{equation}
     ||x||_1 , || x ||_2, ... , || x ||_\infty
 \end{equation}
-, where 
+where 
 \begin{equation}
     ||x||_k = (\sum_{i=0}^{N} x_i^k)^\frac{1}{k}
 \end{equation}
