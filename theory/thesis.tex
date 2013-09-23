@@ -375,7 +375,7 @@ A phone is a unit of speech sound [20]. Phoneme's definition is: "The smallest c
 Language grapheme set usually differs from it audio counterparts, although it does depend on, which language are we talking about. English seems to differ quite a lot, while Italian not so much, what seems to be related to adoption of Latin alphabet. Polish grapheme and phoneme sets are quite similar, although there are some differences. Usually the grapheme set contains more characters than needed to represent every word from a given language and at the same time it is much too small to represent all the nuances of human speech. What is more problematic, the word graphic representation sometimes has very little to do with actual phones of the word. I.e. there are so called homographes: words, that are written the same yet they pronunciation differs ("zamarzać" from "marznąć" and "morzyć") or homophones, that look differently, but are pronounced similar ("może", "morze"). In polish though, the former is quite rare and this fact is actually used by me (chapter 5.3). \newline
 
 
-Actual phones, that are classified as a single phoneme, make a diversified family.  Different variants of a phoneme are called allophones. For example /l/ in English "leap" and "deal" or polish examples of allophones (/ł/ in "umysł" might be soundless contrary to "ławka") or vowels between soft consonants (/a/ in "jajko") [22], or an example, where two allophones can be easily recognized, in the word "koński": 'ń' before 's' has  to allophones: 'ń' and '\~{\j}', which is a nasal 'j'. \newline
+Actual phones, that are classified as a single phoneme, make a diversified family.  Different variants of a phoneme are called allophones. For example /l/ in English "leap" and "deal" or polish examples of allophones (/ł/ in "umysł" might be soundless contrary to "ławka") or vowels between soft consonants (/a/ in "jajko") [22], or an example, where two allophones can be easily recognized, in the word "koński": 'ń' before 's' has  to allophones: 'ń' and '\~{\j}', which is a nasal 'j', nevertheless since there are no two contexts, where both 'ń' and '\~{\j}' create different words, they are treated as a single phoneme. \newline
 
 The phones can differ quite substantially depending on the surrounding. For example almost each phoneme in Polish changes to softer version when put next to /i/ or /j/, although sometimes the change is so substantial, that we no longer talk about allophone, but a completely separate phoneme ('ć' $\iff$ 'c', in contrast to vowels' changes). Notice, that the choice of extracting allophone to a completely new phoneme is all about checking, if leaving it as it is, won't create a situation, where we are unable to distinguish two words with different meaning (see phoneme definition).
 Additionally consecutive phones are not necessarily separated by clearly visible moment of silence. Often one phone is converting slowly into another. To model such transitions, each middle phoneme of all triphones (sequence of three phonemes) are modelled seperately and stored with a context (neighborhood). \newline
@@ -396,6 +396,13 @@ Some of English phonemes and example phones:
 
 The simplest way to find similar audio sequence is to find a sequence which is nearby to another,
 that we know represents a certain sound, phoneme or word. [16] \newline
+The example application of the distances presented below would be to classify frames from some audio stream as phonemes:
+\begin{itemize}
+    \item Let's assume, that we have a training set of audio frames, that are assigned to different phonemes (and silence maybe).
+    \item We would like to classify frames from a completely different audio stream as phonemes.
+    \item By calculating a distance from each frame to each phoneme set, we can find the nearest set. The set's phoneme will be the one, we assign to the input frame.
+\end{itemize}
+The distance between set of points and a single point can be calculated either by calculating distance from a centroid of the set or an average of all distances between the point and all elements from the set. \newline
 
 To calculate a distance we could use various norms:
 \begin{equation}
@@ -410,15 +417,17 @@ All such norms are fine for uncorrelated vectors, which is really not the case w
 
 
 For correlated vectors, we could try to introduce some weighting factor inside.\newline
-What factor should we use?\newline
+What factor should we use?
+
+\newpage
 One approach is to tune the factors using external methods, which theoretically may give us some additional benefit of properly modelling phonemes, that we try to measure distance from, however this is a bit out of the scope of this chapter and most probably would in the end look similar to a different method.
-A simpler approach would be to calculate correlations and use them in a distance measure.
+A simpler approach would be to calculate correlations between populations (frequencies magnitudes or signal features) and use them in a distance measure.
 If we had a correlation matrix ($P$), than our distance could be:
 \begin{equation}
     dist_{\text{using correlations}}(\vec x, \vec p) = (\vec x - \vec p)^T P^{-1} (\vec x - \vec p)
 \end{equation}
                
-Karl Pearson introduced such an idea [23] in form of correlation coefficient defined between two random populations:  
+Karl Pearson introduced such an idea [23] in a form of correlation coefficient defined between two random populations:  
 \begin{equation}
     \rho_{XY} = \frac{cov(X, Y)}{\sigma_X \sigma_Y} = \frac{E[(X - \mu_X)(Y - \mu_Y)]}{\sigma_X \sigma_Y}
 \end{equation}
@@ -436,9 +445,8 @@ By removing them we obtain so called Mahalanobis distance [16]:
     distance_{Mahalanobis}(\vec x, \vec p) = (\vec x - \vec p)^T \tilde C^{-1} (\vec x - \vec p)
 \end{equation}
 
-If we knew elements belonging to any given phoneme, we could calculate a distance between this training sample and any encountered speech signal.
+Mahalanobis distance would be a perfect choice for the example application from above. The covariance matrix here, would be a matrix of covariances of the points belonging to the single phoneme set. However the problem is to get an initial training set with assigned phonemes.
 
-\newpage
 \newpage
 \subsection{Experiments}
 
@@ -452,9 +460,9 @@ The idea behind these experiments, was to see if similarities in speech can be f
 In theory if we could match similar sequences, than maybe we could derive from the matching a phoneme set (with example phones), that could be used in further studies. \newline
 In both experiments different distance measures were used, to see how helpful they are at separating different phonemes. \newline
 
-In first experiment I chose some long word, that occured more then once in the text. Then I'll estimated the times it should appear in the speech and then for quite large areas (which was more or less of $O(\sqrt{total \: \: time})$ in size) around the estimated time, I searched for the most similar sequences either with a speech signal in form of feature vectors described earlier, or a vector of frequencies magnitudes. \newline
+In first experiment I chose some long word, that occured more then once in the text. Then I'll estimated the times it should appear in the speech and then for quite large areas (which was more or less of $O(\sqrt{total \: \: time})$ in size) around the estimated time, I searched for the most similar sequences either with a speech signal in a form of feature vectors described earlier, or a vector of frequencies magnitudes. \newline
 This experiment was an utter failure, since it always found two familiar sequences, that were in no way familiar in a speech sense.
-However I also tried to see how it behaved with marked one occurence of the word, and then it was actually able to find other occurences, ... sometimes. \newline
+However I also tried to see how it behaved with marked one occurence of the word, and then it was actually able to find other occurences, ... in one case out of five. \newline
 
 In the second experiment I picked first three letters of the text and a portion of detected speech, which suppose to be aligned together. I found all occurences of the letters and then I proceded in similar manner, as in first experiment. I estimated time they all should appear in the recording and then I have tried to find them within a certain neighborhood of the estimated times. It wasn't a success, but I was able to find around 50\% of all occurences of the three letter sequence from the beginning of the text and other found were quite similar (80\% of the time they contained two out of three phonemes), although I was lucky, that in my testing recording, the starting three letter sequence occurrences in the text were quite far from each other, so I never searched twice the same area. \newline
 
@@ -468,7 +476,7 @@ we would like to model a distribution of emitting data point by the class. \newl
 
 
 A natural choice is a normal distribution, although we have to remember, that observation comes from a multidimensional universum, where populations are not independent. \newline
-Luckily there is a definition of multivariate normal distribution, that considers correlations:
+Luckily, there is a definition of multivariate normal distribution, that considers correlations:
 \begin{equation}
     f_x(x_1,...,x_k) = \frac{1}{\sqrt{(2\pi)^k |{\Sigma}| }}exp(-\frac{1}{2}(x-\mu)^T{\Sigma}^{-1}(x-\mu))
 \end{equation}
