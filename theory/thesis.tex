@@ -375,7 +375,7 @@ A phone is a unit of speech sound [20]. Phoneme's definition is: "The smallest c
 Language grapheme set usually differs from it audio counterparts, although it does depend on, which language are we talking about. English seems to differ quite a lot, while Italian not so much, what seems to be related to adoption of Latin alphabet. Polish grapheme and phoneme sets are quite similar, although there are some differences. Usually the grapheme set contains more characters than needed to represent every word from a given language and at the same time it is much too small to represent all the nuances of human speech. What is more problematic, the word graphic representation sometimes has very little to do with actual phones of the word. I.e. there are so called homographes: words, that are written the same yet they pronunciation differs ("zamarzać" from "marznąć" and "morzyć") or homophones, that look differently, but are pronounced similar ("może", "morze"). In polish though, the former is quite rare and this fact is actually used by me (chapter 5.3). \newline
 
 
-Actual phones, that are classified as a single phoneme, make a diversified family.  Different variants of a phoneme are called allophones. For example /l/ in English "leap" and "deal" or polish examples of allophones (/ł/ in "umysł" might be soundless contrary to "ławka") or vowels between soft consonants (/a/ in "jajko") [22], or an example, where two allophones can be easily recognized, in the word "koński": 'ń' before 's' has  to allophones: 'ń' and '\~{\j}', which is a nasal 'j', nevertheless since there are no two contexts, where both 'ń' and '\~{\j}' create different words, they are treated as a single phoneme. \newline
+Actual phones, that are classified as a single phoneme, make a diversified family.  Different variants of a phoneme are called allophones. For example /l/ in English "leap" and "deal" or polish examples of allophones (/ł/ in "umysł" might be voiceless contrary to "ławka") or vowels between soft consonants (/a/ in "jajko") [22], or an example, where two allophones can be easily recognized, in the word "koński": 'ń' before 's' has  to allophones: 'ń' and '\~{\j}', which is a nasal 'j', nevertheless since there are no two contexts, where both 'ń' and '\~{\j}' create different words, they are treated as a single phoneme. \newline
 
 The phones can differ quite substantially depending on the surrounding. For example almost each phoneme in Polish changes to softer version when put next to /i/ or /j/, although sometimes the change is so substantial, that we no longer talk about allophone, but a completely separate phoneme ('ć' $\iff$ 'c', in contrast to vowels' changes). Notice, that the choice of extracting allophone to a completely new phoneme is all about checking, if leaving it as it is, won't create a situation, where we are unable to distinguish two words with different meaning (see phoneme definition).
 Additionally consecutive phones are not necessarily separated by clearly visible moment of silence. Often one phone is converting slowly into another. To model such transitions, each middle phoneme of all triphones (sequence of three phonemes) are modelled seperately and stored with a context (neighborhood). \newline
@@ -733,7 +733,7 @@ To recreate the matching, one could iterate backwards over partial values, or as
 
 \subsection{Results}
 
-The efficiency of above method was tested versus a word alignment (obtained with method from section 5) in two ways:
+The efficiency of above method was tested versus a word alignment obtained with method from section 5, where I calculate an alignment with word granularity using trained Russian audio model. I create statistic for two different variants:
 \begin{itemize}
     \item calculate statistics for time differences 
           \subitem for a given label ($(s_j, e_j), t_i$), where $t_i$ is a sequence of words $(w_1, ..., w_k)$
@@ -767,17 +767,17 @@ The statistics are:
 \begin{itemize}
     \item time differences:
     \begin{itemize}
-        \item there were \textbf{370} chunks which time frame were within a \textbf{0.5s} difference, 
+        \item there were \textbf{370} chunks (50,7\%) which time frame were within a \textbf{0.5s} difference, 
         \item average time difference was \textbf{0.77s}
         \item standard deviation was \textbf{0.84s}
         \item maximum time difference was \textbf{11.21s}
     \end{itemize}
     \item word differences:
     \begin{itemize}
-        \item \textbf{393} chunks had \textbf{0} difference in words
-        \item \textbf{136} chunks where different by \textbf{1} word (missing or additional)
-        \item \textbf{48} different by \textbf{2} words
-        \item \textbf{56} with a difference over \textbf{5} words
+        \item \textbf{393} (53.8\%) chunks had \textbf{0} difference in words
+        \item \textbf{136} (18.9\%) chunks where different by \textbf{1} word (missing or additional)
+        \item \textbf{48} (6.6\%) different by \textbf{2} words
+        \item \textbf{56} (7.7\%) with a difference over \textbf{5} words
     \end{itemize}
     \begin{center}
         \includegraphics[scale=0.6]{length_based_results_better.jpg}
@@ -791,17 +791,17 @@ was set to \textbf{300ms}:
 \begin{itemize}
     \item time differences:
     \begin{itemize}
-        \item there were \textbf{154} chunks which time frame were within a \textbf{0.5s} difference, 
+        \item there were \textbf{154} chunks (30.6\%) which time frame were within a \textbf{0.5s} difference, 
         \item average time difference was \textbf{5.24s}
         \item standard deviation was \textbf{5.23s}
         \item maximum time difference was \textbf{37.9s}
     \end{itemize}
     \item word differences:
     \begin{itemize}
-        \item \textbf{179} chunks had \textbf{0} difference in words
-        \item \textbf{54} chunks where different by \textbf{1} word (missing or additional)
-        \item \textbf{20} different by \textbf{2} words
-        \item \textbf{56} with a difference over \textbf{10} words
+        \item \textbf{179} (35.6\%) chunks had \textbf{0} difference in words
+        \item \textbf{54} (10.7\%) chunks where different by \textbf{1} word (missing or additional)
+        \item \textbf{20} (4\%) different by \textbf{2} words
+        \item \textbf{56} (11.1\%) with a difference over \textbf{10} words
     \end{itemize}
     \begin{center}
         \includegraphics[scale=0.6]{length_based_results_worse.jpg}
@@ -1152,7 +1152,7 @@ The algorithm looks as follows:
     \item iterate over a character sequence,
     \begin{itemize}
         \item remove all candidates from $P$, that will never be a match after adding current character,
-        \item if exists such $p \in P$, that it is currently matched, set $c$ with $p$
+        \item if exists such $p \in P$, that it is currently matched, set $p$ to $c$
         \item if $P$ is empty
         \begin{itemize}
             \item for each $s$ phoneme sequence in $c$:
@@ -1217,7 +1217,7 @@ and for word "drzewo":
 \end{itemize}
 giving two alternatives of Russian and English phoneme realization. \newline
 
-I would leave here an open question if it is possible to create such a grammar for more accurate dictionaries.It might be, since phonemes are the effect of how comfortable it is to say a given sequence of phones and people are not really able to remember too complex conversion. It might be possible, that the grammar would need take into account some rare oddities, like word “one”, but there is definitely a finite number of such. In order to find such a grammar, probably a study on existing and trained dictionaries should be done, but this is out of the scope of this project.
+I would leave here an open question if it is possible to create such a grammar for more accurate dictionaries. It might be, since phonemes are the effect of how comfortable it is to say a given sequence of phones and people are not really able to remember too complex conversion. It might be possible, that the grammar would need take into account some rare oddities, like word “one”, but there is definitely a finite number of such. In order to find such a grammar, probably a study on existing and trained dictionaries should be done, but this is out of the scope of this project.
 
 \newpage
 \subsection{Audio model alignment and results.}
@@ -1382,7 +1382,7 @@ A sample of needed changes: \newline
     the additional phoneme was ignored in the matching
     \item similarly in Russian conversion I never added additional phoneme (resulting with “nn e”), and Corpora sometimes had “i” phoneme in similar situations, \newline
     as above the additional phoneme was ignored
-    \item Corpora uses actual phonetics replacing soften versions of i.e. “z”, “zh” with alternatives (“s”, “sz”) and vice-versa (hardening), \newline
+    \item Corpora uses actual phonetics replacing voiced versions of i.e. “z”, “zh” with voiceless alternatives (“s”, “sz”) and vice-versa (gaining voice), \newline
     the phonemes were considered similar and were matched against each other
     \item Corpora has separate phoneme for “ą”, “ę”, “dz”, “dż” like, but my conversions always split them into more phonemes (i.e. 'o' and 'ł', 'e' and 'ł', 'd' and 'z', 'd' and 'ż'), \newline
     my phonemes were merged into one single chunk, which was matched against testing label
@@ -1466,7 +1466,7 @@ For the chosen chunks the algorithm converts assigned text to a phoneme sequence
 Once we do this, we have quite a similar set up as in chapter 6 when I wanted to train phoneme models having word alignment. At this point I haven't changed anything and the algorithm proceeds in the same manner. \newline
 Just as before initial distributions are trained from the same crude assignment and as before the training uses a variation of EM algorithm, where estimation step is an alignment of phonemes and maximization step uses assigned frames to train the next generation of distributions. \newline
 
-The only problem with this approach is, that the aligned chunks may be quite long (several tens of seconds) and this increases the runtime of the algorithm quite substantially, so a proper upper time threshold should be chosen. Anyway it is still a better way, than perforimg the task manually.
+The only problem with this approach is, that the aligned chunks may be quite long (several tens of seconds) and this increases the runtime of the algorithm quite substantially, so a proper upper time threshold should be chosen. Anyway, it is still a better way, than perforimg the task manually.
 
 
 \newpage
@@ -1484,7 +1484,7 @@ Each two states are $s_i \neq s_j \iff i \neq j$, although two phonemes and thei
 
 Queue at my algorithm contains a fixed number $N$ of best scoring sequences ending at $N$ states. \newline
 In other words for each state $s_i$ at most one sequence is kept in a queue only and only if there are no more than $N-1$ states, for which best performing sequences ending at the states have worse score than a best score of all sequences ending at the state $s_i$. \newline
-Even simpler my queue is a map with $N$ elements, where keys are states and values are sequences, which got the best score for a state being a key so far. \newline
+Even simpler, my queue is a map with $N$ elements, where keys are states and values are sequences, which got the best score for a state being a key so far. \newline
 Each sequence added to a queue may:
 \begin{itemize}
     \item not be stored if all scores in map are greater than added sequence score
@@ -1567,7 +1567,7 @@ The problem also showed in the average time difference, which is up to 3 times b
 What do we need phoneme alignment for? For training purposes it may not be needed, since a word or sentence level tagging is quite good, although additional alignment may improve training performance and/or efficiency and maybe more elaborate methods can be proposed, that can utilize initial phoneme tagging. \newline
 There is one application, that is widely used: from train announcements through automatic reading to  blind people support systems. It is a speech synthesizer, and such, that not only can be easily understood, but also sounds human alike. People tend to dislike artificial things that resemble humans too closely, but not completely. The automatic announcement systems can't be creepy or people will feel uneasy around it and may not want to hear it at all. Personally I hate synthesized audio books, which are just so unpleasant to listen to. \newline
 
-It is nearly impossible to record all possible words at all possible forms to create well sounding synthesizer even for quite small announcement systems. An obvious alternative is to use a proper phoneme alignment to extract and combine parts from similarly sounding sentences, to produce a new form of or totally new word. \newline \newline
+It is nearly impossible to record all possible words at all possible forms and contexts to create well sounding synthesizer even for quite small announcement systems. An obvious alternative is to use a proper phoneme alignment to extract and combine parts from similarly sounding sentences, to produce a new form of or totally new word. \newline \newline
 
 \subsection{Testing application of a synthesizer}
 
