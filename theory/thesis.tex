@@ -484,19 +484,7 @@ Luckily, there is a definition of multivariate normal distribution, that conside
 where $\Sigma$ is a covariance matrix and $|\Sigma|$ is its determinant. \newline
 The problem with this vector arises, when $\Sigma$ matrix is singular, which is not invertible nor it has determinant. This can happen quite often, when the observation data is too small. \newline
 
-Covariance matrix is always symmetric and positive-semidefinitive.\newline
-Symmetry comes directly from a definition: $cov(X) = E[(X - E(X))(X - E(X))^T]$, since outer product of a single vector gives always a symmetric matrix. \newline
 
-Positive-semidefinitive matrix is a matrix, where for any product $a^T A a$ with any non-zero complex vector $a$ is real and non-negative:
-\begin{equation}
-    a^T A a >= 0
-\end{equation}
-
-A product with any vector $a$ and a covariance matrix is also equal to: 
-\begin{equation}
-    a^T \Sigma a = a^T E(XX^T) a + a^T\mu\mu^T a = \frac 1 N (\sum_{i=1}^N a^T X X^T a) + a^T\mu\mu^T a
-\end{equation}
-and each element of the sum is square of inner product of two vectors, so it is always positive (or equal to zero). \newline
 
 In order to prevent degenerate cases we can allow only positive-definite matrices. \newline
 Any such a matrix is guaranteed to be invertible. \newline
@@ -2127,5 +2115,24 @@ what is a definition of a mean. \newline
 \end{multline}
 
 what is a definition of variance and a standard deviation is a square root of variance. \newline
+
+\newpage
+\section{Covariance matrix properties}
+Covariance matrix is always symmetric and positive-semidefinitive.\newline
+Symmetry comes directly from a definition: $cov(X) = E[(X - E(X))(X - E(X))^T]$, since outer product of a single vector gives always a symmetric matrix. \newline
+
+Positive-semidefinitive matrix is a matrix, where for any product $a^T A a$ with any non-zero complex vector $a$ is real and non-negative:
+\begin{equation}
+    a^T A a >= 0
+\end{equation}
+
+A product with any vector $a$ and a covariance matrix is also equal to: 
+\begin{equation}
+    a^T \Sigma a = a^T E(XX^T) a + a^T\mu\mu^T a = \frac 1 N (\sum_{i=1}^N a^T X X^T a) + a^T\mu\mu^T a
+\end{equation}
+and each element of the sum is square of inner product of two vectors, so it is always positive (or equal to zero). \newline
+
+
+
 \end{appendices}
 \end{document}
