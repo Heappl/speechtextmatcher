@@ -1726,6 +1726,11 @@ At the end a best scoring stream is returned as a resulting synthesized audio fo
 \subsection{Results and conclusions}
 
 How does it work? It is hard create automatic test for speech synthesizing. Theoretically I could rerun word alignment to see how it would perform for synthesized speech, however the alignment works even if there are occasional mismatches between text and speech, so it doesn't really gives much, except maybe checks if there are no total misses. It poses a certain challenge to create such a test, the challenge, that I'm not necessary willing to take, since I am a bit more optimistic about total misses, especially after looking at statistics from previous chapters and in the end, the human inspection is necessary anyway to check how it actually performs. \newline
+The more systemized tests of the speech synthesizer are proposed [31], but they all require human assessment. Example tests may look as follows:
+\begin{itemize}
+    \item writing down recognized synthesized sentences by human participants and counting committed errors
+    \item subjective evaluation of naturality of synthesized speech by large number of listeners
+\end{itemize}
 
 My idea of a test is to try to synthesize various texts more or less randomly chosen and see for myself how it performs and where it behaves incorrectly. \newline
 
@@ -1964,6 +1969,7 @@ https://bitbucket.org/Heappl/speechtextmatcher.
 \bibitem{} John-Paul Hosom \emph{Speaker-Independent Phoneme Alignment Using Transition- Dependent States}
 \bibitem{} Larry Moss \emph{Example of the Baum-Welch Algorithm}
 \bibitem{} Emilio Frazzoli \emph{Principles of Autonomy and Decision Making. Lecture 21: Intro to Hidden Markov Models, the Baum-Welch algorithm}
+\bibitem{} Benjamin Picart, Thomas Drugman, Thierry Dutoit \emph{Assessing the Intelligibility and Quality of HMM-based Speech Synthesis with a Variable Degree of Articulation}
 \end{thebibliography}
 
 \newpage
