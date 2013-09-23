@@ -56,7 +56,7 @@ What is sound? According to dictionary: "Vibrations transmitted through an elast
 How do we hear? Human ear consist about 30000 hair-cells, which can convert mechanical wave of the sound into electromagnetic wave inside auditory nerves [2]. 
 Each of these cells is excited by different frequency of mechanical wave of internal ear fluids, so it is no surprise, that people can hear only a certain range of frequencies, as stated in definition. These we expect to be finely tuned to the range of the sounds we can produce. Although it seems, that we can hear a bit more, but as we don't need that, it happens, that as we grow older, our hearing range is getting smaller, because our hearing cells fail sometimes, but mostly those responsible for high frequencies, which we don't use too often.\newline
 
-Humans can hear frequencies, that begins as low as 12Hz (under laboratory conditions) to 20kHz (for adults usually much lower). However speech range is a little bit smaller than that [3]: \newline
+Humans can hear frequencies, that begins as low as 12Hz (under laboratory conditions) to 20kHz (for adults usually much lower). However speech range is a little bit smaller than that [3], as shown in the figure 1. \newline
 
 \begin{figure}[hb]
     \centering
@@ -125,7 +125,7 @@ So far we haven't found any use in the speech recognition for a phase part of th
 \end{equation}
 
 \newpage
-On figure 3 we can see sample functions and the result of Fourier Transform applied to them.
+In the figure 3 we can see sample functions and the result of Fourier Transform applied to them.
 \begin{figure}[hb]
     \centering
     \includegraphics[scale=0.3]{sample_dft_conversion.jpg}
@@ -139,7 +139,7 @@ Windows with abrupt signal discontinuities may contain spectral artefacts, so a 
    w_j = 0.54 - 0.46 cos(\frac{2 \pi j}{W - 1}) 
 \end{equation}
 where $W$ is a window size (number of frames) and $j$ is a frame number and result ($w_j$) is a scaling weight.
-The function's plot is given below:
+The function's plot is given in the figure 4.
 \begin{figure}[hb]
     \centering
     \includegraphics[scale=0.5]{hamming_window.jpg}
@@ -147,14 +147,14 @@ The function's plot is given below:
 \end{figure}
 
 \newpage
-Note that it emphasises values in the middle of the window, so our actual windows should overlap to cover whole time domain. For example by shifting a window by a percentage of it actual width:
+Note that it emphasises values in the middle of the window, so our actual windows should overlap to cover whole time domain. For example by shifting a window by a percentage of it actual width as in the figure 5.
 \begin{figure}[hb]
     \centering
     \includegraphics[scale=0.3]{window_shifting.jpg}
     \caption[]{Window shifting example from sphinx4 javadoc}
 \end{figure}
 
-A plot of human speech signal in a frequency domain, which shows powers of signal at each frequency, and a plot in a time domain: [3]
+The figure 6 shows a plot of human speech signal in a frequency domain, which shows powers of signal at each frequency, and a plot in a time domain. [3]
 \begin{figure}[hb]
     \centering
     \includegraphics[scale=0.5]{speech_spectrogram.jpg}
@@ -168,7 +168,7 @@ Looking at the frequency spectrum of human speech we see, that  the signal in th
 A cepstrum of the signal gives us this additional information. \newline
 
 The word is derived by reordering characters in the word spectrum to indicate switch of domains, similarly as word 'quefrency'. The cepstrum operates in the domain of time and the basic intuition is, that it reveals a rate of change in the different spectrum bands. 
-For example a cepstrum of an echoed signal in the picture below shows clearly a three 'quefrencies' of the echo of the signal. [12]
+For example a cepstrum of an echoed signal in the figure 7 shows clearly a three 'quefrencies' of the echo of the signal. [12]
 \begin{figure}[hb]
     \centering
     \includegraphics[scale=0.4]{echo_cepstrum.jpg}
@@ -315,7 +315,7 @@ The filters are chosen, so the result would simulate a mel-scale given by the fo
     melFreq = 2595 log(1 + linearFrequency / 700)
 \end{equation}
 
-The given filters should look like in the picture:
+The given filters should look like in the figure 9.
 \begin{figure}[hb]
     \centering
     \includegraphics[scale=0.4]{mel_filters.jpg}
@@ -355,7 +355,7 @@ cepstrum as additional features of the speech signal. It improves noticeably spe
 by adding additional information about changes in the cepstrum data. \newline
 
 For the initial cepstrum data it adds additionally twice the size vector with first and second order
-differences, calculated as shown in the picture:
+differences, calculated as shown in the figure 10.
 \begin{figure}[hb]
     \centering
     \includegraphics[scale=0.6]{deltas_calc.jpg}
@@ -383,7 +383,7 @@ Additionally consecutive phones are not necessarily separated by clearly visible
 
 Phonemes are very important in the computational language modelling, either in speech recognition or alignment. The importance is derived directly from its definition. It is a unit of speech, which can't be switched to another without changing the meaning. This is the unit, that need to be modelled if we want to recognize and/or distinguish different words. Finer granularity of model is necessary only to make a better prediction where an observed phone belongs.
 
-Some of English phonemes and example phones:
+Some of English phonemes and example phones are shown in the figure 11.
 \begin{figure}[hb]
     \centering
     \includegraphics[height=8.7cm, width=13cm]{example_phones_1.jpg}
@@ -1580,14 +1580,14 @@ Testing is relatively straightforward and requires a good ear and a bit of time.
 \subsection{Synthesizing speech with phoneme alignment}
 Speech synthesizing can be simple and hard depending on what we actually want to get in the end and how much can we invest into preparation of audio files. \newline
 
-On one end we have an easy problem of combining spoken words and phrases into sentences and the only thing we need to do, is match a silence part together. \newline
+On one end we have not so easy problem of combining spoken words and phrases into sentences and the `only' thing we need to do, is to choose words, that most naturally combine together, and then just match a silence part, so there is no sound artefact from merging words. \newline
 On the other we have a complete synthesizer, which don't have any prepared audio data and tries to produce the sound signal on it is own. It is manageable, but currently all such a synthesizers have very little in common with a human speech and sound very robotic. Synthesizing a human like speech this way at this moment is completely outside our capabilities, but we can't disprove, that it won't be possible someday, after all in theory it is “only” a matter of simulating human respiration organs. \newline
 
 Current top performing synthesizers (i.e. Ivona) are settling somewhere at the middle. Although for announcement systems (i.e. in trains) it looks like it never synthesizes single word, but all are already recorded and it only combines them into larger statements. It might be feasible in this case, but most of the time it is impractical, because of the number of words needed to be recorded by a living, breathing and wanting to be paid human. Recording of million of words would take around 7 weeks of non-stop work assuming, that recording of one word would take only a second. And that is nearly not enough, especially for languages where inflection is much more complex than in English. \newline
 
 The solution is to use much smaller recording set and use it to create/synthesize words, that don't exist in the set. \newline
 
-I experimented with two algorithms for word synthesizing. First is a bit better for testing purposes of phoneme alignment, while the second produces better results. Both algorithms used as an input audio recording tagged with phonemes. \newline
+I experimented with two algorithms for word synthesizing. First is a bit better for testing purposes of phoneme alignment, while the second produces better results. Both algorithms use audio recording tagged with phonemes as an input. \newline
 
 
 Both algorithms have a common part of choosing word candidates and merging them altogether. The only difference is a part of creating candidate when the word doesn't exist in the input text. \newline
@@ -1628,7 +1628,7 @@ Synthesizing algorithm:
     \item Merge calculated sequence into one audio stream.
 \end{enumerate}
 
-The scoring function a of merging two candidates: $c_{i,w_k} \in C_{w_k}$ for $k$-th word and $c_{j,w_{k+1}} \in C_{w_{k+1}}$ for $k+1$-th word, is a sum of euclidean distances between a small\footnote{i.e. a constant factor of size of candidates} number of sequential frames from the ending of $c_{i,w_k}$ and the beginning of $c_{j,w_{k+1}}$. \newline
+The scoring function of merging two candidates: $c_{i,w_k} \in C_{w_k}$ for $k$-th word and $c_{j,w_{k+1}} \in C_{w_{k+1}}$ for $k+1$-th word, is a sum of euclidean distances between a small\footnote{i.e. a constant factor of size of candidates} number of sequential frames from the ending of $c_{i,w_k}$ and the beginning of $c_{j,w_{k+1}}$. \newline
 The beginning is a prefix of any $c_{i,w_k}$, which has a length not greater than a fixed fraction of $|c_{i,w_k}|$. \newline
 Similarly the ending is a suffix of any $c_{i,w_k}$, which has a length not greater than the same fixed fraction of $|c_{i,w_k}|$. 
 
@@ -1663,7 +1663,7 @@ This algorithm is a bit better for checking correctness of phoneme alignment, be
 For the same reason it will have a poorer quality, because even if the aligner is perfect, the boundary frames might have some sound artefacts caused by preceding or succeeding phoneme, i.e. it is quite common, that the last vowel of the sentences changes to a breathing sound, when a speaker is exhaling or breathing in after longer sentence, and that is quite hard to separate, without actually training for recognizing breathing sounds, but to train them, you need a text with marked occurrences of such. \newline
 \newline
 
-The resulting audio contained quite some of such artefacts and sometimes a bit additional silence here and there. The phonemes seemed to be more or less in order, but the word was a bit hard to understand, because the flow was kind of odd and very unnatural. Clearly it isn't a good synthesizer.
+The resulting audio contained quite some of such artefacts and sometimes a bit additional silence here and there. The phonemes seemed to be more or less in order, but the word was a bit hard to understand, because the flow was kind of odd and very unnatural. Clearly, it isn't a good synthesizer.
 
 \newpage
 \subsubsection{Middle to middle synthesizer}
@@ -1694,7 +1694,7 @@ An element $S_i$ from the sequence of candidate sets $(S_1,...,S_n)$ resulted fr
 It is possible, that one of such a candidate set would be empty, if there were no such a subsequence, but it is not quite likely, that in larger file it will happen. In this case we could fall back to some variation of this method and the first one, but a preferred subsequences of length of at least 3 are quite common.\newline
 
 The next part of algorithm has to choose which of them should be merged and at which frame they are to be combined. \newline
-The algorithm once again uses a dynamic programming technique in quite similar manner to the common part, the main difference is in the scoring function.
+The algorithm once again uses a dynamic programming technique in quite similar manner to the common part, and although the main difference is in the scoring function, the details about processed variables are not simple to present, without explaining whole algorithm.
 
 \newpage
 
@@ -1714,7 +1714,7 @@ then a score of combining those two sequences is:
 \end{equation}
 where $\delta$ is a constant chosen based on empirical experiments. \newline
 
-A picture shows intervals from two sequences, for which a distance is calculated, and if a closest frames were chosen as the arrow indicates, how a resulting stream would look like:
+The figure 23 shows intervals from two sequences, for which a distance is calculated, and if a closest frames were chosen as the arrow indicates, how a resulting stream would look like.
 
 \begin{minipage}[0,0]{15cm}
     \includegraphics[scale=0.5]{audio_merging.jpg}
